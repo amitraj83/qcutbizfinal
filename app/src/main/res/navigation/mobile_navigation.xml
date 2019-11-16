@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_profile">
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.qcut.biz.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/nav_waiting_list"
+        android:name="com.qcut.biz.ui.waiting_list.WaitingListFragment"
+        android:label="Waiting List"
+        tools:layout="@layout/fragment_waiting_list" />
+
+    <fragment
+        android:id="@+id/nav_go_online"
+        android:name="com.qcut.biz.ui.go_online.GoOnlineFragment"
+        android:label="Go Online"
+        tools:layout="@layout/fragment_go_online" />
+</navigation>

@@ -20,6 +20,21 @@
             android:fontFamily="@font/montserrat_medium"
             android:title="Go Online" />
         <item
+            android:id="@+id/shop_address"
+            android:icon="@drawable/ic_wifi_black_24dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:title="Shop Address" />
+        <item
+            android:id="@+id/opening_hours"
+            android:icon="@drawable/ic_wifi_black_24dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:title="Opening Hours" />
+        <item
+            android:id="@+id/add_services"
+            android:icon="@drawable/ic_wifi_black_24dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:title="Add Services" />
+        <item
             android:id="@+id/nav_log_out"
             android:icon="@drawable/ic_input_black_24dp"
             android:fontFamily="@font/montserrat_medium"

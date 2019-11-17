@@ -71,8 +71,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navController.navigate(R.id.nav_waiting_list);
 
         } else if (id == R.id.nav_online) {
-            navController.navigate(R.id.nav_go_online);
-
+            navController.navigate(R.id.nav_waiting_list);
+        } else if (id == R.id.shop_address) {
+            navController.navigate(R.id.nav_go_shop_details);
+        } else if (id == R.id.opening_hours) {
+            navController.navigate(R.id.nav_go_shop_opening_hours);
+        } else if (id == R.id.add_services) {
+            navController.navigate(R.id.nav_go_shop_add_services);
         } else if (id == R.id.nav_log_out) {
             Intent intentLogOut = new Intent(MainActivity.this, StartActivity.class);
             startActivity(intentLogOut);

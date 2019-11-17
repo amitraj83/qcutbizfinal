@@ -49,6 +49,7 @@
     <string name="email">Email</string>
     <string name="shop_address_line_1">Shop Address Line 1</string>
     <string name="shop_address_line_2">Shop Address Line 2</string>
+    <string name="gmap_link">Google Map Link</string>
     <string name="area">Area</string>
     <string name="city">City</string>
     <string name="country">Country</string>
@@ -61,6 +62,7 @@
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
     <string name="save_profile">Save Profile</string>
+    <string name="save_general">Save</string>
     <string name="clonsilla_barbers">Clonsilla Barbers</string>
     <string name="unit_204_clonsilla_rd">Unit 204, Clonsilla Rd</string>
     <string name="dublin_15">Dublin 15</string>

@@ -1,369 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white">
+        android:layout_height="0dp"
+        android:layout_weight="9">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:weightSum="20"
+        android:layout_margin="20dp">
 
         <TextView
             android:id="@+id/edit_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/edit_profile"
-            android:fontFamily="@font/montserrat_medium"
-            android:textSize="20sp"
-            android:textColor="@android:color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/email_online"
-            android:layout_width="362dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/backgroundItems"
-            android:fontFamily="@font/montserrat_regular"
-            android:hint="@string/email"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_profile" />
-
-        <EditText
-            android:id="@+id/password_online"
-            android:layout_width="362dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/backgroundItems"
-            android:fontFamily="@font/montserrat_regular"
-            android:hint="@string/password"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/email_online" />
-
-        <EditText
-            android:id="@+id/shop_address_1"
-            android:layout_width="362dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/backgroundItems"
-            android:fontFamily="@font/montserrat_regular"
-            android:hint="@string/shop_address_line_1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/password_online" />
-
-        <EditText
-            android:id="@+id/shop_address_2"
-            android:layout_width="362dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="@color/backgroundItems"
-            android:fontFamily="@font/montserrat_regular"
-            android:hint="@string/shop_address_line_2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/shop_address_1" />
-
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/shop_address_2">
+            android:layout_height="0dp"
+            android:text="@string/edit_profile"
+            android:textSize="@dimen/panelHeading2TextSize"
+            android:textColor="@android:color/black"
+            android:layout_weight="2"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="9dp"
-                    android:layout_marginLeft="9dp"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:text="@string/area"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/city"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginStart="9dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="2">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/country"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginStart="9dp" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/expensive"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/normalTextSize"
+            android:layout_weight="1"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/expensive"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginStart="9dp" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"></View>
+        <Spinner
+            android:id="@+id/expensive_spinner_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/monday"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginStart="9dp" />
+    </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/tuesday"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginStart="9dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/wednesday"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="9dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/thursday"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="9dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/friday"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="9dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/saturday"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="9dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:layout_marginLeft="9dp"
-                    android:text="@string/sunday"
-                    android:fontFamily="@font/montserrat_regular"
-                    android:textColor="@android:color/black"
-                    android:textSize="17sp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="9dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <Spinner
-                    android:id="@+id/area_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="10dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/city_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/country_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/expensive_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/monday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/tuesday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/wednesday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/thurday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/friday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/saturday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:id="@+id/sunday_spinner_left"
-                    android:layout_width="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_height="20dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="115dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <View
-                    android:layout_marginTop="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <View
-                    android:layout_marginTop="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <View
-                    android:layout_marginTop="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <View
-                    android:layout_marginTop="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/monday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/tuesday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/wednesday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/thurday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/friday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/saturday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-                <Spinner
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/sunday_spinner_right"
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        <ListView
+            android:id="@+id/listViewOnline"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="8dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_service"
@@ -376,42 +76,28 @@
             android:text="@string/add_service"
             android:textColor="@color/backgroundItems"
             android:textSize="15sp"
+            android:layout_gravity="center"
             app:backgroundTint="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listViewOnline"
             app:rippleColor="#33AAAAAA"
             app:strokeColor="@color/backgroundItems"
             app:strokeWidth="2dp" />
 
 
-        <Button
-            android:id="@+id/bottom_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/bottomBtnColor"
-            android:fontFamily="@font/montserrat_medium"
-            android:paddingBottom="0dp"
-            android:text="@string/save_profile"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="17sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/add_service" />
+    </LinearLayout>
+    </ScrollView>
+    <Button
+        android:id="@+id/bottom_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/bottomBtnColor"
+        android:fontFamily="@font/montserrat_medium"
+        android:paddingBottom="0dp"
+        android:text="@string/save_profile"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:layout_weight="1"/>
 
-        <ListView
-            android:id="@+id/listViewOnline"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+</LinearLayout>
 

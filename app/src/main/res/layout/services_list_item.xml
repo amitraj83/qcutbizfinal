@@ -15,7 +15,7 @@
         android:paddingTop="18dp"
         android:paddingBottom="18dp"
         android:text="@string/hair_cut"
-        android:fontFamily="@font/montserrat_medium"
+        android:fontFamily="@font/montserrat_light"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 
@@ -32,7 +32,7 @@
         android:paddingTop="18dp"
         android:paddingBottom="18dp"
         android:text="@string/_14_00"
-        android:fontFamily="@font/montserrat_medium"
+        android:fontFamily="@font/montserrat_light"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:orientation="vertical">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="0dp"
+    android:weightSum="9"
+    android:layout_weight="9"
+    android:orientation="vertical"
+    android:layout_margin="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:text="Shop Details"
+        android:gravity="center"
+        android:textSize="@dimen/panelHeading2TextSize"
+        android:textColor="@android:color/black"
+        android:layout_weight="0.5">
+    </TextView>
+
+
+    <EditText
+        android:id="@+id/email_online"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/email"
+        android:layout_weight="1"
+        android:editable="false"/>
+
+    <EditText
+        android:id="@+id/password_online"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/password"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/shop_address_1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_address_line_1"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/shop_address_2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_address_line_2"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/gmap_link"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/gmap_link"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="1">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/city"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/normalTextSize"
+            android:layout_weight="1"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"></View>
+        <Spinner
+            android:id="@+id/city_spinner_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="1">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/area"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/normalTextSize"
+            android:layout_weight="1"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"></View>
+        <Spinner
+            android:id="@+id/area_spinner_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/country"
+            android:layout_marginTop="5dp"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/normalTextSize"
+            android:layout_weight="1"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"></View>
+        <Spinner
+            android:id="@+id/country_spinner_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
+
+    </LinearLayout>
+</LinearLayout>
+    <Button
+        android:id="@+id/bottom_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/bottomBtnColor"
+        android:fontFamily="@font/montserrat_medium"
+        android:text="@string/save_general"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:layout_weight="1"/>
+
+</LinearLayout>

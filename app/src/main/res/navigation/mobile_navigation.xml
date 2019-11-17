@@ -22,4 +22,23 @@
         android:name="com.qcut.biz.ui.go_online.GoOnlineFragment"
         android:label="Go Online"
         tools:layout="@layout/fragment_go_online" />
+    <fragment
+        android:id="@+id/nav_go_shop_details"
+        android:name="com.qcut.biz.ui.adapters.ShopDetailsFragment"
+        android:label="Shop Details"
+        tools:layout="@layout/fragment_shop_details" />
+
+    <fragment
+        android:id="@+id/nav_go_shop_opening_hours"
+        android:name="com.qcut.biz.ui.adapters.ShopOpeningHoursFragment"
+        android:label="Shop opening hours"
+        tools:layout="@layout/fragment_shop_details" />
+
+    <fragment
+        android:id="@+id/nav_go_shop_add_services"
+        android:name="com.qcut.biz.ui.adapters.ShopAddServicesFragment"
+        android:label="Shop Add Services"
+        tools:layout="@layout/fragment_shop_details" />
+
+
 </navigation>

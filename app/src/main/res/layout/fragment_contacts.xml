@@ -18,7 +18,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:text="@string/phone_353_87654321"
-            android:fontFamily="@font/montserrat_regular"
+            android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
 
@@ -29,7 +29,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:text="@string/email_mybarber_gmail_com"
-            android:fontFamily="@font/montserrat_regular"
+            android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
 
@@ -40,7 +40,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
             android:text="@string/google_map_https_gmap_com_xsrdfnekd"
-            android:fontFamily="@font/montserrat_regular"
+            android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
 

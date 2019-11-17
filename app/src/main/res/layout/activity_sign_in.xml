@@ -1,110 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".SignInActivity">
+    android:orientation="vertical"
+    tools:context=".activity.SignInActivity"
+    android:weightSum="10">
 
-    <EditText
-        android:id="@+id/email"
-        android:layout_width="362dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="52dp"
-        android:backgroundTint="@color/backgroundItems"
-        android:drawableRight="@drawable/ic_email_black_24dp"
-        android:hint="@string/email_address"
-        android:fontFamily="@font/montserrat_regular"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_text" />
-
-    <EditText
-        android:id="@+id/sign_up_password"
-        android:layout_width="362dp"
-        android:layout_height="46dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@color/backgroundItems"
-        android:drawableRight="@drawable/ic_lock_black_24dp"
-        android:hint="@string/password"
-        android:fontFamily="@font/montserrat_regular"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:layout_margin="30dp">
 
     <TextView
         android:id="@+id/welcome_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
         android:text="@string/welcome"
-        android:fontFamily="@font/montserrat_medium"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="@dimen/panelHeadingTextSize"
+        android:layout_weight="2"
+        android:gravity="center"/>
+
 
     <TextView
         android:id="@+id/sign_up_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
         android:text="@string/sign_in_to_your_account"
-        android:fontFamily="@font/montserrat_medium"
+        android:fontFamily="@font/montserrat_light"
         android:textColor="#0E0D0D"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcome_text" />
+        android:textSize="@dimen/panelHeading2TextSize"
+        android:layout_weight="1"
+        android:gravity="center"/>
+
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/inputViewHeight"
+        android:backgroundTint="@color/backgroundItems"
+        android:drawableRight="@drawable/ic_email_black_24dp"
+        android:hint="@string/email_address"
+        android:layout_weight="1"
+        android:fontFamily="@font/montserrat_light"/>
+
+    <EditText
+        android:id="@+id/sign_up_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/inputViewHeight"
+        android:backgroundTint="@color/backgroundItems"
+        android:drawableRight="@drawable/ic_lock_black_24dp"
+        android:hint="@string/password"
+        android:layout_weight="1"
+        android:fontFamily="@font/montserrat_light"/>
 
     <TextView
         android:id="@+id/forgot_btn"
-        android:layout_width="215dp"
-        android:layout_height="33dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/inputViewHeight"
         android:clickable="true"
+        android:layout_marginTop="20dp"
         android:focusable="true"
         android:text="@string/forgot_password"
-        android:fontFamily="@font/montserrat_regular"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.142"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_password" />
+        android:textSize="@dimen/normalTextSize"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/sign_in_screen"
-        android:layout_width="362dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:background="@drawable/round_button_blue"
-        android:text="@string/sign_in"
-        android:fontFamily="@font/montserrat_medium"
-        android:textAllCaps="false"
+        android:text="@string/sign_in_apper"
         android:textColor="@android:color/white"
-        android:textSize="17sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/forgot_btn" />
+        android:textSize="@dimen/buttonCAPTextSize"
+        android:layout_weight="1.5"
+        android:gravity="center"/>
+
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/bottom_button"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:background="@color/bottomBtnColor"
         android:paddingBottom="0dp"
         android:text="@string/don_t_have_an_account_click_to_sign_up"
         android:textAllCaps="false"
-        android:fontFamily="@font/montserrat_regular"
         android:textColor="@android:color/white"
-        android:textSize="17sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:textSize="@dimen/normalTextSize"
+        android:layout_weight="1"/>
+</LinearLayout>

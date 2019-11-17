@@ -1,121 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".SignInActivity">
+    tools:context=".activity.SignInActivity"
+    android:orientation="vertical"
+    android:weightSum="10"
+    android:layout_margin="30dp">
 
-    <EditText
-        android:id="@+id/shop_name"
-        android:layout_width="362dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="52dp"
-        android:backgroundTint="@color/backgroundItems"
-        android:hint="@string/shop_name"
-        android:fontFamily="@font/montserrat_regular"
-        android:drawableRight="@drawable/ic_shopping_cart_black_24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_text" />
-
-    <EditText
-        android:id="@+id/user_name"
-        android:layout_width="362dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@color/backgroundItems"
-        android:drawableRight="@drawable/ic_account_box_black_24dp"
-        android:hint="@string/your_name"
-        android:fontFamily="@font/montserrat_regular"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/shop_name" />
-
-    <EditText
-        android:id="@+id/sign_up_email"
-        android:layout_width="362dp"
-        android:layout_height="46dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@color/backgroundItems"
-        android:drawableRight="@drawable/ic_email_black_24dp"
-        android:hint="@string/email_address"
-        android:fontFamily="@font/montserrat_regular"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_name" />
-
-    <EditText
-        android:id="@+id/sign_up_password"
-        android:layout_width="362dp"
-        android:layout_height="46dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@color/backgroundItems"
-        android:drawableRight="@drawable/ic_lock_black_24dp"
-        android:hint="@string/password"
-        android:fontFamily="@font/montserrat_regular"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_email" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="6"
+        android:layout_weight="9">
 
     <TextView
         android:id="@+id/welcome_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:text="@string/welcome"
-        android:fontFamily="@font/montserrat_regular"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="@dimen/panelHeadingTextSize"
+        android:layout_weight="1"
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/sign_up_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
         android:text="@string/sign_up_to_your_account"
-        android:fontFamily="@font/montserrat_medium"
         android:textColor="#0E0D0D"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcome_text" />
+        android:textSize="@dimen/panelHeading2TextSize"
+        android:layout_weight="0.5"
+        android:gravity="center"/>
+
+    <EditText
+        android:id="@+id/shop_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_name"
+        android:drawableRight="@drawable/ic_shopping_cart_black_24dp"
+        android:layout_weight="1"
+        android:fontFamily="@font/montserrat_light"/>
+
+    <EditText
+        android:id="@+id/user_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:drawableRight="@drawable/ic_account_box_black_24dp"
+        android:hint="@string/your_name"
+        android:layout_weight="1"
+        android:fontFamily="@font/montserrat_light"/>
+
+    <EditText
+        android:id="@+id/sign_up_email"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:drawableRight="@drawable/ic_email_black_24dp"
+        android:hint="@string/email_address"
+        android:fontFamily="@font/montserrat_light"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/sign_up_password"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:drawableRight="@drawable/ic_lock_black_24dp"
+        android:hint="@string/password"
+        android:fontFamily="@font/montserrat_light"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/sign_up_screen"
-        android:layout_width="362dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="84dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/round_button_blue"
-        android:text="@string/sign_up"
-        android:fontFamily="@font/montserrat_medium"
-        android:textAllCaps="false"
+        android:text="@string/sign_up_upper"
         android:textColor="@android:color/white"
-        android:textSize="17sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_password" />
-
+        android:textSize="@dimen/buttonCAPTextSize"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
     <TextView
         android:id="@+id/terms_txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:fontFamily="@font/montserrat_regular"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
         android:text="@string/by_signing_up_you_agree_to_our_terms_and_conditions"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:gravity="center"/>
+    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

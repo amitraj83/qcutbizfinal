@@ -5,19 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".StartActivity">
+    tools:context=".activity.StartActivity">
 
 
     <Button
         android:id="@+id/sign_up"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="24dp"
+        android:layout_margin="24dp"
         android:background="@drawable/round_button_blue"
         android:text="@string/sign_up_upper"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="#FAFFFFFF"
-        android:textSize="18sp"
+        android:textSize="@dimen/buttonCAPTextSize"
         android:radius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.508"
@@ -32,18 +32,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:tint="#9C090808"/>
 
     <Button
         android:id="@+id/sign_up_text"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="44dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/round_button_blue"
         android:text="@string/sign_in_apper"
         android:fontFamily="@font/montserrat_medium"
         android:textColor="#FAFFFFFF"
-        android:textSize="18sp"
+        android:textSize="@dimen/buttonCAPTextSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"

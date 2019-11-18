@@ -15,7 +15,7 @@
         android:layout_weight="9"
         android:orientation="vertical"
         android:weightSum="10"
-        android:layout_margin="30dp">
+        android:layout_margin="20dp">
 
     <TextView
         android:id="@+id/welcome_text"
@@ -23,7 +23,7 @@
         android:layout_height="20dp"
         android:text="@string/welcome"
         android:textSize="@dimen/panelHeadingTextSize"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:gravity="center"/>
 
 
@@ -40,7 +40,7 @@
 
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/sign_in_email"
         android:layout_width="match_parent"
         android:layout_height="@dimen/inputViewHeight"
         android:backgroundTint="@color/backgroundItems"
@@ -50,24 +50,26 @@
         android:fontFamily="@font/montserrat_light"/>
 
     <EditText
-        android:id="@+id/sign_up_password"
+        android:id="@+id/sign_in_password"
         android:layout_width="match_parent"
         android:layout_height="@dimen/inputViewHeight"
         android:backgroundTint="@color/backgroundItems"
         android:drawableRight="@drawable/ic_lock_black_24dp"
         android:hint="@string/password"
         android:layout_weight="1"
-        android:fontFamily="@font/montserrat_light"/>
+        android:fontFamily="@font/montserrat_light"
+        android:inputType="textPassword"/>
 
     <TextView
         android:id="@+id/forgot_btn"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/inputViewHeight"
+        android:layout_height="0dp"
         android:clickable="true"
         android:layout_marginTop="20dp"
         android:focusable="true"
         android:text="@string/forgot_password"
         android:textSize="@dimen/normalTextSize"
+        android:gravity="right"
         android:layout_weight="1"/>
 
     <Button
@@ -75,10 +77,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/round_button_blue"
-        android:text="@string/sign_in_apper"
+        android:text="@string/sign_in"
         android:textColor="@android:color/white"
         android:textSize="@dimen/buttonCAPTextSize"
-        android:layout_weight="1.5"
+        android:layout_weight="1.25"
         android:gravity="center"/>
 
 

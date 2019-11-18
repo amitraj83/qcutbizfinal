@@ -12,6 +12,13 @@
     <dimen name="panelHeadingTextSize">22dp</dimen>
     <dimen name="panelHeading2TextSize">20dp</dimen>
 
+    <dimen name="dialogHeadingTextSize">26dp</dimen>
+    <dimen name="dialogNormalTextSize">20dp</dimen>
+    <dimen name="dialogNameTextSize">24dp</dimen>
+
     <dimen name="inputViewHeight">30dp</dimen>
+
+
+
 
 </resources>

@@ -4,102 +4,95 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="250dp"
-    app:cardCornerRadius="5dp"
     android:background="@android:color/white"
+    app:cardCornerRadius="5dp"
     app:cardElevation="2dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="4">
 
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/backgroundItems"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             android:id="@+id/dialog_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center_horizontal"
+            android:layout_height="0dp"
+            android:gravity="center"
             android:text="@string/add_customer"
             android:fontFamily="@font/montserrat_medium"
             android:textColor="#FFF"
-            android:textSize="28sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="@dimen/dialogHeadingTextSize"
+            android:background="@color/backgroundItems"
+            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/ready_to_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
             android:text="@string/add_customer_to_the_waiting_queue"
-            android:fontFamily="@font/montserrat_regular"
+            android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
-            android:textSize="19sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view" />
+            android:textSize="@dimen/dialogNormalTextSize"
+            android:layout_weight="1"/>
 
         <EditText
             android:id="@+id/customer_name"
-            android:layout_width="347dp"
-            android:layout_height="46dp"
-            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:backgroundTint="@color/backgroundItems"
             android:hint="@string/customer_name"
-            android:fontFamily="@font/montserrat_regular"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ready_to_start" />
+            android:fontFamily="@font/montserrat_light"
+            android:layout_weight="1"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            ></EditText>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/cancel_add_customer"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="147dp"
-            android:layout_height="51dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginLeft="32dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="24dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:text="@string/cancel"
-            android:textColor="@color/backgroundItems"
-            android:textSize="15sp"
-            app:backgroundTint="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/customer_name"
-            app:layout_constraintVertical_bias="0.6"
-            app:rippleColor="#33AAAAAA"
-            app:strokeColor="@color/backgroundItems"
-            app:strokeWidth="2dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:weightSum="3"
+            android:layout_margin="20dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/accept_add_customer"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="147dp"
-            android:layout_height="51dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="32dp"
-            android:layout_marginBottom="24dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:text="@string/add"
-            android:textColor="@android:color/white"
-            android:textSize="15sp"
-            app:backgroundTint="@color/backgroundItems"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/customer_name"
-            app:layout_constraintVertical_bias="0.133" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_action_service"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_light"
+                android:text="@string/cancel"
+                android:textColor="@color/backgroundItems"
+                android:textSize="@dimen/buttonCAPTextSize"
+                app:backgroundTint="@android:color/white"
+                app:rippleColor="#33AAAAAA"
+                app:strokeColor="@color/backgroundItems"
+                app:strokeWidth="2dp"
+                android:layout_weight="1.35"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"></View>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start_action_service"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/montserrat_light"
+                android:text="@string/add"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/buttonCAPTextSize"
+                app:backgroundTint="@color/backgroundItems"
+                android:layout_weight="1.35"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 </androidx.cardview.widget.CardView>

@@ -34,38 +34,7 @@ public class GoOnlineFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_go_online, container, false);
 
         LayoutInflater factory = LayoutInflater.from(getContext());
-        final View addServiceView = factory.inflate(R.layout.add_service_dialog, null);
-        final AlertDialog addServiceDialog = new AlertDialog.Builder(getContext()).create();
-        addServiceDialog.setView(addServiceView);
 
-        addService = root.findViewById(R.id.add_service);
-        addService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addServiceDialog.show();
-                addServiceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                addServiceDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-            }
-        });
-
-        String[] priceServiceItems = new String[] {
-                "Arial", "Arial", "Arial",
-        };
-        Spinner priceServiceSpinner = (Spinner) addServiceView.findViewById(R.id.price_service_spinner);
-        ArrayAdapter<String> priceServiceAdapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_spinner_item, priceServiceItems);
-        priceServiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        priceServiceSpinner.setAdapter(priceServiceAdapter);
-
-        mHairCuts = new String[] {
-                "Hair Cut",
-                "Dry Haircut",
-        };
-
-        mPricesHairCuts = new String[] {
-                "$ 14.00",
-                "$ 14.00",
-        };
 
         //Initialize ListView
         mListView = root.findViewById(R.id.listViewOnline);

@@ -1,6 +1,8 @@
 package com.qcut.biz.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -8,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.multidex.MultiDex;
 
 import com.qcut.biz.R;
 
@@ -21,6 +24,11 @@ public class StartActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        SharedPreferences sp = getSharedPreferences("login",MODE_PRIVATE);
+        if(sp.getBoolean("isLoggedIn",false) && (sp.getString("userid",null) != null)){
+            Intent intent = new Intent(StartActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
         setContentView(R.layout.activity_start);
         getSupportActionBar().hide();
 
@@ -43,4 +51,5 @@ public class StartActivity extends AppCompatActivity {
         });
 
     }
+
 }

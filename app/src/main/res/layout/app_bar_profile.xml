@@ -32,12 +32,13 @@
                 android:fontFamily="@font/montserrat_medium"
                 android:textColor="@android:color/white"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:id="@+id/status_change"/>
 
             <ImageView
                 android:id="@+id/blinking_dot"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
                 android:layout_gravity="end"
                 android:layout_marginEnd="5dp"
                 android:layout_marginRight="5dp"

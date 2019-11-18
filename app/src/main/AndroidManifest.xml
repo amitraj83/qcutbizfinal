@@ -11,18 +11,22 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_profile"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".activity.SignUpActivity">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SignUpActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.qcut.biz.activity.StartActivity" />
         </activity>
-        <activity android:name=".activity.SignInActivity">
+        <activity android:name=".activity.SignInActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.qcut.biz.activity.StartActivity" />
         </activity>
-        <activity android:name=".activity.StartActivity">
+        <activity android:name=".activity.StartActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

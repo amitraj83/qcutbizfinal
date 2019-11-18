@@ -1,32 +1,51 @@
 package com.qcut.biz.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.multidex.MultiDex;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.util.TimeUtil;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
     private ImageView blinkingDot;
+    private SharedPreferences sp;
+    private String userid;
+    private FirebaseDatabase database = null;
+    private TextView statusChangeTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +53,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        FirebaseApp.initializeApp(this);
+        database = FirebaseDatabase.getInstance();
+        sp = getSharedPreferences("login",MODE_PRIVATE);
+        userid = sp.getString("userid", null);
+
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
@@ -46,21 +70,103 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         blinkingDot = findViewById(R.id.blinking_dot);
 
-        Animation animation = new AlphaAnimation(1, 0);
+        final Animation animation = new AlphaAnimation(1, 0);
         animation.setDuration(1000);
         animation.setInterpolator(new LinearInterpolator());
         animation.setRepeatCount(Animation.INFINITE);
         animation.setRepeatMode(Animation.REVERSE);
+        animation.cancel();
+        animation.reset();
         blinkingDot.startAnimation(animation);
+
+        statusChangeTV = findViewById(R.id.status_change);
+
+        final DatabaseReference online = database.getReference().child("barbershops").child(userid).child("queues")
+                .child(TimeUtil.getTodayDDMMYYYY()).child("online");
+        online.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    if (dataSnapshot.getValue() != null &&
+                            dataSnapshot.getValue().toString().equalsIgnoreCase("true")) {
+                        statusChangeTV.setText(MainActivity.this.getString(R.string.status_online));
+                        animation.start();
+                    } else {
+                        statusChangeTV.setText(MainActivity.this.getString(R.string.status_offline));
+                        animation.cancel();
+                        animation.reset();
+                    }
+                } else {
+                    statusChangeTV.setText(MainActivity.this.getString(R.string.status_offline));
+                    animation.cancel();
+                    animation.reset();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        statusChangeTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(userid == null) {
+                    Toast.makeText(MainActivity.this, "Problem. Please logout and Login again. ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                final TextView statusTV = (TextView) v;
+                final String currentStatus = String.valueOf(statusTV.getText());
+
+                final DatabaseReference online = database.getReference().child("barbershops").child(userid).child("queues")
+                        .child(TimeUtil.getTodayDDMMYYYY()).child("online");
+                online.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String OFFLINE = MainActivity.this.getString(R.string.status_offline);
+                        String ONLINE = MainActivity.this.getString(R.string.status_online);
+
+                        if (dataSnapshot.exists()) {
+                                if(currentStatus.equalsIgnoreCase(OFFLINE)) {
+                                    //go online
+                                    online.setValue(true);
+                                    blinkingDot.startAnimation(animation);
+                                    statusTV.setText(ONLINE);
+
+                                } else {
+                                    //go offline
+                                    online.setValue(false);
+                                    statusTV.setText(OFFLINE);
+                                    animation.cancel();
+                                    animation.reset();
+                                }
+                        } else {
+                            online.setValue(false);
+                            statusTV.setText(OFFLINE);
+                            animation.cancel();
+                            animation.reset();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+            }
+        });
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
     }
 
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(final MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -71,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navController.navigate(R.id.nav_waiting_list);
 
         } else if (id == R.id.nav_online) {
+
             navController.navigate(R.id.nav_waiting_list);
         } else if (id == R.id.shop_address) {
             navController.navigate(R.id.nav_go_shop_details);
@@ -79,8 +186,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.add_services) {
             navController.navigate(R.id.nav_go_shop_add_services);
         } else if (id == R.id.nav_log_out) {
-            Intent intentLogOut = new Intent(MainActivity.this, StartActivity.class);
-            startActivity(intentLogOut);
+
+            sp.edit().putBoolean("isLoggedIn",false).apply();
+            sp.edit().putString("userid", null).apply();
+            if(sp.getBoolean("isLoggedIn",false) && (sp.getString("userid",null) != null)) {
+                Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                startActivity(intent);
+            }
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -94,4 +207,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
 }

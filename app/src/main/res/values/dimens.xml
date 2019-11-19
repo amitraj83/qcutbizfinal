@@ -19,6 +19,7 @@
     <dimen name="inputViewHeight">30dp</dimen>
 
 
+    <dimen name="buttonHeight">50dp</dimen>
 
 
 </resources>

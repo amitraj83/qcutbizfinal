@@ -35,12 +35,12 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/next_customer"
                 style="@style/Base.TextAppearance.AppCompat.Headline"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Jason Parker"
+                android:text="No Next Customer"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="36sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -54,7 +54,7 @@
                 android:layout_marginTop="20dp"
                 android:weightSum="2"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2">
+                app:layout_constraintTop_toBottomOf="@+id/next_customer">
 
                 <Button
                     android:id="@+id/start_service"
@@ -90,7 +90,7 @@
     </androidx.cardview.widget.CardView>
 
     <ListView
-        android:id="@+id/waitingListView"
+        android:id="@+id/today_queue"
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_margin="10dp"

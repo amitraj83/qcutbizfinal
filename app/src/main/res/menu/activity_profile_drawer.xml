@@ -14,11 +14,7 @@
             android:icon="@drawable/ic_view_list_black_24dp"
             android:fontFamily="@font/montserrat_medium"
             android:title="Waiting List" />
-        <item
-            android:id="@+id/nav_online"
-            android:icon="@drawable/ic_wifi_black_24dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:title="Go Online" />
+
         <item
             android:id="@+id/shop_address"
             android:icon="@drawable/ic_edit_location_black_24dp"

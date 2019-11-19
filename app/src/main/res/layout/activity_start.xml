@@ -1,96 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".activity.StartActivity">
+    tools:context=".activity.StartActivity"
+    android:orientation="vertical"
+    android:weightSum="10">
 
 
-    <Button
-        android:id="@+id/sign_up"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="24dp"
-        android:background="@drawable/round_button_blue"
-        android:text="@string/sign_up_upper"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="#FAFFFFFF"
-        android:textSize="@dimen/buttonCAPTextSize"
-        android:radius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_up_text" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="480dp"
+        android:layout_height="0dp"
+        android:layout_weight="7"
         android:background="@drawable/start_image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:tint="#9C090808"/>
+        android:orientation="vertical"
+        android:alpha="1"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:text="QCut"
+            android:textSize="60dp"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:textColor="#FAFFFFFF"/>
 
-    <Button
-        android:id="@+id/sign_up_text"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="@string/spend_time_wisely"
+            android:textColor="#FAFFFFFF"
+            android:textSize="20dp"
+            android:fontFamily="@font/montserrat_bold"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/round_button_blue"
-        android:text="@string/sign_in_apper"
-        android:fontFamily="@font/montserrat_medium"
-        android:textColor="#FAFFFFFF"
-        android:textSize="@dimen/buttonCAPTextSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
-        android:text="@string/app_name"
-        android:fontFamily="@font/montserrat_extrabold"
-        android:textColor="@android:color/white"
-        android:textSize="70sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="180dp"
-        android:text="@string/spend_time_wisely"
-        android:fontFamily="@font/montserrat_regular"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/not_waiting_in_queues"
-        android:fontFamily="@font/montserrat_regular"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:layout_margin="40dp"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/sign_up"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/buttonHeight"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/round_button_blue"
+            android:text="@string/sign_up"
+            android:gravity="center"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_light"
+            android:textColor="#FAFFFFFF"
+            android:textSize="@dimen/panelHeading2TextSize"
+            android:radius="10dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="30dp"/>
+        <Button
+            android:id="@+id/sign_up_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/buttonHeight"
+            android:background="@drawable/round_button_blue"
+            android:text="@string/sign_in"
+            android:gravity="center"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_light"
+            android:textColor="#FAFFFFFF"
+            android:textSize="@dimen/panelHeading2TextSize"/>
+    </LinearLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>

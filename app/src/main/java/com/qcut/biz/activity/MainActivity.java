@@ -176,9 +176,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_list) {
             navController.navigate(R.id.nav_waiting_list);
 
-        } else if (id == R.id.nav_online) {
-
-            navController.navigate(R.id.nav_waiting_list);
         } else if (id == R.id.shop_address) {
             navController.navigate(R.id.nav_go_shop_details);
         } else if (id == R.id.opening_hours) {

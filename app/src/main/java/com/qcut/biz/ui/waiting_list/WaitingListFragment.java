@@ -145,6 +145,17 @@ public class WaitingListFragment extends Fragment {
         final AlertDialog serviceDoneDialog = new AlertDialog.Builder(getContext()).create();
         serviceDoneDialog.setView(serviceDoneView);
 
+
+        dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                serviceDoneDialog.show();
+                serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                serviceDoneDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+            }
+        });
+
+
         return root;
     }
 

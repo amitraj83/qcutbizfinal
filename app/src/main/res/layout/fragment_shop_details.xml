@@ -23,8 +23,8 @@
     android:layout_width="match_parent"
     android:background="@android:color/white"
     android:layout_height="0dp"
-    android:weightSum="9"
-    android:layout_weight="8.5"
+    android:weightSum="10"
+    android:layout_weight="8.6"
     android:orientation="vertical"
     android:layout_marginTop="0dp"
     android:layout_marginBottom="0dp"
@@ -34,7 +34,7 @@
 
 
     <EditText
-        android:id="@+id/email_online"
+        android:id="@+id/shop_details_email"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:backgroundTint="@color/backgroundItems"
@@ -43,15 +43,31 @@
         android:editable="false"/>
 
     <EditText
-        android:id="@+id/password_online"
+        android:id="@+id/shop_details_password"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:backgroundTint="@color/backgroundItems"
         android:hint="@string/password"
+        android:layout_weight="1"
+        android:inputType="textPassword"/>
+
+    <EditText
+        android:id="@+id/shop_details_contact_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/your_name"
+        android:layout_weight="1"/>
+    <EditText
+        android:id="@+id/shop_details_shop_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_name"
         android:layout_weight="1"/>
 
     <EditText
-        android:id="@+id/shop_address_1"
+        android:id="@+id/shop_details_address_1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:backgroundTint="@color/backgroundItems"
@@ -59,7 +75,7 @@
         android:layout_weight="1"/>
 
     <EditText
-        android:id="@+id/shop_address_2"
+        android:id="@+id/shop_details_address_2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:backgroundTint="@color/backgroundItems"
@@ -67,7 +83,7 @@
         android:layout_weight="1"/>
 
     <EditText
-        android:id="@+id/gmap_link"
+        android:id="@+id/shop_details_gmap_link"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:backgroundTint="@color/backgroundItems"
@@ -85,46 +101,19 @@
             android:layout_height="match_parent"
             android:text="@string/city"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/panelHeading2TextSize"
+            android:textSize="18dp"
             android:fontFamily="@font/montserrat_light"
             android:layout_weight="1"
             android:gravity="center_vertical"/>
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"></View>
+            android:layout_weight="0.5"></View>
         <Spinner
-            android:id="@+id/city_spinner_left"
+            android:id="@+id/shop_details_city"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        android:weightSum="3"
-        android:layout_weight="1">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="@string/area"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/panelHeading2TextSize"
-            android:fontFamily="@font/montserrat_light"
-            android:layout_weight="1"
-            android:gravity="center_vertical"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"></View>
-        <Spinner
-            android:id="@+id/area_spinner_left"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
-
+            android:layout_weight="1.5"/>
     </LinearLayout>
 
     <LinearLayout
@@ -138,27 +127,26 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/country"
-            android:layout_marginTop="5dp"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/panelHeading2TextSize"
+            android:textSize="18dp"
             android:fontFamily="@font/montserrat_light"
             android:layout_weight="1"
             android:gravity="center_vertical"/>
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"></View>
+            android:layout_weight="0.5"></View>
         <Spinner
-            android:id="@+id/country_spinner_left"
+            android:id="@+id/shop_details_country"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             />
 
     </LinearLayout>
 </LinearLayout>
     <Button
-        android:id="@+id/bottom_button"
+        android:id="@+id/shop_details_save"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -168,6 +156,6 @@
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:textSize="17sp"
-        android:layout_weight="1"/>
+        android:layout_weight="0.9"/>
 
 </LinearLayout>

@@ -1,101 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:background="@android:color/white"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_centerInParent="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:background="@drawable/main_page_background"
+        android:layout_weight="3">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <TextView
+            android:id="@+id/profile_shop_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.9"
+            android:lines="1"
+            android:gravity="center"
+            android:text="Loading..."
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@android:color/white"
+            android:textSize="35sp"/>
 
-            <ImageView
-                android:id="@+id/menu_icon"
-                android:layout_width="match_parent"
-                android:layout_height="203dp"
-                android:background="@drawable/main_page_background"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/profile_address_1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:lines="1"
+            android:text="@string/unit_204_clonsilla_rd"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:layout_weight="0.7"
+            android:gravity="center"
+            />
 
-            <TextView
-                android:id="@+id/clonsilla"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="44dp"
-                android:lines="1"
-                android:text="@string/clonsilla_barbers"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@android:color/white"
-                android:textSize="35sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/profile_address_2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:lines="1"
+            android:text="@string/dublin_15"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:layout_weight="0.7"
+            android:gravity="center"/>
 
-            <TextView
-                android:id="@+id/unit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:lines="1"
-                android:text="@string/unit_204_clonsilla_rd"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@android:color/white"
-                android:textSize="25sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/clonsilla" />
+        <TextView
+            android:id="@+id/profile_city"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:lines="1"
+            android:text="@string/dublin_15"
+            android:fontFamily="@font/montserrat_medium"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:layout_weight="0.7"
+            android:gravity="center"/>
 
-            <TextView
-                android:id="@+id/dublin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:lines="1"
-                android:text="@string/dublin_15"
-                android:fontFamily="@font/montserrat_medium"
-                android:textColor="@android:color/white"
-                android:textSize="25sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/unit" />
+    </LinearLayout>
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tablayout"
-                android:fontFamily="@font/montserrat_light"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menu_icon">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:orientation="vertical">
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tablayout"
+            android:fontFamily="@font/montserrat_light"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_weight="1">
 
-            </com.google.android.material.tabs.TabLayout>
+        </com.google.android.material.tabs.TabLayout>
 
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/viewPager"
-                android:layout_width="match_parent"
-                android:layout_height="482dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tablayout" />
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="6"/>
+    </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    </FrameLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

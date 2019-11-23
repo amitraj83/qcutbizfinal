@@ -9,21 +9,21 @@ public class Shop {
     public String password = "";
     public String phone = "";
     public String address = "";
-    public String sunOpen = "0900";
-    public String monOpen = "0900";
-    public String tueOpen = "0900";
-    public String wedOpen = "0900";
-    public String thuOpen = "0900";
-    public String friOpen = "0900";
-    public String satOpen = "0900";
+    public String sunOpen = "9:00 AM";
+    public String monOpen = "9:00 AM";
+    public String tueOpen = "9:00 AM";
+    public String wedOpen = "9:00 AM";
+    public String thuOpen = "9:00 AM";
+    public String friOpen = "9:00 AM";
+    public String satOpen = "9:00 AM";
 
-    public String sunClose = "2100";
-    public String monClose = "2100";
-    public String tueClose = "2100";
-    public String wedClose = "2100";
-    public String thuClose = "2100";
-    public String friClose = "2100";
-    public String satClose = "2100";
+    public String sunClose = "9:00 PM";
+    public String monClose = "9:00 PM";
+    public String tueClose = "9:00 PM";
+    public String wedClose = "9:00 PM";
+    public String thuClose = "9:00 PM";
+    public String friClose = "9:00 PM";
+    public String satClose = "9:00 PM";
 
     public Shop(String id, String email, String name, String shopname, String password) {
         this.id = id;

@@ -32,6 +32,7 @@ android:id="@+id/queue_view">
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:paddingTop="20dp"
+        android:drawablePadding="5dp"
         android:paddingRight="10dp"
         android:paddingBottom="20dp"
         android:text="@string/in_chair"

@@ -53,11 +53,11 @@ public class ShopQueueModelAdaptor extends ArrayAdapter<ShopQueueModel> {
 
         if (dataModel.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
             Drawable waitingDrawable = parent.getContext().getResources().getDrawable( R.drawable.ic_action_waiting );
-            txtStatus.setCompoundDrawablesWithIntrinsicBounds(waitingDrawable, null, null, null);
+            txtStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, waitingDrawable, null);
             txtStatus.setText(dataModel.getDisplayTimeToWait());
         } else {
             Drawable progressDrawable = parent.getContext().getResources().getDrawable( R.drawable.ic_action_progress );
-            txtStatus.setCompoundDrawablesWithIntrinsicBounds(progressDrawable, null, null, null);
+            txtStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, progressDrawable, null);
             txtStatus.setText("In Chair");
         }
         // Return the completed view to render on screen

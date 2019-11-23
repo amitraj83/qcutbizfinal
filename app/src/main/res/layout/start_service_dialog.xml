@@ -39,11 +39,11 @@
             android:layout_weight="1"/>
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/start_service_cust_name"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="@string/nate_miller"
+            android:text="Loading..."
             android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
             android:textSize="@dimen/dialogNameTextSize"
@@ -58,7 +58,7 @@
             android:layout_margin="20dp">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/cancel_action_service"
+                android:id="@+id/no_start_service"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -78,7 +78,7 @@
                 android:layout_weight="0.3"></View>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/start_action_service"
+                android:id="@+id/yes_start_service"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

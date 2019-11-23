@@ -1,17 +1,14 @@
 package com.qcut.biz.ui.waiting_list;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.text.InputType;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -74,33 +71,8 @@ public class WaitingListFragment extends Fragment {
 
         final LayoutInflater factory = LayoutInflater.from(getContext());
 
-        final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
-        final AlertDialog startServiceDialog = new AlertDialog.Builder(getContext()).create();
-        startServiceDialog.setView(startServiceView);
+        cardViewStartSkipService(root, factory);
 
-        startService = root.findViewById(R.id.start_service);
-        startService.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startServiceDialog.show();
-                startServiceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                startServiceDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-            }
-        });
-
-        final View skipCustomerView = factory.inflate(R.layout.skip_customer_dialog, null);
-        final AlertDialog skipCustomerDialog = new AlertDialog.Builder(getContext()).create();
-        skipCustomerDialog.setView(skipCustomerView);
-
-        skipCostumer = root.findViewById(R.id.skip_customer);
-        skipCostumer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                skipCustomerDialog.show();
-                skipCustomerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                skipCustomerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-            }
-        });
 
 
         addCustomer = root.findViewById(R.id.add_customer_fab);
@@ -141,22 +113,290 @@ public class WaitingListFragment extends Fragment {
         showQueue();
         queueChangeListener();
 
-        final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
-        final AlertDialog serviceDoneDialog = new AlertDialog.Builder(getContext()).create();
-        serviceDoneDialog.setView(serviceDoneView);
+
 
 
         dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                serviceDoneDialog.show();
-                serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                serviceDoneDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+                changeCustomerStatus(factory, position);
             }
         });
 
 
         return root;
+    }
+
+    private void cardViewStartSkipService(View root, final LayoutInflater factory) {
+
+        startService = root.findViewById(R.id.start_service);
+        startService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showStartServiceDialog(factory);
+            }
+        });
+
+
+        skipCostumer = root.findViewById(R.id.skip_customer);
+        skipCostumer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSkipServiceDialog(factory);
+
+            }
+        });
+
+    }
+
+    private void showSkipServiceDialog(LayoutInflater factory) {
+        final String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
+        if(queuedCustomerId != null &&
+                queuedCustomerId.trim().equalsIgnoreCase("none") ||
+                queuedCustomerId.trim().equalsIgnoreCase("")) {
+            Toast toast= Toast.makeText(getContext(),
+                    "No Customer in the queue", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+            toast.show();
+        } else {
+            final View skipCustomerView = factory.inflate(R.layout.skip_customer_dialog, null);
+            TextView skipCustName = (TextView) skipCustomerView.findViewById(R.id.skip_customer_name);
+            skipCustName.setText(nextCustomerTV.getText());
+            final AlertDialog skipCustomerDialog = new AlertDialog.Builder(getContext()).create();
+            skipCustomerDialog.setView(skipCustomerView);
+
+            skipCustomerDialog.show();
+            skipCustomerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            skipCustomerDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+
+            Button yesButton = (Button) skipCustomerDialog.findViewById(R.id.yes_skip_service);
+            Button noButton = (Button) skipCustomerDialog.findViewById(R.id.no_skip_service);
+
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    yesSkipCustomer(queuedCustomerId);
+                    skipCustomerDialog.dismiss();
+                }
+            });
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    skipCustomerDialog.dismiss();
+                }
+            });
+
+        }
+    }
+
+    private void yesSkipCustomer(final String nextCustomerId) {
+        final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
+                .child("queues").child(TimeUtil.getTodayDDMMYYYY());
+        queue.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
+                    Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                    while (snapshotIterator.hasNext()) {
+                        DataSnapshot aCustomer = snapshotIterator.next();
+                        String key = aCustomer.getKey();
+                        if(!key.equalsIgnoreCase("online")) {
+                            if (aCustomer.child("name").getValue() != null) {
+                                String name = aCustomer.child("name").getValue().toString();
+                                long timeToWait = aCustomer.child("timeToWait").getValue() != null ?
+                                        Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
+                                String status = aCustomer.child("status").getValue() != null ?
+                                        aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
+                                if(status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                }
+                                models.add(new ShopQueueModel(key, name, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
+                            }
+                        }
+                    }
+                    Collections.sort(models, new DataComparator());
+                    ShopQueueModel prev = null;
+                    ShopQueueModel next = null;
+                    for (ShopQueueModel model : models) {
+                        if(model.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+                            if(model.getId().equalsIgnoreCase(nextCustomerId)) {
+                                prev = model;
+                                continue;
+                            }
+                            if(prev != null) {
+                                next = model;
+                                break;
+                            }
+
+                        }
+                    }
+                    if(prev != null && next != null) {
+                        Map<String, Object> prevData = new HashMap<>();
+                        prevData.put("timeToWait", next.getTimeToWait());
+                        Map<String, Object> nextData = new HashMap<>();
+                        nextData.put("timeToWait", prev.getTimeToWait());
+
+                        final DatabaseReference prevRef = database.getReference().child("barbershops").child(userid)
+                                .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(prev.getId());
+                        prevRef.updateChildren(prevData);
+
+                        final DatabaseReference nextRef = database.getReference().child("barbershops").child(userid)
+                                .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getId());
+                        nextRef.updateChildren(nextData);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void showStartServiceDialog(LayoutInflater factory) {
+        String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
+        if(queuedCustomerId != null &&
+                queuedCustomerId.trim().equalsIgnoreCase("none") ||
+                queuedCustomerId.trim().equalsIgnoreCase("")) {
+            Toast toast= Toast.makeText(getContext(),
+                    "No Customer in the queue", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+            toast.show();
+        } else {
+            final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
+            TextView startServiceCustName = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
+            startServiceCustName.setText(nextCustomerTV.getText());
+            final AlertDialog startServiceDialog = new AlertDialog.Builder(getContext()).create();
+            startServiceDialog.setView(startServiceView);
+
+            startServiceDialog.show();
+            startServiceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            startServiceDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+
+            Button yesButton = (Button) startServiceDialog.findViewById(R.id.yes_start_service);
+            Button noButton = (Button) startServiceDialog.findViewById(R.id.no_start_service);
+
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
+                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
+                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(queuedCustomerId);
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("status", Status.PROGRESS);
+                    map.put("timeToWait", 0);
+                    map.put("placeInQueue", 0);
+                    queue.updateChildren(map);
+
+                    if(adapter != null) {
+                        showQueue();
+                    }
+                    startServiceDialog.dismiss();
+                }
+            });
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startServiceDialog.dismiss();
+                }
+            });
+
+        }
+    }
+
+    private void changeCustomerStatus(LayoutInflater factory, int position) {
+        final ShopQueueModel queueItem = (ShopQueueModel) dynamicListView.getItemAtPosition(position);
+        if(queueItem.getStatus().equalsIgnoreCase(Status.PROGRESS.name())) {
+            final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
+            TextView custNameTV = (TextView) serviceDoneView.findViewById(R.id.service_done_customer_name);
+            custNameTV.setText(queueItem.getName());
+            final AlertDialog serviceDoneDialog = new AlertDialog.Builder(getContext()).create();
+            serviceDoneDialog.setView(serviceDoneView);
+
+
+            serviceDoneDialog.show();
+            serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            serviceDoneDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+
+            addServiceDoneButtonsClickListener(serviceDoneDialog, queueItem);
+
+        } else if (queueItem.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+            final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
+            TextView custNameTV = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
+            custNameTV.setText(queueItem.getName());
+            final AlertDialog serviceStartDialog = new AlertDialog.Builder(getContext()).create();
+            serviceStartDialog.setView(startServiceView);
+
+            serviceStartDialog.show();
+            serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            serviceStartDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+            addServiceStartButtonsClickListener(serviceStartDialog, queueItem);
+        }
+
+    }
+
+    private void addServiceStartButtonsClickListener(final AlertDialog serviceStartDialog, final ShopQueueModel queueItem) {
+
+        Button yesButton = (Button) serviceStartDialog.findViewById(R.id.yes_start_service);
+        Button noButton = (Button) serviceStartDialog.findViewById(R.id.no_start_service);
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String queuedCustomerId = String.valueOf(queueItem.getId());
+                if (queuedCustomerId != null) {
+                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
+                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(queuedCustomerId);
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("status", Status.PROGRESS);
+                    map.put("timeToWait", 0);
+                    map.put("placeInQueue", 0);
+                    queue.updateChildren(map);
+                }
+                serviceStartDialog.dismiss();
+            }
+        });
+        noButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                serviceStartDialog.dismiss();
+            }
+        });
+    }
+
+    private void addServiceDoneButtonsClickListener(final AlertDialog serviceDoneDialog, final ShopQueueModel queueItem) {
+
+        Button yesButton = (Button) serviceDoneDialog.findViewById(R.id.yes_done_service);
+        Button noButton = (Button) serviceDoneDialog.findViewById(R.id.no_done_service);
+
+        yesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String queuedCustomerId = String.valueOf(queueItem.getId());
+                if (queuedCustomerId != null) {
+                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
+                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(queuedCustomerId);
+
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("status", Status.DONE);
+                    map.put("timeToWait", 0);
+                    map.put("placeInQueue", 0);
+                    queue.updateChildren(map);
+                }
+                serviceDoneDialog.dismiss();
+            }
+        });
+
+        noButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                serviceDoneDialog.dismiss();
+            }
+        });
     }
 
 

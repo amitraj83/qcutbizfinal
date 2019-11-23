@@ -231,7 +231,7 @@
 
     </LinearLayout>
     <Button
-        android:id="@+id/bottom_button"
+        android:id="@+id/save_opening_hours"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="0dp"

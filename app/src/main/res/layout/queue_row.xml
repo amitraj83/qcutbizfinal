@@ -37,7 +37,7 @@ android:id="@+id/queue_view">
         android:paddingBottom="20dp"
         android:text="@string/in_chair"
         android:fontFamily="@font/montserrat_light"
-        android:textSize="18sp" />
+        android:textSize="18sp"/>
 
 </androidx.cardview.widget.CardView>
 

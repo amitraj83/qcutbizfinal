@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="270dp"
     android:background="@android:color/white"
     app:cardCornerRadius="5dp"
     app:cardElevation="2dp">
@@ -29,7 +29,7 @@
 
 
         <EditText
-            android:id="@+id/customer_name"
+            android:id="@+id/add_service_name"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:backgroundTint="@color/backgroundItems"
@@ -41,12 +41,16 @@
             android:layout_marginLeft="20dp"
             />
 
-        <Spinner
-            android:id="@+id/price_service_spinner"
+
+        <EditText
+            android:id="@+id/add_service_price"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:backgroundTint="@color/backgroundItems"
+            android:hint="@string/service_name"
             android:fontFamily="@font/montserrat_regular"
             android:layout_weight="1"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             />
@@ -60,7 +64,7 @@
             android:layout_margin="20dp">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/cancel_action_service"
+                android:id="@+id/add_service_cancel_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -80,7 +84,7 @@
                 android:layout_weight="0.3"></View>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/start_action_service"
+                android:id="@+id/add_service_yes_button"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

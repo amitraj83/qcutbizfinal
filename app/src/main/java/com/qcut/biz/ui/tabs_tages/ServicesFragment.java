@@ -53,7 +53,7 @@ public class ServicesFragment extends Fragment {
         };
 
         //Initialize ListView
-        mListView = root.findViewById(R.id.listView);
+        mListView = root.findViewById(R.id.add_service_list_services);
         CustomAdapter customAdapter = new CustomAdapter();
         mListView.setAdapter(customAdapter);
 

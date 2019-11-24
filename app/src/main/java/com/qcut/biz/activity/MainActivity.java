@@ -186,10 +186,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             sp.edit().putBoolean("isLoggedIn",false).apply();
             sp.edit().putString("userid", null).apply();
-            if(sp.getBoolean("isLoggedIn",false) && (sp.getString("userid",null) != null)) {
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
                 startActivity(intent);
-            }
 
         }
 

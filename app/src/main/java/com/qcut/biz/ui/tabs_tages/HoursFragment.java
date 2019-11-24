@@ -51,7 +51,7 @@ public class HoursFragment extends Fragment {
         };
 
         //Initialize ListView
-        mListView = root.findViewById(R.id.listView);
+        mListView = root.findViewById(R.id.add_service_list_services);
         mListView.setDivider(null);
         HoursFragment.CustomAdapter customAdapter = new HoursFragment.CustomAdapter();
         mListView.setAdapter(customAdapter);

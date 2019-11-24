@@ -1,6 +1,7 @@
 package com.qcut.biz.ui.tabs_tages;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,61 +10,91 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.models.ServicePriceModel;
+import com.qcut.biz.ui.adapters.ShopAddServicesFragment;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class ServicesFragment extends Fragment {
 
     ListView mListView;
     String[] mNames, mPrices;
+    private FirebaseDatabase database = null;
+    private String userid;
+    private SharedPreferences sp;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_services, container, false);
-
-        // Inflate the layout for this fragment
-        mNames = new String[] {
-                "Hair Cut",
-                "Hair Cut 2",
-                "Hair Cut 3",
-                "Hair Cut 4",
-                "Hair Cut 5",
-                "Hair Cut 6",
-                "Hair Cut 7",
-                "Hair Cut 8",
-                "Hair Cut 9",
-                "Hair Cut 10",
-        };
-
-        mPrices = new String[] {
-                "$ 10.00",
-                "$ 11.00",
-                "$ 12.00",
-                "$ 13.00",
-                "$ 14.00",
-                "$ 15.00",
-                "$ 16.00",
-                "$ 17.00",
-                "$ 18.00",
-                "$ 19.00",
-                "$ 20.00",
-        };
-
+        database = FirebaseDatabase.getInstance();
+        sp = getContext().getSharedPreferences("login", MODE_PRIVATE);
+        userid = sp.getString("userid", null);
         //Initialize ListView
         mListView = root.findViewById(R.id.add_service_list_services);
-        CustomAdapter customAdapter = new CustomAdapter();
-        mListView.setAdapter(customAdapter);
+
+        showList();
 
         return root;
     }
 
+    private void showList() {
+
+        final DatabaseReference servicesRef = database.getReference().child("barbershops").child(userid)
+                .child("services");
+        servicesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                List<ServicePriceModel> spList = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    DataSnapshot next = iterator.next();
+                    String sName = next.getKey();
+                    String pName = "n/a";
+                    if(next.getValue() != null) {
+                        pName = String.valueOf(next.getValue());
+                    }
+                    spList.add(new ServicePriceModel(sName, pName));
+                }
+                CustomAdapter customAdapter = new CustomAdapter(spList);
+                mListView.setAdapter(customAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
     class CustomAdapter extends BaseAdapter {
+
+        List<ServicePriceModel> spList;
+
+        public CustomAdapter(List<ServicePriceModel> spList){
+            this.spList = spList;
+        }
+
         @Override
         public int getCount() {
-            return mNames.length;
+            return spList.size();
         }
 
         @Override
@@ -79,15 +110,17 @@ public class ServicesFragment extends Fragment {
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
 
-            @SuppressLint("ViewHolder") View listView_layout = getLayoutInflater().inflate(R.layout.services_list_item, null);
+            @SuppressLint("ViewHolder")
+            View listView_layout = getLayoutInflater().inflate(R.layout.services_list_item, null);
 
             TextView mServiceName = listView_layout.findViewById(R.id.service_name);
             TextView mServicePrice = listView_layout.findViewById(R.id.service_price);
 
-            mServiceName.setText(mNames[i]);
-            mServicePrice.setText(mPrices[i]);
+            mServiceName.setText(spList.get(i).getName());
+            mServicePrice.setText(spList.get(i).getPrice());
 
             return listView_layout;
         }
     }
+
 }

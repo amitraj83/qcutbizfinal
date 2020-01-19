@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.ShopQueueModel;
 import com.qcut.biz.ui.adapters.ShopQueueModelAdaptor;
 import com.qcut.biz.util.Status;
@@ -39,6 +41,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -410,12 +413,50 @@ public class WaitingListFragment extends Fragment {
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 950);
 
         Button yesButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_yes);
         Button noButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_no);
 
         final EditText input = (EditText) addCustomerView.findViewById(R.id.new_customer_name);
+
+        final Spinner ddSpinner = addCustomerView.findViewById(R.id.spinner_barber_selection);
+
+        final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid)
+                .child("barbers");
+        barbersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                List<Barber> barberList = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    DataSnapshot next = iterator.next();
+                    DataSnapshot name = next.child("name");
+                    DataSnapshot imagePath = next.child("imagePath");
+
+                    barberList.add(new Barber(name.getValue().toString(), imagePath.getValue().toString()));
+                }
+                BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(getContext(), barberList);
+                ddSpinner.setAdapter(customAdapter);
+
+                ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override

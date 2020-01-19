@@ -44,6 +44,8 @@
                 android:layout_marginRight="5dp"
                 android:background="@drawable/blinking_dot" />
 
+
+
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>

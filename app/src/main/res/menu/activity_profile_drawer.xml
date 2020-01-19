@@ -10,6 +10,11 @@
             android:fontFamily="@font/montserrat_medium"
             android:title="Profile" />
         <item
+            android:id="@+id/addBarber"
+            android:icon="@drawable/ic_barber_add_black_24dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:title="Add Barber" />
+        <item
             android:id="@+id/nav_list"
             android:icon="@drawable/ic_view_list_black_24dp"
             android:fontFamily="@font/montserrat_medium"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="350dp"
     android:background="@android:color/white"
     app:cardCornerRadius="5dp"
     app:cardElevation="2dp">
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:weightSum="4">
+        android:weightSum="5">
 
 
 
@@ -50,6 +50,14 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             ></EditText>
+
+
+        <Spinner
+            android:id="@+id/spinner_barber_selection"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="20dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"

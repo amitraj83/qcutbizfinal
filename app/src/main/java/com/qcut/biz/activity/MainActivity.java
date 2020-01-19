@@ -36,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
 import com.qcut.biz.util.TimeUtil;
+import com.qcut.biz.util.TimerService;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         sp = getSharedPreferences("login",MODE_PRIVATE);
         userid = sp.getString("userid", null);
 
+        startService(new Intent(getBaseContext(), TimerService.class));
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
@@ -173,6 +175,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_profile) {
             navController.navigate(R.id.nav_profile);
 
+        } else if (id == R.id.addBarber) {
+            navController.navigate(R.id.nav_add_barber);
         } else if (id == R.id.nav_list) {
             navController.navigate(R.id.nav_waiting_list);
 
@@ -186,14 +190,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             sp.edit().putBoolean("isLoggedIn",false).apply();
             sp.edit().putString("userid", null).apply();
-                Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                startActivity(intent);
-
+            setOffline();
+            Intent intent = new Intent(MainActivity.this, StartActivity.class);
+            startActivity(intent);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setOffline() {
+        final DatabaseReference online = database.getReference().child("barbershops").child(userid).child("queues")
+                .child(TimeUtil.getTodayDDMMYYYY()).child("online");
+        online.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String OFFLINE = MainActivity.this.getString(R.string.status_offline);
+                String ONLINE = MainActivity.this.getString(R.string.status_online);
+
+                if (dataSnapshot.exists()) {
+
+                        //go offline
+                        online.setValue(false);
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
     }
 
     @Override

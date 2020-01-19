@@ -12,37 +12,98 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:text="@string/phone_353_87654321"
-            android:fontFamily="@font/montserrat_light"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:text="Phone:"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_weight="0.75"/>
+
+            <TextView
+                android:id="@+id/profile_contact_phone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="n/a"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_weight="1.25"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp"
+                android:text="Email:"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_weight="0.75"/>
+
+            <TextView
+                android:id="@+id/profile_contact_email"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="n/a"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:layout_weight="1.25"/>
+        </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
-            android:text="@string/email_mybarber_gmail_com"
+            android:text="Google Map:"
             android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_weight="0.75"/>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/profile_contact_gmap"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
             android:layout_marginTop="20dp"
-            android:text="@string/google_map_https_gmap_com_xsrdfnekd"
+            android:text="n/a"
             android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_weight="1.25"/>
+
+    </LinearLayout>
+
+
 
     </LinearLayout>
 

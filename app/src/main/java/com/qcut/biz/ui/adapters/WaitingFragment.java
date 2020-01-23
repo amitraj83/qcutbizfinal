@@ -1,8 +1,11 @@
 package com.qcut.biz.ui.adapters;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -42,10 +45,14 @@ import com.qcut.biz.R;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.ui.waiting_list.BarberSelectionArrayAdapter;
 import com.qcut.biz.util.RandomString;
+import com.qcut.biz.util.Status;
+import com.qcut.biz.util.TimeUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -56,6 +63,14 @@ public class WaitingFragment extends Fragment {
     private String userid;
     FirebaseStorage storage;
     StorageReference storageReference;
+    private Context mContext;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -63,60 +78,81 @@ public class WaitingFragment extends Fragment {
         final TabLayout tabLayout = (TabLayout) root.findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        sp = getContext().getSharedPreferences("login", MODE_PRIVATE);
+        sp = mContext.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
-        FirebaseApp.initializeApp(getContext());
+        FirebaseApp.initializeApp(mContext);
         database = FirebaseDatabase.getInstance();
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        Button viewById = root.findViewById(R.id.addTab);
+        final Button addBarber = root.findViewById(R.id.addTab);
         Button tabIndexTest = root.findViewById(R.id.tab_index_test);
 
         tabIndexTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(getContext(), "Button pressed."+tabLayout.getSelectedTabPosition()+" -- "+tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Button pressed."+tabLayout.getSelectedTabPosition()+" -- "+tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        viewById.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                final LayoutInflater factory = LayoutInflater.from(getContext());
-                final View selectBarberView = factory.inflate(R.layout.select_barber, null);
-                final AlertDialog selectBarberDialog = new AlertDialog.Builder(getContext()).create();
-                selectBarberDialog.setView(selectBarberView);
+        final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid);
 
 
-                selectBarberDialog.show();
-                selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-
-                final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
-                final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
-
-
-                final Spinner ddSpinner = selectBarberDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
-
-                final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid)
-                        .child("barbers");
-                barbersRef.addValueEventListener(new ValueEventListener() {
+                ////////////////////
+        barbersRef.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                        List<Barber> barberList = new ArrayList<>();
+                    public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                        Iterator<DataSnapshot> iterator = dataSnapshot.child("barbers").getChildren().iterator();
+                        final List<Barber> barberList = new ArrayList<>();
                         while (iterator.hasNext()) {
-                            DataSnapshot next = iterator.next();
-                            DataSnapshot name = next.child("name");
-                            DataSnapshot imagePath = next.child("imagePath");
-
-                            barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                            final DataSnapshot next = iterator.next();
+                            final DataSnapshot name = next.child("name");
+                            final DataSnapshot imagePath = next.child("imagePath");
+                            boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
+                            if(!bq) {
+                                barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                            }
+                            else {
+                                boolean tabExists =false;
+                                for (int i = 0; i < tabLayout.getTabCount(); i++){
+                                    if(tabLayout.getTabAt(i).getTag().toString().equalsIgnoreCase(next.getKey().toString())) {
+                                        tabExists = true;
+                                    }
+                                }
+                                if(!tabExists){
+                                    addTab(name.getValue().toString(), tabLayout, root, next.getKey(), imagePath.getValue().toString(), dataSnapshot);
+                                }
+                            }
                         }
-                        BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(getContext(), barberList);
+
+
+                        addBarber.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                final LayoutInflater factory = LayoutInflater.from(mContext);
+                                final View selectBarberView = factory.inflate(R.layout.select_barber, null);
+                                final AlertDialog selectBarberDialog = new AlertDialog.Builder(mContext).create();
+                                selectBarberDialog.setView(selectBarberView);
+
+
+                                selectBarberDialog.show();
+                                selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+
+                                final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
+                                final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
+
+
+
+
+                                //----------------------------
+                                final Spinner ddSpinner = selectBarberDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
+
+
+                        BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
                         ddSpinner.setAdapter(customAdapter);
 
 
@@ -132,72 +168,12 @@ public class WaitingFragment extends Fragment {
                                     @Override
                                     public void onClick(View v) {
 
+                                        String name = dataSnapshot.child("barbers").child(selectedKey).child("name").getValue().toString();
+                                        String imagePath = dataSnapshot.child("barbers").child(selectedKey).child("imagePath").getValue().toString();
 
-                                        final TabLayout.Tab tab = tabLayout.newTab();
-                                        tab.setTag("xyz "+new RandomString());
-                                        tabLayout.addTab(tab.setText("Loading...").setIcon(R.drawable.photo_barber));
+                                        addTab(name, tabLayout, root, selectedKey, imagePath, dataSnapshot);
 
-                                        final ViewPager viewPager = (ViewPager) root.findViewById(R.id.pager);
-                                        final PagerAdapter adapter = new PagerAdapter(getActivity().getSupportFragmentManager(), tabLayout.getTabCount(), tabLayout);
-                                        viewPager.setAdapter(adapter);
-                                        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
-                                        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                                            @Override
-                                            public void onTabSelected(TabLayout.Tab tab) {
-                                                viewPager.setCurrentItem(tab.getPosition());
-                                            }
-
-                                            @Override
-                                            public void onTabUnselected(TabLayout.Tab tab) {
-
-                                            }
-
-                                            @Override
-                                            public void onTabReselected(TabLayout.Tab tab) {
-
-                                            }
-                                        });
                                         selectBarberDialog.dismiss();
-
-                                        database.getReference().child("barbershops").child(userid)
-                                                .child("barbers").child(selectedKey).addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                if(dataSnapshot.exists()) {
-                                                    String name = dataSnapshot.child("name").getValue().toString();
-                                                    tab.setText(name);
-                                                }
-
-                                                StorageReference child = storageReference.child(dataSnapshot.child("imagePath").getValue().toString());
-                                                child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Uri> task) {
-                                                        if(task.isSuccessful()) {
-                                                            Glide.with(getContext())
-                                                                    .load(task.getResult())
-                                                                    .into(new SimpleTarget<Drawable>() {
-
-                                                                        @Override
-                                                                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                                                            tab.setIcon(resource);
-                                                                        }
-                                                                    });
-
-                                                        } else {
-                                                            Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
-
 
                                     }
                                 });
@@ -208,14 +184,19 @@ public class WaitingFragment extends Fragment {
                                     }
                                 });
 
-
-
                             }
                             @Override
                             public void onNothingSelected(AdapterView<?> adapterView) {
 
                             }
                         });
+
+
+                        //----------------------------------
+                            }
+                        });
+
+
                     }
 
                     @Override
@@ -225,13 +206,81 @@ public class WaitingFragment extends Fragment {
                 });
 
 
+////////////////////////////////
 
+
+
+        return root;
+    }
+
+    private void addTab(String name, TabLayout tabLayout, View root, String selectedKey, String imagePath, @NonNull DataSnapshot dataSnapshot) {
+        final TabLayout.Tab tab = tabLayout.newTab();
+        tab.setTag(selectedKey);
+        tabLayout.addTab(tab.setText("Loading...").setIcon(R.drawable.photo_barber));
+
+        final ViewPager viewPager = (ViewPager) root.findViewById(R.id.pager);
+        final PagerAdapter adapter = new PagerAdapter(getActivity().getSupportFragmentManager(), tabLayout.getTabCount(), tabLayout);
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        tab.setText(name);
+        createBarberQueue(selectedKey);
+
+
+//        StorageReference child = storageReference.child();
+        StorageReference child = storageReference.child(imagePath);
+        child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if(task.isSuccessful()) {
+                    Glide.with(mContext)
+                            .load(task.getResult())
+                            .into(new SimpleTarget<Drawable>() {
+                                @Override
+                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                    tab.setIcon(resource);
+                                }
+                            });
+                } else {
+                    Toast.makeText(mContext, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void createBarberQueue(String selectedKey) {
+        DatabaseReference queue = database.getReference().child("barbershops").child(userid)
+                .child("queues").child(TimeUtil.getTodayDDMMYYYY());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", Status.OPEN);
+        Task<Void> voidTask = queue.child(selectedKey).setValue(map);
+        voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
 
             }
         });
 
 
 
-        return root;
+
     }
 }

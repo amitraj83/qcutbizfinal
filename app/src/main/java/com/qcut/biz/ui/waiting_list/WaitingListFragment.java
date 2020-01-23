@@ -1,6 +1,7 @@
 package com.qcut.biz.ui.waiting_list;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -59,9 +60,19 @@ public class WaitingListFragment extends Fragment {
     private ListView dynamicListView = null;
     private TextView nextCustomerTV;
     private String tag;
+    private Context mContext;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
     public WaitingListFragment(String tag) {
         this.tag = tag;
     }
+
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -69,14 +80,14 @@ public class WaitingListFragment extends Fragment {
                 ViewModelProviders.of(this).get(WaitingListModel.class);
         View root = inflater.inflate(R.layout.fragment_waiting_list, container, false);
 
-        sp = getContext().getSharedPreferences("login", MODE_PRIVATE);
+        sp = mContext.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
-        FirebaseApp.initializeApp(getContext());
+        FirebaseApp.initializeApp(mContext);
         database = FirebaseDatabase.getInstance();
 
         nextCustomerTV = root.findViewById(R.id.next_customer);
 
-        final LayoutInflater factory = LayoutInflater.from(getContext());
+        final LayoutInflater factory = LayoutInflater.from(mContext);
 
         cardViewStartSkipService(root, factory);
 
@@ -100,11 +111,11 @@ public class WaitingListFragment extends Fragment {
                             if (onlineValue.equalsIgnoreCase("true")) {
                                 addCustomer(factory);
                             } else {
-                                Toast.makeText(getContext(), "Cannot add customer. First get online.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "Cannot add customer. First get online.", Toast.LENGTH_SHORT).show();
                             }
 
                         } else {
-                            Toast.makeText(getContext(), "Cannot add customer. First get online.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "Cannot add customer. First get online.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -163,7 +174,7 @@ public class WaitingListFragment extends Fragment {
         if(queuedCustomerId != null &&
                 queuedCustomerId.trim().equalsIgnoreCase("none") ||
                 queuedCustomerId.trim().equalsIgnoreCase("")) {
-            Toast toast= Toast.makeText(getContext(),
+            Toast toast= Toast.makeText(mContext,
                     "No Customer in the queue", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
             toast.show();
@@ -171,7 +182,7 @@ public class WaitingListFragment extends Fragment {
             final View skipCustomerView = factory.inflate(R.layout.skip_customer_dialog, null);
             TextView skipCustName = (TextView) skipCustomerView.findViewById(R.id.skip_customer_name);
             skipCustName.setText(nextCustomerTV.getText());
-            final AlertDialog skipCustomerDialog = new AlertDialog.Builder(getContext()).create();
+            final AlertDialog skipCustomerDialog = new AlertDialog.Builder(mContext).create();
             skipCustomerDialog.setView(skipCustomerView);
 
             skipCustomerDialog.show();
@@ -269,7 +280,7 @@ public class WaitingListFragment extends Fragment {
         if(queuedCustomerId != null &&
                 queuedCustomerId.trim().equalsIgnoreCase("none") ||
                 queuedCustomerId.trim().equalsIgnoreCase("")) {
-            Toast toast= Toast.makeText(getContext(),
+            Toast toast= Toast.makeText(mContext,
                     "No Customer in the queue", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
             toast.show();
@@ -277,7 +288,7 @@ public class WaitingListFragment extends Fragment {
             final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
             TextView startServiceCustName = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
             startServiceCustName.setText(nextCustomerTV.getText());
-            final AlertDialog startServiceDialog = new AlertDialog.Builder(getContext()).create();
+            final AlertDialog startServiceDialog = new AlertDialog.Builder(mContext).create();
             startServiceDialog.setView(startServiceView);
 
             startServiceDialog.show();
@@ -322,7 +333,7 @@ public class WaitingListFragment extends Fragment {
             final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
             TextView custNameTV = (TextView) serviceDoneView.findViewById(R.id.service_done_customer_name);
             custNameTV.setText(queueItem.getName());
-            final AlertDialog serviceDoneDialog = new AlertDialog.Builder(getContext()).create();
+            final AlertDialog serviceDoneDialog = new AlertDialog.Builder(mContext).create();
             serviceDoneDialog.setView(serviceDoneView);
 
 
@@ -336,7 +347,7 @@ public class WaitingListFragment extends Fragment {
             final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
             TextView custNameTV = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
             custNameTV.setText(queueItem.getName());
-            final AlertDialog serviceStartDialog = new AlertDialog.Builder(getContext()).create();
+            final AlertDialog serviceStartDialog = new AlertDialog.Builder(mContext).create();
             serviceStartDialog.setView(startServiceView);
 
             serviceStartDialog.show();
@@ -412,7 +423,7 @@ public class WaitingListFragment extends Fragment {
     private void addCustomer(LayoutInflater factory) {
 
         final View addCustomerView = factory.inflate(R.layout.add_customer_dialog, null);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setView(addCustomerView);
 
         final AlertDialog dialog = builder.create();
@@ -421,34 +432,81 @@ public class WaitingListFragment extends Fragment {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 950);
 
-        Button yesButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_yes);
-        Button noButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_no);
+        final Button yesButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_yes);
+        final Button noButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_no);
 
         final EditText input = (EditText) addCustomerView.findViewById(R.id.new_customer_name);
 
         final Spinner ddSpinner = addCustomerView.findViewById(R.id.spinner_barber_selection);
 
-        final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid)
-                .child("barbers");
+        final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid);
         barbersRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                List<Barber> barberList = new ArrayList<>();
-                while (iterator.hasNext()) {
-                    DataSnapshot next = iterator.next();
-                    DataSnapshot name = next.child("name");
-                    DataSnapshot imagePath = next.child("imagePath");
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
+                    Iterator<DataSnapshot> iterator = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).getChildren().iterator();
+                    List<Barber> barberList = new ArrayList<>();
+                    while (iterator.hasNext()) {
+                        DataSnapshot next = iterator.next();
+                        if (next != null && !next.getKey().equalsIgnoreCase("online")) {
+                            String barberKey = next.getKey().toString();
+                            DataSnapshot name = dataSnapshot.child("barbers").child(barberKey).child("name");
+                            DataSnapshot imagePath = dataSnapshot.child("barbers").child(barberKey).child("imagePath");
+                            barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                        }
+                    }
 
-                    barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
-                }
-                BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(getContext(), barberList);
+                BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
                 ddSpinner.setAdapter(customAdapter);
-
+                }
                 ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        final String selectedKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
 
+                        yesButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                if (input != null && !input.getText().toString().trim().equalsIgnoreCase("")) {
+                                    final String name = input.getText().toString();
+                                    int count = 0;
+                                    DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
+                                    Iterator<DataSnapshot> iterator = queueSnapShot.getChildren().iterator();
+                                    while (iterator.hasNext()) {
+                                        DataSnapshot next = iterator.next();
+                                        if (next != null && !next.getKey().equalsIgnoreCase("online")) {
+                                            DataSnapshot statusChild = next.child("status");
+                                            String status = String.valueOf(statusChild.getValue());
+                                            if (status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                                count++;
+                                            }
+                                        }
+                                    }
+
+                                    DatabaseReference queue = queueSnapShot.getRef();
+                                    String key = queue.push().getKey();
+
+                                    Map<String, Object> map = new HashMap<>();
+                                    map.put("name", name);
+                                    map.put("placeInQueue", ++count);
+                                    map.put("skipcount", 0);
+                                    map.put("timeToWait", timePerCut * count);
+                                    map.put("status", Status.QUEUE);
+                                    Task<Void> voidTask = queue.child(key).setValue(map);
+                                    voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            dialog.dismiss();
+                                            Toast.makeText(mContext, name + " added to queue", Toast.LENGTH_SHORT).show();
+
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(mContext, "Cannot add customer. No name provided", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
@@ -464,61 +522,6 @@ public class WaitingListFragment extends Fragment {
         });
 
 
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (input != null && !input.getText().toString().trim().equalsIgnoreCase("")) {
-                    final String name = input.getText().toString();
-                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY());
-                    queue.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            int count = 0;
-                            if (dataSnapshot.exists()) {
-                                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                                while (iterator.hasNext()) {
-                                    DataSnapshot next = iterator.next();
-                                    if (next != null && !next.getKey().equalsIgnoreCase("online")) {
-                                        DataSnapshot statusChild = next.child("status");
-                                        String status = String.valueOf(statusChild.getValue());
-                                        if (status.equalsIgnoreCase(Status.QUEUE.name())) {
-                                            count++;
-                                        }
-                                    }
-                                }
-                            }
-                            String key = queue.push().getKey();
-
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("name", name);
-                            map.put("placeInQueue", ++count);
-                            map.put("skipcount", 0);
-                            map.put("timeToWait", timePerCut * count);
-                            map.put("status", Status.QUEUE);
-                            Task<Void> voidTask = queue.child(key).setValue(map);
-                            voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    dialog.dismiss();
-                                    Toast.makeText(getContext(), name+" added to queue", Toast.LENGTH_SHORT).show();
-
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-                } else {
-                    Toast.makeText(getContext(), "Cannot add customer. No name provided", Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        });
 
         noButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -534,9 +537,9 @@ public class WaitingListFragment extends Fragment {
     private void showQueue() {
         final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
         DatabaseReference dbRef = database.getReference().child("barbershops")
-                .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY());
+                .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
         if(dbRef != null) {
-            dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            dbRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
@@ -545,7 +548,7 @@ public class WaitingListFragment extends Fragment {
                         while (snapshotIterator.hasNext()) {
                             DataSnapshot aCustomer = snapshotIterator.next();
                             String key = aCustomer.getKey();
-                            if(!key.equalsIgnoreCase("online")) {
+                            if(!key.equalsIgnoreCase("status")) {
                                 boolean isCustomerNameNotNull = aCustomer.child("name").getValue() != null;
                                 boolean isCustomerNotDone = !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.DONE.name());
                                 boolean isCustomerNotRemoved = !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.REMOVED.name());
@@ -572,12 +575,14 @@ public class WaitingListFragment extends Fragment {
                                     break;
                                 }
                             }
+                            Context context = mContext;
+                            adapter= new ShopQueueModelAdaptor(models, mContext);
+                            dynamicListView.setAdapter(adapter);
                         } else {
                             nextCustomerTV.setText("No next customer.");
                             nextCustomerTV.setTag("NONE");
                         }
-                        adapter= new ShopQueueModelAdaptor(models, getContext());
-                        dynamicListView.setAdapter(adapter);
+
                     }
                 }
 
@@ -590,19 +595,20 @@ public class WaitingListFragment extends Fragment {
     }
 
     public void queueChangeListener(){
-        DatabaseReference dbRef = database.getReference().child("barbershops")
-                .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY());
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                showQueue();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        showQueue();
+//        DatabaseReference dbRef = database.getReference().child("barbershops")
+//                .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY());
+//        dbRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                showQueue();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     private class DataComparator implements Comparator<ShopQueueModel> {

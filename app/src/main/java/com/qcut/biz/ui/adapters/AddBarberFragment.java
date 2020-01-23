@@ -130,7 +130,7 @@ public class AddBarberFragment extends Fragment {
                     DataSnapshot name = next.child("name");
                     DataSnapshot imagePath = next.child("imagePath");
 
-                    barberList.add(new Barber(name.getValue().toString(), imagePath.getValue().toString()));
+                    barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
                 }
                 CustomAdapter customAdapter = new CustomAdapter(barberList);
                 listBarbers.setAdapter(customAdapter);
@@ -168,7 +168,7 @@ public class AddBarberFragment extends Fragment {
                                 String key = barbersRef.push().getKey();
 //                                Uri downloadUrl =
 //                                        taskSnapshot.getStorage().getDownloadUrl().getResult();
-                                barbersRef.child(key).setValue(new Barber(name, taskSnapshot.getMetadata().getPath()));
+                                barbersRef.child(key).setValue(new Barber(key, name, taskSnapshot.getMetadata().getPath()));
                             }
 
 

@@ -177,6 +177,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.addBarber) {
             navController.navigate(R.id.nav_add_barber);
+        } else if (id == R.id.temp) {
+            navController.navigate(R.id.temp_fragment);
         } else if (id == R.id.nav_list) {
             navController.navigate(R.id.nav_waiting_list);
 

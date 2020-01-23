@@ -58,6 +58,10 @@ public class WaitingListFragment extends Fragment {
     private ShopQueueModelAdaptor adapter = null;
     private ListView dynamicListView = null;
     private TextView nextCustomerTV;
+    private String tag;
+    public WaitingListFragment(String tag) {
+        this.tag = tag;
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -76,9 +80,11 @@ public class WaitingListFragment extends Fragment {
 
         cardViewStartSkipService(root, factory);
 
-
+        TextView viewById = root.findViewById(R.id.textView);
+//        viewById.setText(tag);
 
         addCustomer = root.findViewById(R.id.add_customer_fab);
+
         addCustomer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -434,7 +440,7 @@ public class WaitingListFragment extends Fragment {
                     DataSnapshot name = next.child("name");
                     DataSnapshot imagePath = next.child("imagePath");
 
-                    barberList.add(new Barber(name.getValue().toString(), imagePath.getValue().toString()));
+                    barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
                 }
                 BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(getContext(), barberList);
                 ddSpinner.setAdapter(customAdapter);

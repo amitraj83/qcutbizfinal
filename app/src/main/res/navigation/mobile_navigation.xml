@@ -46,5 +46,10 @@
         android:label="Add Barber"
         tools:layout="@layout/fragment_add_barber" />
 
+    <fragment
+        android:id="@+id/temp_fragment"
+        android:name="com.qcut.biz.ui.adapters.WaitingFragment"
+        android:label="Temp Fragment"
+        tools:layout="@layout/waiting_queue" />
 
 </navigation>

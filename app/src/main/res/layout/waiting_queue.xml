@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:gravity="center">
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addTab"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Add "
+            android:textColor="@color/backgroundItems"
+            android:textSize="12dp"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_weight="1"
+            android:layout_margin="2dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tab_index_test"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Break"
+            android:textColor="@color/backgroundItems"
+            android:textSize="12dp"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_weight="1"
+            android:layout_margin="2dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/stop_queue"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Stop Q"
+            android:textColor="@color/backgroundItems"
+            android:textSize="12dp"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_weight="1"
+            android:layout_margin="2dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/close_queue"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Close Q"
+            android:textColor="@color/backgroundItems"
+            android:textSize="12dp"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_weight="1"
+            android:layout_margin="2dp"/>
+
+    </LinearLayout>
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/tab_layout"
+        android:layout_weight="1"/>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:background="?attr/colorPrimary"
+        android:elevation="6dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+
+
+</LinearLayout>

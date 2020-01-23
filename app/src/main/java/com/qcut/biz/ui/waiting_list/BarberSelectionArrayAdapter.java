@@ -48,6 +48,8 @@ public class BarberSelectionArrayAdapter extends ArrayAdapter<String> {
         TextView name;
     }
 
+
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -70,6 +72,7 @@ public class BarberSelectionArrayAdapter extends ArrayAdapter<String> {
             }
         });
         name.setText(barberList.get(position).getName());
+        convertView.setTag(barberList.get(position).getId());
         return convertView;
     }
 }

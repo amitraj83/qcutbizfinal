@@ -131,7 +131,7 @@ public class WaitingListFragment extends Fragment {
 
         dynamicListView = root.findViewById(R.id.today_queue);
         showQueue();
-        queueChangeListener();
+//        queueChangeListener();
 
 
 
@@ -369,7 +369,7 @@ public class WaitingListFragment extends Fragment {
                 String queuedCustomerId = String.valueOf(queueItem.getId());
                 if (queuedCustomerId != null) {
                     final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(queuedCustomerId);
+                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
 
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.PROGRESS);

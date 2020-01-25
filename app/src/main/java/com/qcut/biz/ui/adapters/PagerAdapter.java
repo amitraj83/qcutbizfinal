@@ -11,11 +11,12 @@ import com.qcut.biz.ui.waiting_list.WaitingListFragment;
 public class PagerAdapter extends FragmentStatePagerAdapter {
     int mNumOfTabs;
     TabLayout tabLayout;
-
+    public FragmentManager fm;
     public PagerAdapter(FragmentManager fm, int NumOfTabs, TabLayout tabLayout) {
         super(fm);
         this.mNumOfTabs = NumOfTabs;
         this.tabLayout = tabLayout;
+        this.fm = fm;
     }
 
     @Override

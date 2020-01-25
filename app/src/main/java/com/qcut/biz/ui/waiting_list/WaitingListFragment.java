@@ -62,6 +62,7 @@ public class WaitingListFragment extends Fragment {
     private TextView nextCustomerTV;
     private String tag;
     private Context mContext;
+    public View rootView;
 
     @Override
     public void onAttach(Context context) {
@@ -79,7 +80,8 @@ public class WaitingListFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         waitingListModel =
                 ViewModelProviders.of(this).get(WaitingListModel.class);
-        View root = inflater.inflate(R.layout.fragment_waiting_list, container, false);
+        final View root = inflater.inflate(R.layout.fragment_waiting_list, container, false);
+        this.rootView = root;
 //        root.setVisibility(30);
 //        root.setBackgroundColor(Color.RED);
 
@@ -93,6 +95,34 @@ public class WaitingListFragment extends Fragment {
         final LayoutInflater factory = LayoutInflater.from(mContext);
 
         cardViewStartSkipService(root, factory);
+
+        DatabaseReference barberStatusRef = database.getReference().child("barbershops").child(userid)
+                .child("queues").child(TimeUtil.getTodayDDMMYYYY())
+                .child(tag.toString())
+                .child("status");
+        barberStatusRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    if(dataSnapshot.getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
+                        root.findViewById(R.id.barber_on_break_message).setVisibility(View.VISIBLE);
+                        root.findViewById(R.id.next_customer_card).setVisibility(View.INVISIBLE);
+                        root.findViewById(R.id.cardView).setBackgroundColor(Color.YELLOW);
+
+                    } else {
+                        root.findViewById(R.id.cardView).setBackgroundColor(Color.WHITE);
+                        root.findViewById(R.id.next_customer_card).setVisibility(View.VISIBLE);
+                        root.findViewById(R.id.barber_on_break_message).setVisibility(View.INVISIBLE);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         TextView viewById = root.findViewById(R.id.textView);
 //        viewById.setText(tag);
@@ -451,11 +481,14 @@ public class WaitingListFragment extends Fragment {
                     while (iterator.hasNext()) {
                         DataSnapshot next = iterator.next();
                         if (next != null && !next.getKey().equalsIgnoreCase("online")) {
-                            queueBarberIdList.add(next.getKey());
                             String barberKey = next.getKey().toString();
                             DataSnapshot name = dataSnapshot.child("barbers").child(barberKey).child("name");
                             DataSnapshot imagePath = dataSnapshot.child("barbers").child(barberKey).child("imagePath");
-                            if(next.getKey() != null && name.getValue() != null && imagePath.getValue() != null){
+                            String barberStatus = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY())
+                                    .child(barberKey).child("status").getValue().toString();
+                            if(next.getKey() != null && name.getValue() != null
+                                    && imagePath.getValue() != null && !barberStatus.equalsIgnoreCase(Status.STOP.name())){
+                                queueBarberIdList.add(next.getKey());
                                 barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
                             }
                         }

@@ -66,7 +66,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:fontFamily="@font/montserrat_regular"
-            android:text="Close Q"
+            android:text="Remove Q"
             android:textColor="@color/backgroundItems"
             android:textSize="12dp"
             app:backgroundTint="@android:color/white"

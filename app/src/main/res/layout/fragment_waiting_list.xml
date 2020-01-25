@@ -21,7 +21,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/barber_on_break_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Barber on Break"
+            android:textSize="36sp"
+            android:gravity="center"
+            android:fontFamily="@font/montserrat_medium"
+        />
+
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/next_customer_card"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -42,8 +54,8 @@
                 style="@style/Base.TextAppearance.AppCompat.Headline"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="No Next Customer"
+                android:gravity="center"
                 android:fontFamily="@font/montserrat_medium"
                 android:textSize="36sp"
                 app:layout_constraintEnd_toEndOf="parent"

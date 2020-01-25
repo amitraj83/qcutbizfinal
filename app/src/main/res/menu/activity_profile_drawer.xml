@@ -15,6 +15,11 @@
             android:icon="@drawable/ic_barber_add_black_24dp"
             android:fontFamily="@font/montserrat_medium"
             android:title="Add Barber" />
+        <item
+            android:id="@+id/temp"
+            android:icon="@drawable/ic_view_list_black_24dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:title="Waiting Queue" />
         <!--
         <item
             android:id="@+id/nav_list"
@@ -37,11 +42,7 @@
             android:icon="@drawable/ic_add_box_black_24dp"
             android:fontFamily="@font/montserrat_medium"
             android:title="Add Services" />
-        <item
-            android:id="@+id/temp"
-            android:icon="@drawable/ic_add_box_black_24dp"
-            android:fontFamily="@font/montserrat_medium"
-            android:title="Waiting Queue" />
+
         <item
             android:id="@+id/nav_log_out"
             android:icon="@drawable/ic_input_black_24dp"

@@ -61,6 +61,7 @@ public class WaitingFragment extends Fragment {
     private Context mContext;
     Button takeBreakButton = null;
     Button stopQButton = null;
+    Button closeQButton = null;
 
 
     @Override
@@ -86,26 +87,23 @@ public class WaitingFragment extends Fragment {
         final Button addBarber = root.findViewById(R.id.addTab);
         takeBreakButton = root.findViewById(R.id.tab_index_test);
         stopQButton = root.findViewById(R.id.stop_queue);
-
+//        stopQButton = root.findViewById(R.id.close_queue);
 
 
         stopQButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatabaseReference barberStatusRef = database.getReference().child("barbershops").child(userid);
-//                        .child("queues").child(TimeUtil.getTodayDDMMYYYY())
-//                        .child(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag().toString())
-//                        .child("status");
                 barberStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             String dialogTitle, dialogText, confirmText;
-                            final Status newStatus ;
+                            final Status newStatus;
                             String status = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY())
                                     .child(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag().toString())
                                     .child("status").getValue().toString();
-                            if(status.equalsIgnoreCase(Status.STOP.name())) {
+                            if (status.equalsIgnoreCase(Status.STOP.name())) {
                                 stopQButton.setText("STOPPED");
                                 stopQButton.setTextColor(Color.RED);
                                 dialogTitle = "Resume Queue";
@@ -126,6 +124,7 @@ public class WaitingFragment extends Fragment {
                             String barberName = dataSnapshot.child("barbers").child(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag().toString())
                                     .child("name").getValue().toString();
                             queueStatusChangeDialog(dialogTitle, dialogText, confirmText, newStatus, tabLayout, barberName, photoPath);
+                            //tabLayout.removeTabAt(tabLayout.getSelectedTabPosition());
                         }
                     }
 
@@ -142,19 +141,16 @@ public class WaitingFragment extends Fragment {
             public void onClick(View v) {
 
                 DatabaseReference barberStatusRef = database.getReference().child("barbershops").child(userid);
-//                        .child("queues").child(TimeUtil.getTodayDDMMYYYY())
-//                        .child(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag().toString())
-//                        .child("status");
                 barberStatusRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
                             String dialogTitle, dialogText, confirmText;
-                            final Status newStatus ;
+                            final Status newStatus;
                             String status = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY())
                                     .child(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag().toString())
                                     .child("status").getValue().toString();
-                            if(status.equalsIgnoreCase(Status.BREAK.name())) {
+                            if (status.equalsIgnoreCase(Status.BREAK.name())) {
                                 takeBreakButton.setText("On Break");
                                 takeBreakButton.setTextColor(Color.RED);
                                 dialogTitle = "Resume Work";
@@ -191,109 +187,109 @@ public class WaitingFragment extends Fragment {
         final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid);
 
 
-
-               ////////////////////
+        ////////////////////
         barbersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> iterator = dataSnapshot.child("barbers").getChildren().iterator();
-                        final List<Barber> barberList = new ArrayList<>();
-                        while (iterator.hasNext()) {
-                            final DataSnapshot next = iterator.next();
-                            final DataSnapshot name = next.child("name");
-                            final DataSnapshot imagePath = next.child("imagePath");
-                            boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
-                            if(!bq) {
-                                barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
-                            }
-                            else {
-                                boolean tabExists =false;
-                                for (int i = 0; i < tabLayout.getTabCount(); i++){
-                                    if(tabLayout.getTabAt(i).getTag().toString().equalsIgnoreCase(next.getKey().toString())) {
-                                        tabExists = true;
-                                    }
-                                }
-                                if(!tabExists){
-                                    addTab(name.getValue().toString(), tabLayout, root, next.getKey(), imagePath.getValue().toString(), dataSnapshot);
-                                }
+            @Override
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> iterator = dataSnapshot.child("barbers").getChildren().iterator();
+                final List<Barber> barberList = new ArrayList<>();
+                while (iterator.hasNext()) {
+                    final DataSnapshot next = iterator.next();
+                    final DataSnapshot name = next.child("name");
+                    final DataSnapshot imagePath = next.child("imagePath");
+                    boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
+                    if (!bq) {
+                        barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                    } else {
+                        boolean tabExists = false;
+                        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+                            if (tabLayout.getTabAt(i).getTag().toString().equalsIgnoreCase(next.getKey().toString())) {
+                                tabExists = true;
                             }
                         }
-
-
-                        addBarber.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                final LayoutInflater factory = LayoutInflater.from(mContext);
-                                final View selectBarberView = factory.inflate(R.layout.select_barber, null);
-                                final AlertDialog selectBarberDialog = new AlertDialog.Builder(mContext).create();
-                                selectBarberDialog.setView(selectBarberView);
-
-
-                                selectBarberDialog.show();
-                                selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                                selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-
-                                final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
-                                final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
-
-                                //----------------------------
-                                final Spinner ddSpinner = selectBarberDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
-
-
-                                BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
-                                ddSpinner.setAdapter(customAdapter);
-
-                                ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, long l) {
-
-                                        final String selectedKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
-
-                                        yesButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-
-                                                String name = dataSnapshot.child("barbers").child(selectedKey).child("name").getValue().toString();
-                                                String imagePath = dataSnapshot.child("barbers").child(selectedKey).child("imagePath").getValue().toString();
-
-                                                addTab(name, tabLayout, root, selectedKey, imagePath, dataSnapshot);
-
-                                                selectBarberDialog.dismiss();
-
-                                            }
-                                        });
-                                        noButton.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                selectBarberDialog.dismiss();
-                                            }
-                                        });
-
-                                    }
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                                    }
-                                });
-
-
-                        //----------------------------------
-                            }
-                        });
-
-
+                        if (!tabExists) {
+                            addTab(name.getValue().toString(), tabLayout, root, next.getKey(), imagePath.getValue().toString(), dataSnapshot);
+                        }
                     }
+                }
 
+
+                addBarber.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    public void onClick(View v) {
 
+                        if (barberList.size() > 0) {
+                            final LayoutInflater factory = LayoutInflater.from(mContext);
+                            final View selectBarberView = factory.inflate(R.layout.select_barber, null);
+                            final AlertDialog selectBarberDialog = new AlertDialog.Builder(mContext).create();
+                            selectBarberDialog.setView(selectBarberView);
+
+
+                            selectBarberDialog.show();
+                            selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                            selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+
+                            final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
+                            final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
+
+                            //----------------------------
+                            final Spinner ddSpinner = selectBarberDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
+
+                            BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
+                            ddSpinner.setAdapter(customAdapter);
+
+                            ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, long l) {
+
+                                    final String selectedKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
+
+                                    yesButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            String name = dataSnapshot.child("barbers").child(selectedKey).child("name").getValue().toString();
+                                            String imagePath = dataSnapshot.child("barbers").child(selectedKey).child("imagePath").getValue().toString();
+
+                                            addTab(name, tabLayout, root, selectedKey, imagePath, dataSnapshot);
+
+                                            selectBarberDialog.dismiss();
+
+                                        }
+                                    });
+                                    noButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            selectBarberDialog.dismiss();
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                }
+                            });
+
+                        } else {
+                            Toast.makeText(mContext, "No barber to add", Toast.LENGTH_SHORT).show();
+                        }
+                        //----------------------------------
                     }
                 });
 
 
-////////////////////////////////
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+////////////////////////////////
 
 
         return root;
@@ -311,9 +307,9 @@ public class WaitingFragment extends Fragment {
         takeBreakDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         takeBreakDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 900);
 
-        ((TextView)takeBreakDialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
-        ((TextView)takeBreakDialog.findViewById(R.id.take_break_text)).setText("Dear "+barberName);
-        ((TextView)takeBreakDialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
+        ((TextView) takeBreakDialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
+        ((TextView) takeBreakDialog.findViewById(R.id.take_break_text)).setText("Dear " + barberName);
+        ((TextView) takeBreakDialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
 
         final ImageView photoView = takeBreakDialog.findViewById(R.id.take_break_photo);
 
@@ -321,7 +317,7 @@ public class WaitingFragment extends Fragment {
         child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     Glide.with(mContext)
                             .load(task.getResult())
                             .into(photoView);
@@ -337,7 +333,7 @@ public class WaitingFragment extends Fragment {
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Task<Void> voidTask  = database.getReference().child("barbershops").child(userid)
+                final Task<Void> voidTask = database.getReference().child("barbershops").child(userid)
                         .child("queues").child(TimeUtil.getTodayDDMMYYYY())
                         .child(tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getTag().toString())
                         .child("status").setValue(newStatus);
@@ -381,7 +377,7 @@ public class WaitingFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            if(dataSnapshot.getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
+                            if (dataSnapshot.getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
                                 takeBreakButton.setText("On Break");
                                 takeBreakButton.setTextColor(Color.RED);
                             } else {
@@ -389,7 +385,7 @@ public class WaitingFragment extends Fragment {
                                 takeBreakButton.setTextColor(getResources().getColor(R.color.backgroundItems));
                             }
 
-                            if(dataSnapshot.getValue().toString().equalsIgnoreCase(Status.STOP.name())) {
+                            if (dataSnapshot.getValue().toString().equalsIgnoreCase(Status.STOP.name())) {
                                 stopQButton.setText("STOPPED");
                                 stopQButton.setTextColor(Color.RED);
                             } else {
@@ -424,7 +420,7 @@ public class WaitingFragment extends Fragment {
         child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     Glide.with(mContext)
                             .load(task.getResult())
                             .into(new SimpleTarget<Drawable>() {
@@ -446,7 +442,7 @@ public class WaitingFragment extends Fragment {
         queue.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(!dataSnapshot.child(selectedKey).exists()) {
+                if (!dataSnapshot.child(selectedKey).exists()) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.OPEN);
                     Task<Void> voidTask = queue.child(selectedKey).setValue(map);
@@ -464,10 +460,6 @@ public class WaitingFragment extends Fragment {
 
             }
         });
-
-
-
-
 
 
     }

@@ -469,6 +469,7 @@ public class WaitingListFragment extends Fragment {
 
         final Spinner ddSpinner = addCustomerView.findViewById(R.id.spinner_barber_selection);
 
+
         final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid);
         barbersRef.addValueEventListener(new ValueEventListener() {
             @Override

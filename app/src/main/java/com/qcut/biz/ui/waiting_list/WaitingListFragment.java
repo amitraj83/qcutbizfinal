@@ -3,6 +3,7 @@ package com.qcut.biz.ui.waiting_list;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -79,6 +80,8 @@ public class WaitingListFragment extends Fragment {
         waitingListModel =
                 ViewModelProviders.of(this).get(WaitingListModel.class);
         View root = inflater.inflate(R.layout.fragment_waiting_list, container, false);
+//        root.setVisibility(30);
+//        root.setBackgroundColor(Color.RED);
 
         sp = mContext.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
@@ -131,10 +134,6 @@ public class WaitingListFragment extends Fragment {
 
         dynamicListView = root.findViewById(R.id.today_queue);
         showQueue();
-//        queueChangeListener();
-
-
-
 
         dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -303,7 +302,7 @@ public class WaitingListFragment extends Fragment {
                 public void onClick(View v) {
                     String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
                     final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(queuedCustomerId);
+                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
 
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.PROGRESS);
@@ -312,7 +311,7 @@ public class WaitingListFragment extends Fragment {
                     queue.updateChildren(map);
 
                     if(adapter != null) {
-                        showQueue();
+                       // showQueue();
                     }
                     startServiceDialog.dismiss();
                 }
@@ -376,6 +375,7 @@ public class WaitingListFragment extends Fragment {
                     map.put("timeToWait", 0);
                     map.put("placeInQueue", 0);
                     queue.updateChildren(map);
+                    //showQueue();
                 }
                 serviceStartDialog.dismiss();
             }
@@ -399,7 +399,7 @@ public class WaitingListFragment extends Fragment {
                 String queuedCustomerId = String.valueOf(queueItem.getId());
                 if (queuedCustomerId != null) {
                     final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(queuedCustomerId);
+                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
 
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.DONE);
@@ -443,19 +443,25 @@ public class WaitingListFragment extends Fragment {
         barbersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                final List<String> queueBarberIdList = new ArrayList<String>();
                 if(dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
                     Iterator<DataSnapshot> iterator = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).getChildren().iterator();
                     List<Barber> barberList = new ArrayList<>();
+
                     while (iterator.hasNext()) {
                         DataSnapshot next = iterator.next();
                         if (next != null && !next.getKey().equalsIgnoreCase("online")) {
+                            queueBarberIdList.add(next.getKey());
                             String barberKey = next.getKey().toString();
                             DataSnapshot name = dataSnapshot.child("barbers").child(barberKey).child("name");
                             DataSnapshot imagePath = dataSnapshot.child("barbers").child(barberKey).child("imagePath");
-                            barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                            if(next.getKey() != null && name.getValue() != null && imagePath.getValue() != null){
+                                barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                            }
                         }
                     }
 
+                    barberList.add(new Barber("Any", "Any", ""));
                 BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
                 ddSpinner.setAdapter(customAdapter);
                 }
@@ -469,39 +475,13 @@ public class WaitingListFragment extends Fragment {
                             public void onClick(View v) {
 
                                 if (input != null && !input.getText().toString().trim().equalsIgnoreCase("")) {
-                                    final String name = input.getText().toString();
-                                    int count = 0;
-                                    DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
-                                    Iterator<DataSnapshot> iterator = queueSnapShot.getChildren().iterator();
-                                    while (iterator.hasNext()) {
-                                        DataSnapshot next = iterator.next();
-                                        if (next != null && !next.getKey().equalsIgnoreCase("online")) {
-                                            DataSnapshot statusChild = next.child("status");
-                                            String status = String.valueOf(statusChild.getValue());
-                                            if (status.equalsIgnoreCase(Status.QUEUE.name())) {
-                                                count++;
-                                            }
+                                    if(selectedKey.equalsIgnoreCase("any")) {
+                                        for (String barberKey: queueBarberIdList) {
+                                            pushCustomerToDB(input, dataSnapshot, barberKey, dialog);
                                         }
+                                    } else {
+                                        pushCustomerToDB(input, dataSnapshot, selectedKey, dialog);
                                     }
-
-                                    DatabaseReference queue = queueSnapShot.getRef();
-                                    String key = queue.push().getKey();
-
-                                    Map<String, Object> map = new HashMap<>();
-                                    map.put("name", name);
-                                    map.put("placeInQueue", ++count);
-                                    map.put("skipcount", 0);
-                                    map.put("timeToWait", timePerCut * count);
-                                    map.put("status", Status.QUEUE);
-                                    Task<Void> voidTask = queue.child(key).setValue(map);
-                                    voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            dialog.dismiss();
-                                            Toast.makeText(mContext, name + " added to queue", Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    });
                                 } else {
                                     Toast.makeText(mContext, "Cannot add customer. No name provided", Toast.LENGTH_SHORT).show();
                                 }
@@ -532,17 +512,53 @@ public class WaitingListFragment extends Fragment {
 
     }
 
+    private void pushCustomerToDB(EditText input, @NonNull DataSnapshot dataSnapshot, String selectedKey, final AlertDialog dialog) {
+        final String name = input.getText().toString();
+        int count = 0;
+        DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
+        Iterator<DataSnapshot> iterator = queueSnapShot.getChildren().iterator();
+        while (iterator.hasNext()) {
+            DataSnapshot next = iterator.next();
+            if (next != null && !next.getKey().equalsIgnoreCase("online")) {
+                DataSnapshot statusChild = next.child("status");
+                String status = String.valueOf(statusChild.getValue());
+                if (status.equalsIgnoreCase(Status.QUEUE.name())) {
+                    count++;
+                }
+            }
+        }
+
+        DatabaseReference queue = queueSnapShot.getRef();
+        String key = queue.push().getKey();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("placeInQueue", ++count);
+        map.put("skipcount", 0);
+        map.put("timeToWait", timePerCut * count);
+        map.put("status", Status.QUEUE);
+        Task<Void> voidTask = queue.child(key).setValue(map);
+        voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                dialog.dismiss();
+                Toast.makeText(mContext, name + " added to queue", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
 
 
     private void showQueue() {
-        final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
+
         DatabaseReference dbRef = database.getReference().child("barbershops")
                 .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
         if(dbRef != null) {
             dbRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
+                    final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
+                    if (dataSnapshot.exists() && dataSnapshot.getKey().equalsIgnoreCase(tag)) {
                         Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
                         boolean isSomeOneInQueue = false;
                         while (snapshotIterator.hasNext()) {
@@ -575,14 +591,12 @@ public class WaitingListFragment extends Fragment {
                                     break;
                                 }
                             }
-                            Context context = mContext;
-                            adapter= new ShopQueueModelAdaptor(models, mContext);
-                            dynamicListView.setAdapter(adapter);
                         } else {
                             nextCustomerTV.setText("No next customer.");
                             nextCustomerTV.setTag("NONE");
                         }
-
+                        adapter= new ShopQueueModelAdaptor(models, mContext);
+                        dynamicListView.setAdapter(adapter);
                     }
                 }
 
@@ -595,7 +609,7 @@ public class WaitingListFragment extends Fragment {
     }
 
     public void queueChangeListener(){
-        showQueue();
+        //showQueue();
 //        DatabaseReference dbRef = database.getReference().child("barbershops")
 //                .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY());
 //        dbRef.addValueEventListener(new ValueEventListener() {

@@ -89,5 +89,7 @@
 
     <string name="status_online">"ONLINE"</string>
     <string name="status_offline">"OFFLINE"</string>
+    <string name="yes">Yes</string>
+    <string name="No">No</string>
 
 </resources>

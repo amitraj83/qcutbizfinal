@@ -179,10 +179,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navController.navigate(R.id.nav_add_barber);
         } else if (id == R.id.temp) {
             navController.navigate(R.id.temp_fragment);
-        } else if (id == R.id.nav_list) {
-            navController.navigate(R.id.nav_waiting_list);
-
-        } else if (id == R.id.shop_address) {
+        }
+//        else if (id == R.id.nav_list) {
+//            navController.navigate(R.id.nav_waiting_list);
+//        }
+        else if (id == R.id.shop_address) {
             navController.navigate(R.id.nav_go_shop_details);
         } else if (id == R.id.opening_hours) {
             navController.navigate(R.id.nav_go_shop_opening_hours);

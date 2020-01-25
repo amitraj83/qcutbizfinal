@@ -59,18 +59,20 @@ public class BarberSelectionArrayAdapter extends ArrayAdapter<String> {
         final ImageView photo = (ImageView) convertView.findViewById(R.id.barber_photo_dd);
         TextView name = (TextView) convertView.findViewById(R.id.barber_name_dd);
 
-        StorageReference child = FirebaseStorage.getInstance().getReference().child(barberList.get(position).getImagePath());
+        if(!barberList.get(position).getName().equalsIgnoreCase("any")) {
+            StorageReference child = FirebaseStorage.getInstance().getReference().child(barberList.get(position).getImagePath());
 
-        child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                if(task.isSuccessful()) {
-                    Glide.with(getContext())
-                            .load(task.getResult())
-                            .into(photo);
+            child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if(task.isSuccessful()) {
+                        Glide.with(getContext())
+                                .load(task.getResult())
+                                .into(photo);
+                    }
                 }
-            }
-        });
+            });
+        }
         name.setText(barberList.get(position).getName());
         convertView.setTag(barberList.get(position).getId());
         return convertView;

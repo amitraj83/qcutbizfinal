@@ -47,7 +47,7 @@ public class TimerService extends Service
         sp = ctx.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
 
-        startService();
+        //startService();
     }
 
     private void startService()

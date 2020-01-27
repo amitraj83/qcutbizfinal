@@ -47,6 +47,7 @@ public class ShopDetailsFragment extends Fragment {
     private TextView shopAddress1TV;
     private TextView shopAddress2TV;
     private TextView googleMapLinkTV;
+    private TextView avgTimeToCut;
     private Spinner city;
     //private Spinner area;
     private Spinner country;
@@ -70,6 +71,7 @@ public class ShopDetailsFragment extends Fragment {
         shopAddress1TV = (TextView) root.findViewById(R.id.shop_details_address_1);
         shopAddress2TV = (TextView) root.findViewById(R.id.shop_details_address_2);
         googleMapLinkTV = (TextView) root.findViewById(R.id.shop_details_gmap_link);
+        avgTimeToCut = (TextView) root.findViewById(R.id.shop_details_avg_time_to_cut);
         city = (Spinner) root.findViewById(R.id.shop_details_city);
         //area = (Spinner) root.findViewById(R.id.shop_details_area);
         country = (Spinner) root.findViewById(R.id.shop_details_country);
@@ -201,6 +203,9 @@ public class ShopDetailsFragment extends Fragment {
         }
         if(notEmpty(googleMapLinkTV)) {
             map.put("gmaplink", googleMapLinkTV.getText().toString().trim());
+        }
+        if(notEmpty(avgTimeToCut)) {
+            map.put("avgTimeToCut", avgTimeToCut.getText().toString().trim());
         }
         if(city != null && city.getSelectedItem() != null) {
             map.put("city", city.getSelectedItem().toString());

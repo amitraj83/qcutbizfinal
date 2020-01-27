@@ -217,64 +217,91 @@ public class WaitingFragment extends Fragment {
                 addBarber.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        final List<Barber> barberList = new ArrayList<>();
+                        final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid);
+                        barbersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                                Iterator<DataSnapshot> iterator = dataSnapshot.child("barbers").getChildren().iterator();
+                                final List<Barber> barberList = new ArrayList<>();
+                                while (iterator.hasNext()) {
+                                    final DataSnapshot next = iterator.next();
+                                    final DataSnapshot name = next.child("name");
+                                    final DataSnapshot imagePath = next.child("imagePath");
+                                    boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
+                                    if (!bq) {
+                                        barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                                    }
+                                }
 
-                        if (barberList.size() > 0) {
-                            final LayoutInflater factory = LayoutInflater.from(mContext);
-                            final View selectBarberView = factory.inflate(R.layout.select_barber, null);
-                            final AlertDialog selectBarberDialog = new AlertDialog.Builder(mContext).create();
-                            selectBarberDialog.setView(selectBarberView);
+
+                                if (barberList.size() > 0) {
+                                    final LayoutInflater factory = LayoutInflater.from(mContext);
+                                    final View selectBarberView = factory.inflate(R.layout.select_barber, null);
+                                    final AlertDialog selectBarberDialog = new AlertDialog.Builder(mContext).create();
+                                    selectBarberDialog.setView(selectBarberView);
 
 
-                            selectBarberDialog.show();
-                            selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                            selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+                                    selectBarberDialog.show();
+                                    selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                    selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
 
-                            final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
-                            final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
+                                    final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
+                                    final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
 
-                            //----------------------------
-                            final Spinner ddSpinner = selectBarberDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
+                                    //----------------------------
+                                    final Spinner ddSpinner = selectBarberDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
 
-                            BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
-                            ddSpinner.setAdapter(customAdapter);
+                                    BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
+                                    ddSpinner.setAdapter(customAdapter);
 
-                            ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, long l) {
-
-                                    final String selectedKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
-
-                                    yesButton.setOnClickListener(new View.OnClickListener() {
+                                    ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                         @Override
-                                        public void onClick(View v) {
+                                        public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, long l) {
 
-                                            String name = dataSnapshot.child("barbers").child(selectedKey).child("name").getValue().toString();
-                                            String imagePath = dataSnapshot.child("barbers").child(selectedKey).child("imagePath").getValue().toString();
+                                            final String selectedKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
 
-                                            addTab(name, tabLayout, root, selectedKey, imagePath, dataSnapshot);
+                                            yesButton.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
 
-                                            selectBarberDialog.dismiss();
+                                                    String name = dataSnapshot.child("barbers").child(selectedKey).child("name").getValue().toString();
+                                                    String imagePath = dataSnapshot.child("barbers").child(selectedKey).child("imagePath").getValue().toString();
+
+                                                    addTab(name, tabLayout, root, selectedKey, imagePath, dataSnapshot);
+
+                                                    selectBarberDialog.dismiss();
+
+                                                }
+                                            });
+                                            noButton.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    selectBarberDialog.dismiss();
+                                                }
+                                            });
+
+                                        }
+
+                                        @Override
+                                        public void onNothingSelected(AdapterView<?> adapterView) {
 
                                         }
                                     });
-                                    noButton.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            selectBarberDialog.dismiss();
-                                        }
-                                    });
 
+                                } else {
+                                    Toast.makeText(mContext, "No barber to add", Toast.LENGTH_SHORT).show();
                                 }
 
-                                @Override
-                                public void onNothingSelected(AdapterView<?> adapterView) {
 
-                                }
-                            });
+                            }
 
-                        } else {
-                            Toast.makeText(mContext, "No barber to add", Toast.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
                         //----------------------------------
                     }
                 });

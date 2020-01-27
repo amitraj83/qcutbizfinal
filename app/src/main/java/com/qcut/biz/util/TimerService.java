@@ -17,9 +17,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.qcut.biz.models.Customer;
+import com.qcut.biz.models.CustomerComparator;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,6 +38,8 @@ public class TimerService extends Service
     private FirebaseDatabase database = null;
     private String userid;
     private SharedPreferences sp;
+    int avgTimeToCut = 15;
+
 
 
     public IBinder onBind(Intent arg0)
@@ -47,7 +55,25 @@ public class TimerService extends Service
         sp = ctx.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
 
-        //startService();
+        final DatabaseReference dbRef = database.getReference().child("barbershops").child(userid);
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    String avgTimeToCutStr = dataSnapshot.child("avgTimeToCut").getValue().toString();
+                    if(avgTimeToCutStr != null) {
+                        avgTimeToCut = Integer.valueOf(avgTimeToCutStr);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        startService();
     }
 
     private void startService()
@@ -84,27 +110,51 @@ public class TimerService extends Service
                         if (dataSnapshot.exists()) {
                             Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
                             while (snapshotIterator.hasNext()) {
-                                DataSnapshot aCustomer = snapshotIterator.next();
-                                String key = aCustomer.getKey();
-                                if (!key.equalsIgnoreCase("online")) {
-                                    boolean isCustomerNotDone = !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.DONE.name());
-                                    boolean isCustomerNotRemoved = !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.REMOVED.name());
 
-                                    if (isCustomerNotDone && isCustomerNotRemoved) {
-                                        DataSnapshot timeToWait1 = aCustomer.child("timeToWait");
-                                        if(timeToWait1 != null) {
-                                            long value = Long.valueOf(timeToWait1.getValue() != null
-                                                    ? timeToWait1.getValue().toString() : "-1");
-                                            if(value > 0) {
-                                                Map<String, Object> map = new HashMap<>();
-                                                value--;
-                                                map.put("timeToWait", value);
-                                                dbRef.child(key).updateChildren(map);
+                                DataSnapshot aBarberQueue = snapshotIterator.next();
+
+                                //Check if barber is not on break
+                                String aBarberQueueKey = aBarberQueue.getKey();
+                                if(!aBarberQueueKey.equalsIgnoreCase("online")
+                                        && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
+
+                                    List<Customer> customers = new ArrayList<Customer>();
+                                    if (!aBarberQueueKey.equalsIgnoreCase("online")) {
+                                        Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
+                                        while (childIterator.hasNext()) {
+                                            DataSnapshot aCustomer = childIterator.next();
+                                            if (!aCustomer.getKey().equalsIgnoreCase("status")
+                                                    && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                                String aCustomerKey = aCustomer.getKey();
+                                                customers.add(new Customer(aCustomerKey,
+                                                        Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
+                                                        Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
+                                                );
                                             }
                                         }
+                                    }
+                                    Collections.sort(customers, new CustomerComparator());
 
+                                    int prevCustomerTime = 0;
+                                    for (int i = 0; i < customers.size(); i++) {
+                                        if (i == 0) {
+                                            int timeToWait = customers.get(i).getTimeToWait();
+                                            if (timeToWait > 0) {
+                                                if (timeToWait > avgTimeToCut) {
+                                                    timeToWait = avgTimeToCut;
+                                                }
+                                                int newTimeToWait = timeToWait - 1;
+                                                aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
+                                                prevCustomerTime = newTimeToWait;
+                                            }
+                                        } else {
+                                            aBarberQueue.getRef().child(customers.get(i).getKey())
+                                                    .child("timeToWait").setValue(prevCustomerTime + avgTimeToCut);
+                                            prevCustomerTime = prevCustomerTime + avgTimeToCut;
+                                        }
                                     }
                                 }
+
                             }
                         }
                     }
@@ -116,5 +166,7 @@ public class TimerService extends Service
             }
 
         }
-    };    
+    };
+
+
 }

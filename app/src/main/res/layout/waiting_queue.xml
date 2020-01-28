@@ -25,7 +25,7 @@
             app:rippleColor="#33AAAAAA"
             app:strokeColor="@color/backgroundItems"
             app:strokeWidth="2dp"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:layout_margin="2dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -41,7 +41,7 @@
             app:rippleColor="#33AAAAAA"
             app:strokeColor="@color/backgroundItems"
             app:strokeWidth="2dp"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:layout_margin="2dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -57,7 +57,7 @@
             app:rippleColor="#33AAAAAA"
             app:strokeColor="@color/backgroundItems"
             app:strokeWidth="2dp"
-            android:layout_weight="1"
+            android:layout_weight="1.1"
             android:layout_margin="2dp"/>
 
         <com.google.android.material.button.MaterialButton
@@ -73,7 +73,7 @@
             app:rippleColor="#33AAAAAA"
             app:strokeColor="@color/backgroundItems"
             app:strokeWidth="2dp"
-            android:layout_weight="1"
+            android:layout_weight="1.1"
             android:layout_margin="2dp"/>
 
     </LinearLayout>

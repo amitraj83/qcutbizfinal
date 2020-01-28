@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="400dp"
     android:background="@android:color/white"
     app:cardCornerRadius="5dp"
     app:cardElevation="2dp">
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:weightSum="5">
+        android:weightSum="6">
 
 
 
@@ -51,13 +51,23 @@
             android:layout_marginRight="20dp"
             ></EditText>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:layout_marginTop="5dp"
+            android:text="Select Barber"
+            android:fontFamily="@font/montserrat_light"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/dialogNormalTextSize"
+            android:layout_weight="0.75"/>
 
         <Spinner
             android:id="@+id/spinner_barber_selection"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="2dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -65,7 +75,7 @@
             android:orientation="horizontal"
             android:layout_weight="1"
             android:weightSum="3"
-            android:layout_margin="20dp">
+            android:layout_margin="10dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/add_customer_dialog_no"

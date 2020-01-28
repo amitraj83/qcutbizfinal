@@ -39,6 +39,7 @@
     <string name="customer_name">Customer Name</string>
     <string name="cancel">Cancel</string>
     <string name="select_barber">Select Barber</string>
+    <string name="add_barber">Add Barber</string>
     <string name="add">Add</string>
     <string name="send">Send</string>
     <string name="add_service">Add Service</string>

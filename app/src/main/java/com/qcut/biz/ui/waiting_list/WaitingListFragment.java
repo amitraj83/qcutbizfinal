@@ -21,6 +21,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -62,8 +65,8 @@ public class WaitingListFragment extends Fragment {
     private SharedPreferences sp;
     private String userid;
     private long timePerCut = 15;
-    private ShopQueueModelAdaptor adapter = null;
-    private ListView dynamicListView = null;
+    private WaitingListRecyclerViewAdapter adapter = null;
+    private RecyclerView dynamicListView = null;
     private TextView nextCustomerTV;
     private String tag;
     private Context mContext;
@@ -170,12 +173,12 @@ public class WaitingListFragment extends Fragment {
         dynamicListView = root.findViewById(R.id.today_queue);
         showQueue();
 
-        dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                changeCustomerStatus(factory, position);
-            }
-        });
+//        dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                changeCustomerStatus(factory, position);
+//            }
+//        });
 
 
         return root;
@@ -429,164 +432,7 @@ public class WaitingListFragment extends Fragment {
 
             }
         });
-
-
-        /*voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                final DatabaseReference queueRef = database.getReference().child("barbershops").child(userid)
-                        .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
-                queueRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
-                        while (iterator.hasNext()) {
-                            DataSnapshot customer = iterator.next();
-                            if(!customer.getKey().equalsIgnoreCase("status")) {
-                                int currentPlace = Integer.valueOf(customer.child("placeInQueue").getValue().toString());
-                                if (currentPlace > 0) {
-                                    customer.getRef().child("placeInQueue").setValue(currentPlace - 1);
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-            }
-        });*/
     }
-
-    private void changeCustomerStatus(LayoutInflater factory, int position) {
-        final ShopQueueModel queueItem = (ShopQueueModel) dynamicListView.getItemAtPosition(position);
-        if(queueItem.getStatus().equalsIgnoreCase(Status.PROGRESS.name())) {
-            final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
-            TextView custNameTV = (TextView) serviceDoneView.findViewById(R.id.service_done_customer_name);
-            custNameTV.setText(queueItem.getName());
-            final AlertDialog serviceDoneDialog = new AlertDialog.Builder(mContext).create();
-            serviceDoneDialog.setView(serviceDoneView);
-
-
-            serviceDoneDialog.show();
-            serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            serviceDoneDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-
-            addServiceDoneButtonsClickListener(serviceDoneDialog, queueItem);
-
-        } else if (queueItem.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
-            final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
-            TextView custNameTV = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
-            custNameTV.setText(queueItem.getName());
-            final AlertDialog serviceStartDialog = new AlertDialog.Builder(mContext).create();
-            serviceStartDialog.setView(startServiceView);
-
-            serviceStartDialog.show();
-            serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            serviceStartDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
-            addServiceStartButtonsClickListener(serviceStartDialog, queueItem);
-        }
-
-    }
-
-    private void addServiceStartButtonsClickListener(final AlertDialog serviceStartDialog, final ShopQueueModel queueItem) {
-
-        Button yesButton = (Button) serviceStartDialog.findViewById(R.id.yes_start_service);
-        Button noButton = (Button) serviceStartDialog.findViewById(R.id.no_start_service);
-
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String queuedCustomerId = String.valueOf(queueItem.getId());
-                setCustomerInProgress(queuedCustomerId);
-                serviceStartDialog.dismiss();
-            }
-        });
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                serviceStartDialog.dismiss();
-            }
-        });
-    }
-
-    private void addServiceDoneButtonsClickListener(final AlertDialog serviceDoneDialog, final ShopQueueModel queueItem) {
-
-        Button yesButton = (Button) serviceDoneDialog.findViewById(R.id.yes_done_service);
-        Button noButton = (Button) serviceDoneDialog.findViewById(R.id.no_done_service);
-
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String queuedCustomerId = String.valueOf(queueItem.getId());
-                if (queuedCustomerId != null) {
-                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
-
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("status", Status.DONE);
-                    map.put("timeToWait", 0);
-                    map.put("placeInQueue", -1);
-                    Task<Void> voidTask = queue.updateChildren(map);
-                    voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            DatabaseReference databaseReference = database.getReference().child("barbershops").child(userid)
-                                    .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
-                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot aBarberQueue) {
-                                    String aBarberQueueKey = aBarberQueue.getKey();
-                                    if(!aBarberQueueKey.equalsIgnoreCase("online")) {
-
-                                        List<Customer> customers = new ArrayList<Customer>();
-                                        if (!aBarberQueueKey.equalsIgnoreCase("online")) {
-                                            Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
-                                            while (childIterator.hasNext()) {
-                                                DataSnapshot aCustomer = childIterator.next();
-                                                if (!aCustomer.getKey().equalsIgnoreCase("status")
-                                                        && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                                    String aCustomerKey = aCustomer.getKey();
-                                                    customers.add(new Customer(aCustomerKey,
-                                                            Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                                            Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                                    );
-                                                }
-                                            }
-                                        }
-                                        Collections.sort(customers, new CustomerComparator());
-
-                                        for (int i = 0; i < customers.size(); i++) {
-                                                aBarberQueue.getRef().child(customers.get(i).getKey())
-                                                        .child("timeToWait").setValue(0);
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-                    });
-                }
-                serviceDoneDialog.dismiss();
-            }
-        });
-
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                serviceDoneDialog.dismiss();
-            }
-        });
-    }
-
 
     private void addCustomer(LayoutInflater factory) {
 
@@ -598,7 +444,7 @@ public class WaitingListFragment extends Fragment {
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 950);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1100);
 
         final Button yesButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_yes);
         final Button noButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_no);
@@ -790,7 +636,12 @@ public class WaitingListFragment extends Fragment {
                             nextCustomerTV.setText("No customer.");
                             nextCustomerTV.setTag("NONE");
                         }
-                        adapter= new ShopQueueModelAdaptor(models, mContext);
+                        adapter= new WaitingListRecyclerViewAdapter(models, mContext, tag, database, userid);
+                        dynamicListView.setAdapter(adapter);
+
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+                        dynamicListView.setLayoutManager(mLayoutManager);
+                        dynamicListView.setItemAnimator(new DefaultItemAnimator());
                         dynamicListView.setAdapter(adapter);
                     }
                 }

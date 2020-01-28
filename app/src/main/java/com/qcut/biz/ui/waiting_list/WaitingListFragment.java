@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -643,6 +645,30 @@ public class WaitingListFragment extends Fragment {
                         dynamicListView.setLayoutManager(mLayoutManager);
                         dynamicListView.setItemAnimator(new DefaultItemAnimator());
                         dynamicListView.setAdapter(adapter);
+
+
+//                        RecyclerView.ItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+//                        dynamicListView.addItemDecoration(divider);
+
+                        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+                            @Override
+                            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder dragged,
+                                                  @NonNull RecyclerView.ViewHolder target) {
+                                int position_dragged = dragged.getAdapterPosition();
+                                int position_target = target.getAdapterPosition();
+                                Collections.swap(models, position_dragged, position_target);
+                                adapter.notifyItemMoved(position_dragged, position_target);
+                                return false;
+                            }
+
+                            @Override
+                            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+                            }
+                        });
+                        helper.attachToRecyclerView(dynamicListView);
+
                     }
                 }
 

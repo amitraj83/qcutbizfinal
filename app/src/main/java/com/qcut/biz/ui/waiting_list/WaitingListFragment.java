@@ -173,6 +173,10 @@ public class WaitingListFragment extends Fragment {
         });
 
         dynamicListView = root.findViewById(R.id.today_queue);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
+        dynamicListView.setLayoutManager(mLayoutManager);
+        dynamicListView.setItemAnimator(new DefaultItemAnimator());
+
         showQueue();
 
 //        dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -641,10 +645,7 @@ public class WaitingListFragment extends Fragment {
                         adapter= new WaitingListRecyclerViewAdapter(models, mContext, tag, database, userid);
                         dynamicListView.setAdapter(adapter);
 
-                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-                        dynamicListView.setLayoutManager(mLayoutManager);
-                        dynamicListView.setItemAnimator(new DefaultItemAnimator());
-                        dynamicListView.setAdapter(adapter);
+//                        dynamicListView.setAdapter(adapter);
 
 
 //                        RecyclerView.ItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

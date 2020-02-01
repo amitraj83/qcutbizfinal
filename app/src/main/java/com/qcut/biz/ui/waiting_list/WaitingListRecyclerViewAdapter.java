@@ -45,6 +45,14 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
         this.userid = userid;
     }
 
+    public void setDataSet(ArrayList<ShopQueueModel> dataSet) {
+        this.dataSet = dataSet;
+    }
+
+    public ArrayList<ShopQueueModel> getDataSet() {
+        return this.dataSet;
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

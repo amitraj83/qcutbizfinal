@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -176,17 +177,101 @@ public class WaitingListFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
         dynamicListView.setLayoutManager(mLayoutManager);
         dynamicListView.setItemAnimator(new DefaultItemAnimator());
+        final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
+        adapter= new WaitingListRecyclerViewAdapter(models, mContext, tag, database, userid);
+        dynamicListView.setAdapter(adapter);
 
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            int dragFrom = -1;
+            int dragTo = -1;
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN,0);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder dragged,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                final int position_dragged = dragged.getAdapterPosition();
+                final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder)recyclerView.findViewHolderForAdapterPosition(position_dragged))
+                        .custStatus.getTag().toString();
+                if(!status.equalsIgnoreCase(Status.QUEUE.name())) {
+                    return false;
+                }
+                final int position_target = target.getAdapterPosition();
+                Collections.swap(adapter.getDataSet(), position_dragged, position_target);
+                if(dragFrom == -1) {
+                    dragFrom =  position_dragged;
+                }
+                dragTo = position_target;
+
+                adapter.notifyItemMoved(position_dragged, position_target);
+
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+            @Override
+            public void clearView(final RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                final DatabaseReference barberRef = database.getReference().child("barbershops").child(userid)
+                        .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
+
+                barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                     @Override
+                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                         List<Customer> customers = new ArrayList<Customer>();
+                         Iterator<DataSnapshot> childIterator = dataSnapshot.getChildren().iterator();
+                         while (childIterator.hasNext()) {
+                             DataSnapshot aCustomer = childIterator.next();
+                             if (!aCustomer.getKey().equalsIgnoreCase("status")
+                                     && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                 String aCustomerKey = aCustomer.getKey();
+                                 customers.add(new Customer(aCustomerKey,
+                                         Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
+                                         Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
+                                 );
+                             }
+                         }
+                         Collections.sort(customers, new CustomerComparator());
+
+                            int count = 0;
+                         int itemCount = recyclerView.getAdapter().getItemCount();
+                         Map<String, Object> timeToUpdate = new HashMap<>();
+                         for (int i = 0; i < itemCount; i++) {
+                             final String sourceTag = recyclerView.findViewHolderForAdapterPosition(i)
+                                     .itemView.getTag().toString();
+                             final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder)recyclerView.findViewHolderForAdapterPosition(i))
+                                     .custStatus.getTag().toString();
+
+                             if(status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                 timeToUpdate.put(sourceTag + "/timeAdded", i);
+                                 timeToUpdate.put(sourceTag + "/timeToWait", customers.get(count++).getTimeToWait());
+                             }
+
+                         }
+                         barberRef.updateChildren(timeToUpdate);
+
+                     }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+
+                }
+
+        });
+
+        helper.attachToRecyclerView(dynamicListView);
         showQueue();
-
-//        dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                changeCustomerStatus(factory, position);
-//            }
-//        });
-
-
         return root;
     }
 
@@ -269,11 +354,12 @@ public class WaitingListFragment extends Fragment {
                                 String name = aCustomer.child("name").getValue().toString();
                                 long timeToWait = aCustomer.child("timeToWait").getValue() != null ?
                                         Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
+                                long timeAdded = Long.valueOf(aCustomer.child("timeAdded").getValue().toString());
                                 String status = aCustomer.child("status").getValue() != null ?
                                         aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
                                 if(status.equalsIgnoreCase(Status.QUEUE.name())) {
                                 }
-                                models.add(new ShopQueueModel(key, name, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
+                                models.add(new ShopQueueModel(key, name, timeAdded, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
                             }
                         }
                     }
@@ -581,6 +667,7 @@ public class WaitingListFragment extends Fragment {
         map.put("timeToWait", timeToWait);
         map.put("status", Status.QUEUE);
         map.put("timeAdded", new Date().getTime());
+        map.put("timeFirstAddedInQueue", new Date().getTime());
         map.put("customerId", customerId);
 
 
@@ -620,12 +707,13 @@ public class WaitingListFragment extends Fragment {
                                     String name = aCustomer.child("name").getValue().toString();
                                     long timeToWait = aCustomer.child("timeToWait").getValue() != null ?
                                             Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
+                                    long timeAdded = Long.valueOf(aCustomer.child("timeAdded").getValue().toString());
                                     String status = aCustomer.child("status").getValue() != null ?
                                             aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
                                     if(status.equalsIgnoreCase(Status.QUEUE.name())) {
                                         isSomeOneInQueue = true;
                                     }
-                                    models.add(new ShopQueueModel(key, name, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
+                                    models.add(new ShopQueueModel(key, name, timeAdded, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
                                 }
                             }
                         }
@@ -642,34 +730,8 @@ public class WaitingListFragment extends Fragment {
                             nextCustomerTV.setText("No customer.");
                             nextCustomerTV.setTag("NONE");
                         }
-                        adapter= new WaitingListRecyclerViewAdapter(models, mContext, tag, database, userid);
-                        dynamicListView.setAdapter(adapter);
-
-//                        dynamicListView.setAdapter(adapter);
-
-
-//                        RecyclerView.ItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-//                        dynamicListView.addItemDecoration(divider);
-
-                        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
-                                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
-                            @Override
-                            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder dragged,
-                                                  @NonNull RecyclerView.ViewHolder target) {
-                                int position_dragged = dragged.getAdapterPosition();
-                                int position_target = target.getAdapterPosition();
-                                Collections.swap(models, position_dragged, position_target);
-                                adapter.notifyItemMoved(position_dragged, position_target);
-                                return false;
-                            }
-
-                            @Override
-                            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
-                            }
-                        });
-                        helper.attachToRecyclerView(dynamicListView);
-
+                        adapter.setDataSet(models);
+                        adapter.notifyDataSetChanged();
                     }
                 }
 
@@ -702,9 +764,9 @@ public class WaitingListFragment extends Fragment {
 
         @Override
         public int compare(ShopQueueModel o1, ShopQueueModel o2) {
-            if (o1.getTimeToWait() > o2.getTimeToWait()) {
+            if (o1.getTimeAdded() > o2.getTimeAdded()) {
                 return 1;
-            } else if (o1.getTimeToWait() == o2.getTimeToWait()) {
+            } else if (o1.getTimeAdded() == o2.getTimeAdded()) {
                 return 0;
             } else {
                 return -1;

@@ -6,13 +6,23 @@ public class ShopQueueModel {
     private String displayTimeToWait;
     private String status;
     private long timeToWait; //in min
+    private long timeAdded; //in min
 
-    public ShopQueueModel(String id, String name, long timeToWait, String displayTimeToWait, String status) {
+    public ShopQueueModel(String id, String name, long timeAdded, long timeToWait, String displayTimeToWait, String status) {
         this.id = id;
         this.name = name;
         this.displayTimeToWait = displayTimeToWait;
         this.status = status;
         this.timeToWait = timeToWait;
+        this.timeAdded = timeAdded;
+    }
+
+    public long getTimeAdded() {
+        return timeAdded;
+    }
+
+    public void setTimeAdded(long timeAdded) {
+        this.timeAdded = timeAdded;
     }
 
     public String getId() {

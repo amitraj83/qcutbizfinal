@@ -152,6 +152,11 @@ public class ShopDetailsFragment extends Fragment {
                         shopAddress2TV.setText(String.valueOf(addressLine2.getValue()));
                     }
 
+                    DataSnapshot cutTime = dataSnapshot.child("avgTimeToCut");
+                    if(cutTime != null && cutTime.getValue() !=null) {
+                        avgTimeToCut.setText(String.valueOf(cutTime.getValue()));
+                    }
+
                     DataSnapshot gmaplink = dataSnapshot.child("gmaplink");
                     if(gmaplink != null && gmaplink.getValue() !=null) {
                         googleMapLinkTV.setText(String.valueOf(gmaplink.getValue()));

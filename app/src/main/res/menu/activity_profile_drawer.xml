@@ -31,7 +31,7 @@
             android:id="@+id/shop_address"
             android:icon="@drawable/ic_edit_location_black_24dp"
             android:fontFamily="@font/montserrat_medium"
-            android:title="Shop Address" />
+            android:title="Shop Details" />
         <item
             android:id="@+id/opening_hours"
             android:icon="@drawable/ic_access_time_black_24dp"

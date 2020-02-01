@@ -211,7 +211,8 @@ public class AddBarberFragment extends Fragment {
             filePath = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), filePath);
-                barberUploadImageView.setImageBitmap(bitmap);
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, false);
+                barberUploadImageView.setImageBitmap(scaledBitmap);
             } catch (IOException e){
                 e.printStackTrace();
             }

@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -383,6 +385,8 @@ public class WaitingFragment extends Fragment {
 
     private void addTab(String name, TabLayout tabLayout, View root, final String selectedKey, String imagePath, @NonNull DataSnapshot dataSnapshot) {
         final TabLayout.Tab tab = tabLayout.newTab();
+        View customView = LayoutInflater.from(mContext).inflate(R.layout.tab_customer_layout, null);
+        tab.setCustomView(customView);
         tab.setTag(selectedKey);
         tabLayout.addTab(tab.setText("Loading...").setIcon(R.drawable.photo_barber));
 
@@ -440,7 +444,8 @@ public class WaitingFragment extends Fragment {
             }
         });
 
-        tab.setText(name);
+//        tab.setText(name);
+        ((TextView)customView.findViewById(R.id.tab_name)).setText(name);
         createBarberQueue(selectedKey);
 
         StorageReference child = storageReference.child(imagePath);
@@ -448,14 +453,14 @@ public class WaitingFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
+                    RequestOptions myOptions = new RequestOptions()
+                            .override(100, 100);
+
                     Glide.with(mContext)
+                            .asBitmap()
+                            .apply(myOptions)
                             .load(task.getResult())
-                            .into(new SimpleTarget<Drawable>() {
-                                @Override
-                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                    tab.setIcon(resource);
-                                }
-                            });
+                            .into((ImageView) tab.getCustomView().findViewById(R.id.tab_image));
                 } else {
                     Toast.makeText(mContext, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }

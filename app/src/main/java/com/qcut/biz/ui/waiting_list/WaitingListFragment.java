@@ -13,17 +13,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,10 +39,9 @@ import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.ShopQueueModel;
-import com.qcut.biz.ui.adapters.ShopQueueModelAdaptor;
+import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
-import com.qcut.biz.util.TimerService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -554,7 +550,7 @@ public class WaitingListFragment extends Fragment {
                 if(dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
                     Iterator<DataSnapshot> iterator = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).getChildren().iterator();
                     List<Barber> barberList = new ArrayList<>();
-                    barberList.add(new Barber("Any", "Any", ""));
+                    barberList.add(new Barber(Constants.ANY, Constants.ANY, ""));
 
                     while (iterator.hasNext()) {
                         DataSnapshot next = iterator.next();
@@ -586,12 +582,12 @@ public class WaitingListFragment extends Fragment {
 
                                 if (input != null && !input.getText().toString().trim().equalsIgnoreCase("")) {
                                     String customerId = UUID.randomUUID().toString();
-                                    if(selectedKey.equalsIgnoreCase("any")) {
+                                    if(selectedKey.equalsIgnoreCase(Constants.ANY)) {
                                         for (String barberKey: queueBarberIdList) {
-                                            pushCustomerToDB(input, dataSnapshot, barberKey, dialog, customerId);
+                                            pushCustomerToDB(input, dataSnapshot, barberKey, dialog, customerId, true);
                                         }
                                     } else {
-                                        pushCustomerToDB(input, dataSnapshot, selectedKey, dialog, customerId);
+                                        pushCustomerToDB(input, dataSnapshot, selectedKey, dialog, customerId, false);
                                     }
                                 } else {
                                     Toast.makeText(mContext, "Cannot add customer. No name provided", Toast.LENGTH_SHORT).show();
@@ -623,7 +619,7 @@ public class WaitingListFragment extends Fragment {
 
     }
 
-    private void pushCustomerToDB(EditText input, @NonNull DataSnapshot dataSnapshot, String selectedKey, final AlertDialog dialog, String customerId) {
+    private void pushCustomerToDB(EditText input, @NonNull DataSnapshot dataSnapshot, String selectedKey, final AlertDialog dialog, String customerId, boolean isAny) {
         final String name = input.getText().toString();
         int count = 0;
         DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
@@ -669,6 +665,7 @@ public class WaitingListFragment extends Fragment {
         map.put("timeAdded", new Date().getTime());
         map.put("timeFirstAddedInQueue", new Date().getTime());
         map.put("customerId", customerId);
+        map.put("anyBarber", isAny);
 
 
         Task<Void> voidTask = queue.child(key).setValue(map);

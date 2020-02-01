@@ -42,10 +42,12 @@ import com.google.firebase.storage.StorageReference;
 import com.qcut.biz.R;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.ui.waiting_list.BarberSelectionArrayAdapter;
+import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -473,7 +475,7 @@ public class WaitingFragment extends Fragment {
                 .child("queues").child(TimeUtil.getTodayDDMMYYYY());
         queue.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.child(selectedKey).exists()) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.OPEN);
@@ -481,6 +483,73 @@ public class WaitingFragment extends Fragment {
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+                            DataSnapshot aBarber = null;
+                            Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                            while (iterator.hasNext()) {
+                                aBarber = iterator.next();
+                                if(!aBarber.getKey().equalsIgnoreCase(selectedKey)) {
+                                    break;
+                                }
+                            }
+
+                            if(aBarber != null) {
+                                Iterator<DataSnapshot> custIterator = aBarber.getChildren().iterator();
+                                while (custIterator.hasNext()) {
+                                    DataSnapshot aCustomer = custIterator.next();
+                                    Object isAnyBarberValue = aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue();
+                                    if (isAnyBarberValue != null) {
+                                        Boolean isAnyBarber = Boolean.valueOf(isAnyBarberValue.toString());
+                                        if(isAnyBarber) {
+
+
+                                            Map<String, Object> map = new HashMap<>();
+                                            if (aCustomer.child(Constants.Customer.NAME).getValue() != null) {
+                                                map.put(Constants.Customer.NAME,
+                                                        aCustomer.child(Constants.Customer.NAME).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.PLACE_IN_QUEUE).getValue() != null) {
+                                                map.put(Constants.Customer.PLACE_IN_QUEUE, 0);
+                                            }
+                                            if (aCustomer.child(Constants.Customer.SKIP_COUNT).getValue() != null) {
+                                                map.put(Constants.Customer.SKIP_COUNT,
+                                                        aCustomer.child(Constants.Customer.SKIP_COUNT).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.TIME_TO_WAIT).getValue() != null) {
+                                                map.put(Constants.Customer.TIME_TO_WAIT,
+                                                        aCustomer.child(Constants.Customer.TIME_TO_WAIT).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.STATUS).getValue() != null) {
+                                                map.put(Constants.Customer.STATUS,
+                                                        aCustomer.child(Constants.Customer.STATUS).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.TIME_ADDED).getValue() != null) {
+                                                map.put(Constants.Customer.TIME_ADDED,
+                                                        aCustomer.child(Constants.Customer.TIME_ADDED).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.TIME_FIRST_ADDED_IN_QUEUE).getValue() != null) {
+                                                map.put(Constants.Customer.TIME_FIRST_ADDED_IN_QUEUE,
+                                                        aCustomer.child(Constants.Customer.TIME_FIRST_ADDED_IN_QUEUE).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue() != null) {
+                                                map.put(Constants.Customer.CUSTOMER_ID,
+                                                        aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue().toString());
+                                            }
+                                            if (aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue() != null) {
+                                                map.put(Constants.Customer.IS_ANY_BARBER,
+                                                        aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString());
+                                            }
+
+
+                                            String newCustKey = queue.child(selectedKey).push().getKey();
+                                            Task<Void> voidTask = queue.child(selectedKey).child(newCustKey).setValue(map);
+                                        }
+                                    }
+                                }
+                            }
+                            //Add All Any customer
+                            //Find any barber
+                            //list all customer with Any
+                            //push the same customer to this queue
 
                         }
                     });

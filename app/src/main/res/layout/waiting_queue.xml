@@ -96,7 +96,7 @@
         android:elevation="6dp"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:tabPadding="2px"
+        app:tabBackground="@drawable/selector"
         />
 
 

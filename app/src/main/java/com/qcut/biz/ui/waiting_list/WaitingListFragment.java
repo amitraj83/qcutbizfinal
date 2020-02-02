@@ -34,6 +34,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
 import com.qcut.biz.models.Barber;
@@ -191,22 +192,39 @@ public class WaitingListFragment extends Fragment {
             }
 
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder dragged,
-                                  @NonNull RecyclerView.ViewHolder target) {
-                final int position_dragged = dragged.getAdapterPosition();
-                final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder)recyclerView.findViewHolderForAdapterPosition(position_dragged))
-                        .custStatus.getTag().toString();
-                if(!status.equalsIgnoreCase(Status.QUEUE.name())) {
-                    return false;
-                }
-                final int position_target = target.getAdapterPosition();
-                Collections.swap(adapter.getDataSet(), position_dragged, position_target);
-                if(dragFrom == -1) {
-                    dragFrom =  position_dragged;
-                }
-                dragTo = position_target;
+            public boolean onMove(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder dragged,
+                                  @NonNull final RecyclerView.ViewHolder target) {
+                Query barberRef = database.getReference().child("barbershops").child(userid)
+                        .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).
+                        orderByChild(Constants.Customer.STATUS).equalTo(Status.PROGRESS.name());
+                barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()) {
+                            Toast.makeText(mContext, "A customer in chair. Cannot drag or drop others.", Toast.LENGTH_SHORT).show();
+                        } else {
 
-                adapter.notifyItemMoved(position_dragged, position_target);
+                            final int position_dragged = dragged.getAdapterPosition();
+                            final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder)recyclerView.findViewHolderForAdapterPosition(position_dragged))
+                                    .custStatus.getTag().toString();
+                            if(status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                final int position_target = target.getAdapterPosition();
+                                Collections.swap(adapter.getDataSet(), position_dragged, position_target);
+                                if(dragFrom == -1) {
+                                    dragFrom =  position_dragged;
+                                }
+                                dragTo = position_target;
+                                adapter.notifyItemMoved(position_dragged, position_target);
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
 
                 return true;
             }
@@ -232,13 +250,17 @@ public class WaitingListFragment extends Fragment {
                          Iterator<DataSnapshot> childIterator = dataSnapshot.getChildren().iterator();
                          while (childIterator.hasNext()) {
                              DataSnapshot aCustomer = childIterator.next();
-                             if (!aCustomer.getKey().equalsIgnoreCase("status")
-                                     && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                 String aCustomerKey = aCustomer.getKey();
-                                 customers.add(new Customer(aCustomerKey,
-                                         Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                         Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                 );
+                             if (!aCustomer.getKey().equalsIgnoreCase("status")) {
+//                                     && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                 boolean isStatusQUEUE = aCustomer.child("status").exists() ?
+                                         aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name()) : false;
+                                 if(isStatusQUEUE) {
+                                     String aCustomerKey = aCustomer.getKey();
+                                     customers.add(new Customer(aCustomerKey,
+                                             Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
+                                             Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
+                                     );
+                                 }
                              }
                          }
                          Collections.sort(customers, new CustomerComparator());
@@ -353,16 +375,17 @@ public class WaitingListFragment extends Fragment {
                         if(!key.equalsIgnoreCase("online")) {
                             if (aCustomer.child("name").getValue() != null) {
                                 String name = aCustomer.child("name").getValue().toString();
-                                long timeToWait = aCustomer.child("timeToWait").getValue() != null ?
+                                long timeToWait = aCustomer.child("timeToWait").exists() ?
                                         Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
                                 long timeAdded = Long.valueOf(aCustomer.child("timeAdded").getValue().toString());
-                                String status = aCustomer.child("status").getValue() != null ?
+                                String status = aCustomer.child("status").exists() ?
                                         aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
                                 if(status.equalsIgnoreCase(Status.QUEUE.name())) {
                                 }
                                 models.add(new ShopQueueModel(key, name, timeAdded, timeToWait,
                                         TimeUtil.getDisplayWaitingTime(timeToWait), status,
-                                        Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()))
+                                        Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).exists() ?
+                                                aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString() : "true"))
                                 );
                             }
                         }
@@ -483,10 +506,11 @@ public class WaitingListFragment extends Fragment {
 
 
                     Map<String, Object> map = new HashMap<>();
-                    map.put("status", Status.PROGRESS);
-                    map.put("timeToWait", 0);
-                    map.put("timeServiceStarted", new Date().getTime());
-                    map.put("placeInQueue", -1);
+                    map.put(Constants.Customer.STATUS, Status.PROGRESS);
+                    map.put(Constants.Customer.TIME_TO_WAIT, 0);
+                    map.put(Constants.Customer.TIME_ADDED, -1);
+                    map.put(Constants.Customer.TIME_SERVICE_STARTED, new Date().getTime());
+                    map.put(Constants.Customer.PLACE_IN_QUEUE, -1);
                     Task<Void> voidTask = queue.updateChildren(map);
                     final String customerIdForAnyBarber = customerId;
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -668,16 +692,20 @@ public class WaitingListFragment extends Fragment {
                             DataSnapshot aCustomer = snapshotIterator.next();
                             String key = aCustomer.getKey();
                             if(!key.equalsIgnoreCase("status")) {
-                                boolean isCustomerNameNotNull = aCustomer.child("name").getValue() != null;
-                                boolean isCustomerNotDone = !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.DONE.name());
-                                boolean isCustomerNotRemoved = !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.REMOVED.name());
+                                boolean isCustomerNameNotNull = aCustomer.child("name").exists()
+                                        ? aCustomer.child("name").getValue() != null : false;
+                                boolean isCustomerNotDone = aCustomer.child("status").exists() ?
+                                        !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.DONE.name()) : false;
+                                boolean isCustomerNotRemoved = aCustomer.child("status").exists() ?
+                                        !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.REMOVED.name()) : false;
 
                                 if (isCustomerNameNotNull && ( isCustomerNotDone && isCustomerNotRemoved) ) {
                                     String name = aCustomer.child("name").getValue().toString();
-                                    long timeToWait = aCustomer.child("timeToWait").getValue() != null ?
+                                    long timeToWait = aCustomer.child("timeToWait").exists()?
                                             Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
-                                    long timeAdded = Long.valueOf(aCustomer.child("timeAdded").getValue().toString());
-                                    String status = aCustomer.child("status").getValue() != null ?
+                                    long timeAdded = Long.valueOf(aCustomer.child("timeAdded").exists() ?
+                                            aCustomer.child("timeAdded").getValue().toString() : "3");
+                                    String status = aCustomer.child("status").exists() ?
                                             aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
                                     if(status.equalsIgnoreCase(Status.QUEUE.name())) {
                                         isSomeOneInQueue = true;

@@ -27,6 +27,7 @@ import com.qcut.biz.R;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.ShopQueueModel;
+import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
 import com.qcut.biz.util.ViewUtils;
@@ -145,13 +146,17 @@ public class WaitingListClickListener implements View.OnClickListener {
                                             Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
                                             while (childIterator.hasNext()) {
                                                 DataSnapshot aCustomer = childIterator.next();
-                                                if (!aCustomer.getKey().equalsIgnoreCase("status")
-                                                        && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                                    String aCustomerKey = aCustomer.getKey();
-                                                    customers.add(new Customer(aCustomerKey,
-                                                            Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                                            Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                                    );
+                                                if (!aCustomer.getKey().equalsIgnoreCase("status")){
+//                                                        && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                                    boolean isStatusQUEUE = aCustomer.child("status").exists() ?
+                                                            aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name()): false;
+                                                    if(isStatusQUEUE) {
+                                                        String aCustomerKey = aCustomer.getKey();
+                                                        customers.add(new Customer(aCustomerKey,
+                                                                Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
+                                                                Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
+                                                        );
+                                                    }
                                                 }
                                             }
                                         }
@@ -222,12 +227,15 @@ public class WaitingListClickListener implements View.OnClickListener {
                     DataSnapshot customer = iterator.next();
 
                     if(customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
-                        customerId = customer.child("customerId").getValue().toString();
+                        customerId = customer.child("customerId").exists() ? customer.child("customerId").getValue().toString() : "";
                     }
 
-                    if(!customer.getKey().equalsIgnoreCase("status") &&
-                            customer.child("status").getValue().toString().equalsIgnoreCase(Status.PROGRESS.name())) {
-                        isSomeoneInProgress = true;
+                    if(!customer.getKey().equalsIgnoreCase("status") ){
+                        boolean isStatusPROGRESS = customer.child("status").exists() ?
+                                customer.child("status").getValue().toString().equalsIgnoreCase(Status.PROGRESS.name()) : false;
+                        if(isStatusPROGRESS) {
+                            isSomeoneInProgress = true;
+                        }
                     }
                 }
                 if(!isSomeoneInProgress) {
@@ -251,20 +259,28 @@ public class WaitingListClickListener implements View.OnClickListener {
                             dateRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    Iterator<DataSnapshot> queueIt = dataSnapshot.getChildren().iterator();
-                                    while (queueIt.hasNext()) {
-                                        DataSnapshot queueSnapshot = queueIt.next();
-                                        if(!queueSnapshot.getKey().equalsIgnoreCase(tag) && !queueSnapshot.getKey().equalsIgnoreCase("online")) {
-                                            Iterator<DataSnapshot> customersIt = queueSnapshot.getChildren().iterator();
-                                            while (customersIt.hasNext()) {
-                                                DataSnapshot customerDataSnapshot = customersIt.next();
-                                                if(!customerDataSnapshot.getKey().equalsIgnoreCase("status")){
-                                                    if(customerDataSnapshot.child("customerId").getValue().toString()
-                                                            .equalsIgnoreCase(customerIdForAnyBarber)) {
-                                                        queueSnapshot.getRef().child(customerDataSnapshot.getKey()).removeValue();
+                                    if(dataSnapshot.exists()) {
+                                        Iterator<DataSnapshot> queueIt = dataSnapshot.getChildren().iterator();
+                                        while (queueIt.hasNext()) {
+                                            DataSnapshot queueSnapshot = queueIt.next();
+                                            if (!queueSnapshot.getKey().equalsIgnoreCase(tag) && !queueSnapshot.getKey().equalsIgnoreCase("online")) {
+                                                Iterator<DataSnapshot> customersIt = queueSnapshot.getChildren().iterator();
+                                                while (customersIt.hasNext()) {
+                                                    DataSnapshot customerDataSnapshot = customersIt.next();
+                                                    if (!customerDataSnapshot.getKey().equalsIgnoreCase("status")) {
+                                                        if (customerDataSnapshot.child(Constants.Customer.NAME).exists() &&
+                                                                customerDataSnapshot.child("customerId").exists() &&
+                                                                customerDataSnapshot.child("customerId").getValue().toString()
+                                                                .equalsIgnoreCase(customerIdForAnyBarber)) {
+                                                            queueSnapshot.getRef().child(customerDataSnapshot.getKey()).removeValue();
+                                                        } else {
+//                                                            Toast.makeText(mContext, "Customer "
+//                                                                    +customerDataSnapshot.getKey()+
+//                                                                    " does not exists. Delete it from UI. Create new and drag drop.", Toast.LENGTH_LONG).show();
+                                                        }
                                                     }
-                                                }
 
+                                                }
                                             }
                                         }
                                     }
@@ -277,6 +293,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                             });
                         }
                     });
+
                 } else {
                     Toast.makeText(mContext, "Cannot start services. A customer is already in progress.", Toast.LENGTH_LONG).show();
                 }

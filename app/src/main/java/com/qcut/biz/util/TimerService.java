@@ -100,17 +100,22 @@ public class TimerService extends Service {
                                     && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
 
                                 List<Customer> customers = new ArrayList<Customer>();
+                                boolean isSomeOneInProgress = false;
                                 if (!aBarberQueueKey.equalsIgnoreCase("online")) {
                                     Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
                                     while (childIterator.hasNext()) {
                                         DataSnapshot aCustomer = childIterator.next();
-                                        if (!aCustomer.getKey().equalsIgnoreCase("status")
-                                                && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                            String aCustomerKey = aCustomer.getKey();
-                                            customers.add(new Customer(aCustomerKey,
-                                                    Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                                    Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                            );
+                                        if (!aCustomer.getKey().equalsIgnoreCase("status") && aCustomer.child("status").exists()) {
+//                                                && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                            if( aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                                String aCustomerKey = aCustomer.getKey();
+                                                customers.add(new Customer(aCustomerKey,
+                                                        Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
+                                                        Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
+                                                );
+                                            } else if (aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.PROGRESS.name())) {
+                                                isSomeOneInProgress = true;
+                                            }
                                         }
                                     }
                                 }
@@ -126,14 +131,19 @@ public class TimerService extends Service {
                                 int prevCustomerTime = 0;
                                 for (int i = 0; i < customers.size(); i++) {
                                     if (i == 0) {
-                                        int timeToWait = customers.get(i).getTimeToWait();
-                                        if (timeToWait > 0) {
-                                            if (timeToWait > avgTimeToCut) {
-                                                timeToWait = avgTimeToCut;
+                                        if(isSomeOneInProgress) {
+                                            int timeToWait = customers.get(i).getTimeToWait();
+                                            if (timeToWait > 0) {
+                                                if (timeToWait > avgTimeToCut) {
+                                                    timeToWait = avgTimeToCut;
+                                                }
+                                                int newTimeToWait = timeToWait - 1;
+                                                aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
+                                                prevCustomerTime = newTimeToWait;
                                             }
-                                            int newTimeToWait = timeToWait - 1;
-                                            aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
-                                            prevCustomerTime = newTimeToWait;
+                                        } else {
+                                            aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(0);
+                                            prevCustomerTime = 0;
                                         }
                                     } else {
                                         aBarberQueue.getRef().child(customers.get(i).getKey())

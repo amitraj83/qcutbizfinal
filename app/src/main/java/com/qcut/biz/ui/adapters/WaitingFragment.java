@@ -396,7 +396,7 @@ public class WaitingFragment extends Fragment {
         });
     }
 
-    private void addTab(String name, TabLayout tabLayout, View root, final String selectedKey, String imagePath, @NonNull DataSnapshot dataSnapshot) {
+    private void addTab(String name, final TabLayout tabLayout, View root, final String selectedKey, String imagePath, @NonNull DataSnapshot dataSnapshot) {
         final TabLayout.Tab tab = tabLayout.newTab();
         View customView = LayoutInflater.from(mContext).inflate(R.layout.tab_customer_layout, null);
         tab.setCustomView(customView);
@@ -413,7 +413,11 @@ public class WaitingFragment extends Fragment {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-
+                ((TextView)tab.getCustomView().findViewById(R.id.tab_name)).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+//                Toast.makeText(mContext, "TabLayout "+tabLayout.getChildCount() +" current position "+tab.getPosition(), Toast.LENGTH_SHORT).show();
+//                if(tabLayout.getChildCount() > 0) {
+//                    tabLayout.getChildAt(0).setBackgroundColor(Color.WHITE);
+//                }
                 DatabaseReference barberStatusRef = database.getReference().child("barbershops").child(userid)
                         .child("queues").child(TimeUtil.getTodayDDMMYYYY())
                         .child(tab.getTag().toString())

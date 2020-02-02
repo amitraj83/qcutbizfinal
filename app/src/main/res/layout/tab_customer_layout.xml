@@ -6,16 +6,33 @@
     android:weightSum="2"
     android:id="@+id/tab_custom_view">
 
-    <!--<androidx.cardview.widget.CardView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        app:cardCornerRadius="15dp">-->
-            <ImageView
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/myCardView"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:cardCornerRadius="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        >
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/tab_image"
+            android:layout_gravity="center"/>
+    </androidx.cardview.widget.CardView>
+    </LinearLayout>
+            <!--<ImageView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:id="@+id/tab_image"/>
-    <!--</androidx.cardview.widget.CardView>-->
+                android:id="@+id/tab_image"/>-->
 
     <TextView
         android:layout_width="0dp"

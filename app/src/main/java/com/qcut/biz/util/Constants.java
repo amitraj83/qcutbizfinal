@@ -14,6 +14,7 @@ public interface Constants {
         String TIME_FIRST_ADDED_IN_QUEUE = "timeFirstAddedInQueue";
         String CUSTOMER_ID = "customerId";
         String IS_ANY_BARBER = "anyBarber";
+        String TIME_SERVICE_STARTED = "timeServiceStarted";
 
     }
 }

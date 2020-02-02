@@ -7,4 +7,7 @@
     <color name="backgroundItems">#0BD8C3</color>
     <color name="bottomBtnColor">#6D6A6A</color>
     <color name="breakColor">#353232</color>
+    <color name="white">#FFFFFF</color>
+    <color name="tab_selected_color">#FFFFFF</color>
+    <color name="tab_unselected_color">#0BD8C3</color>
 </resources>

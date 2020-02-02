@@ -1,5 +1,7 @@
 package com.qcut.biz.util;
 
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -29,4 +31,18 @@ public class ViewUtils {
         }
         return false;
     }
+
+    public static int getDisplayHeight(WindowManager windowManager) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.heightPixels;
+    }
+
+    public static int getDisplayWidth(WindowManager windowManager) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.widthPixels;
+    }
+
+
 }

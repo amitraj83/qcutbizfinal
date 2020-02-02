@@ -58,7 +58,8 @@
         android:hint="@string/password"
         android:layout_weight="1"
         android:fontFamily="@font/montserrat_light"
-        android:inputType="textPassword"/>
+        android:inputType="textPassword"
+        android:imeOptions="actionDone"/>
 
     <TextView
         android:id="@+id/forgot_btn"

@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,44 +56,24 @@ public class SignInActivity extends AppCompatActivity {
 
         sp = getSharedPreferences("login",MODE_PRIVATE);
 
+        passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    signIn();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         signIn = findViewById(R.id.sign_in_screen);
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Query query = database.getReference().child("barbershops").
-                        orderByChild("email").equalTo(emailText.getText().toString());
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            for (DataSnapshot shopData : dataSnapshot.getChildren()) {
-                                String email = shopData.child("email").getValue().toString();
-                                String password = shopData.child("password").getValue().toString();
-                                if (email.equalsIgnoreCase(emailText.getText().toString()) &&
-                                        password.equalsIgnoreCase(passwordText.getText().toString())) {
-                                    Toast.makeText(SignInActivity.this, "Login Successful.", Toast.LENGTH_LONG).show();
-                                    sp.edit().putBoolean("isLoggedIn",true).apply();
-                                    sp.edit().putString("userid", shopData.getKey().toString()).apply();
-                                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                                    startActivity(intent);
-
-                                } else {
-                                    Toast.makeText(SignInActivity.this, "Login unsuccessful.", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        } else {
-                            Toast.makeText(SignInActivity.this, "Login Does not exist.", Toast.LENGTH_LONG).show();
-
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-            });
-        }});
+                signIn();
+            }});
 
         LayoutInflater factory = LayoutInflater.from(SignInActivity.this);
         final View forgotPasswordView = factory.inflate(R.layout.forgot_password, null);
@@ -109,6 +91,40 @@ public class SignInActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void signIn() {
+        Query query = database.getReference().child("barbershops").
+                orderByChild("email").equalTo(emailText.getText().toString().trim());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot shopData : dataSnapshot.getChildren()) {
+                        String email = shopData.child("email").getValue().toString().trim();
+                        String password = shopData.child("password").getValue().toString().trim();
+                        if (email.equalsIgnoreCase(emailText.getText().toString().trim()) &&
+                                password.equalsIgnoreCase(passwordText.getText().toString().trim())) {
+                            Toast.makeText(SignInActivity.this, "Login Successful.", Toast.LENGTH_LONG).show();
+                            sp.edit().putBoolean("isLoggedIn",true).apply();
+                            sp.edit().putString("userid", shopData.getKey().toString()).apply();
+                            Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                            startActivity(intent);
+
+                        } else {
+                            Toast.makeText(SignInActivity.this, "Login unsuccessful.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } else {
+                    Toast.makeText(SignInActivity.this, "Login Does not exist.", Toast.LENGTH_LONG).show();
+
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+    });
     }
 
     @Override

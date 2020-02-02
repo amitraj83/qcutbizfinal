@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Layout;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,7 @@ import com.qcut.biz.ui.waiting_list.BarberSelectionArrayAdapter;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
+import com.qcut.biz.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -248,7 +250,11 @@ public class WaitingFragment extends Fragment {
 
                                     selectBarberDialog.show();
                                     selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                                    selectBarberDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+                                    int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                            ViewUtils.getDisplayHeight(getActivity().getWindowManager())/4, getResources().getDisplayMetrics());
+                                    int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                            ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+                                    selectBarberDialog.getWindow().setLayout(width, height);
 
                                     final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
                                     final Button noButton = (Button) selectBarberDialog.findViewById(R.id.no_add_barber_queue);
@@ -336,7 +342,12 @@ public class WaitingFragment extends Fragment {
 
         takeBreakDialog.show();
         takeBreakDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        takeBreakDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 900);
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                ViewUtils.getDisplayHeight(getActivity().getWindowManager())/3, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+
+        takeBreakDialog.getWindow().setLayout(width, height);
 
         ((TextView) takeBreakDialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
         ((TextView) takeBreakDialog.findViewById(R.id.take_break_text)).setText("Dear " + barberName);
@@ -497,9 +508,10 @@ public class WaitingFragment extends Fragment {
                                 while (custIterator.hasNext()) {
                                     DataSnapshot aCustomer = custIterator.next();
                                     Object isAnyBarberValue = aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue();
+                                    String status = aCustomer.child(Constants.Customer.STATUS).getValue().toString();
                                     if (isAnyBarberValue != null) {
                                         Boolean isAnyBarber = Boolean.valueOf(isAnyBarberValue.toString());
-                                        if(isAnyBarber) {
+                                        if(isAnyBarber && !status.equalsIgnoreCase(Status.PROGRESS.name())) {
 
 
                                             Map<String, Object> map = new HashMap<>();

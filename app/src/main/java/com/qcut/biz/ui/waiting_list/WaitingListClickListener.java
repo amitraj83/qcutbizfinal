@@ -3,10 +3,13 @@ package com.qcut.biz.ui.waiting_list;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +29,7 @@ import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.ShopQueueModel;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
+import com.qcut.biz.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +76,14 @@ public class WaitingListClickListener implements View.OnClickListener {
 
             serviceDoneDialog.show();
             serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            serviceDoneDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/5,
+                    Resources.getSystem().getDisplayMetrics());
+            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/2,
+                    Resources.getSystem().getDisplayMetrics() );
+
+            serviceDoneDialog.getWindow().setLayout(width, height);
 
             addServiceDoneButtonsClickListener(serviceDoneDialog, v.getTag().toString());
 
@@ -85,7 +96,14 @@ public class WaitingListClickListener implements View.OnClickListener {
 
             serviceStartDialog.show();
             serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            serviceStartDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/4,
+                    Resources.getSystem().getDisplayMetrics());
+            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/2,
+                    Resources.getSystem().getDisplayMetrics());
+
+            serviceStartDialog.getWindow().setLayout(width, height);
             addServiceStartButtonsClickListener(serviceStartDialog, v.getTag().toString());
         }
 

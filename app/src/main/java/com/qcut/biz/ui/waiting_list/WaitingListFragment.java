@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ import com.qcut.biz.models.ShopQueueModel;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
+import com.qcut.biz.util.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -286,7 +288,7 @@ public class WaitingListFragment extends Fragment {
         skipCostumer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showSkipServiceDialog(factory);
+                //showSkipServiceDialog(factory);
 
             }
         });
@@ -418,7 +420,12 @@ public class WaitingListFragment extends Fragment {
 
             startServiceDialog.show();
             startServiceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            startServiceDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 750);
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    ViewUtils.getDisplayHeight(getActivity().getWindowManager())/4, getResources().getDisplayMetrics());
+            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+
+            startServiceDialog.getWindow().setLayout(width, height);
 
             Button yesButton = (Button) startServiceDialog.findViewById(R.id.yes_start_service);
             Button noButton = (Button) startServiceDialog.findViewById(R.id.no_start_service);
@@ -532,7 +539,12 @@ public class WaitingListFragment extends Fragment {
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, 1100);
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                ViewUtils.getDisplayHeight(getActivity().getWindowManager())/3, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+
+        dialog.getWindow().setLayout(width, height);
 
         final Button yesButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_yes);
         final Button noButton = (Button) addCustomerView.findViewById(R.id.add_customer_dialog_no);

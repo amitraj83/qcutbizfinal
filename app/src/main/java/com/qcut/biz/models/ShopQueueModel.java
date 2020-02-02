@@ -7,14 +7,25 @@ public class ShopQueueModel {
     private String status;
     private long timeToWait; //in min
     private long timeAdded; //in min
+    private boolean isAny;
 
-    public ShopQueueModel(String id, String name, long timeAdded, long timeToWait, String displayTimeToWait, String status) {
+    public ShopQueueModel(String id, String name, long timeAdded, long timeToWait,
+                          String displayTimeToWait, String status, boolean isAny) {
         this.id = id;
         this.name = name;
         this.displayTimeToWait = displayTimeToWait;
         this.status = status;
         this.timeToWait = timeToWait;
         this.timeAdded = timeAdded;
+        this.isAny = isAny;
+    }
+
+    public boolean isAny() {
+        return isAny;
+    }
+
+    public void setAny(boolean any) {
+        isAny = any;
     }
 
     public long getTimeAdded() {

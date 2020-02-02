@@ -38,7 +38,7 @@ public class TimerService extends Service
     private FirebaseDatabase database = null;
     private String userid;
     private SharedPreferences sp;
-    int avgTimeToCut = 15;
+//    int avgTimeToCut = 15;
 
 
 
@@ -54,24 +54,6 @@ public class TimerService extends Service
         database = FirebaseDatabase.getInstance();
         sp = ctx.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
-
-        final DatabaseReference dbRef = database.getReference().child("barbershops").child(userid);
-        dbRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
-                    String avgTimeToCutStr = dataSnapshot.child("avgTimeToCut").getValue().toString();
-                    if(avgTimeToCutStr != null) {
-                        avgTimeToCut = Integer.valueOf(avgTimeToCutStr);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         startService();
     }
@@ -101,72 +83,82 @@ public class TimerService extends Service
         @Override
         public void handleMessage(Message msg)
         {
-            final DatabaseReference dbRef = database.getReference().child("barbershops")
-                    .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY());
-            if(dbRef != null) {
-                dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
-                            while (snapshotIterator.hasNext()) {
-
-                                DataSnapshot aBarberQueue = snapshotIterator.next();
-
-                                //Check if barber is not on break
-                                String aBarberQueueKey = aBarberQueue.getKey();
-                                if(!aBarberQueueKey.equalsIgnoreCase("online")
-                                        && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
-
-                                    List<Customer> customers = new ArrayList<Customer>();
-                                    if (!aBarberQueueKey.equalsIgnoreCase("online")) {
-                                        Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
-                                        while (childIterator.hasNext()) {
-                                            DataSnapshot aCustomer = childIterator.next();
-                                            if (!aCustomer.getKey().equalsIgnoreCase("status")
-                                                    && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                                String aCustomerKey = aCustomer.getKey();
-                                                customers.add(new Customer(aCustomerKey,
-                                                        Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                                        Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                                );
-                                            }
-                                        }
-                                    }
-                                    Collections.sort(customers, new CustomerComparator());
-
-                                    int prevCustomerTime = 0;
-                                    for (int i = 0; i < customers.size(); i++) {
-                                        if (i == 0) {
-                                            int timeToWait = customers.get(i).getTimeToWait();
-                                            if (timeToWait > 0) {
-                                                if (timeToWait > avgTimeToCut) {
-                                                    timeToWait = avgTimeToCut;
-                                                }
-                                                int newTimeToWait = timeToWait - 1;
-                                                aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
-                                                prevCustomerTime = newTimeToWait;
-                                            }
-                                        } else {
-                                            aBarberQueue.getRef().child(customers.get(i).getKey())
-                                                    .child("timeToWait").setValue(prevCustomerTime + avgTimeToCut);
-                                            prevCustomerTime = prevCustomerTime + avgTimeToCut;
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-            }
+            updateWaitingTimes(database, userid);
 
         }
     };
+
+    public static void updateWaitingTimes(FirebaseDatabase database, String userid) {
+        final DatabaseReference dbRef = database.getReference().child("barbershops").child(userid);
+//                .child("queues").child(TimeUtil.getTodayDDMMYYYY());
+        if(dbRef != null) {
+            dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshotUserId) {
+                    final DataSnapshot dataSnapshot = dataSnapshotUserId.child("queues").child(TimeUtil.getTodayDDMMYYYY());
+                    if (dataSnapshot.exists()) {
+                        Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                        while (snapshotIterator.hasNext()) {
+
+                            DataSnapshot aBarberQueue = snapshotIterator.next();
+
+                            //Check if barber is not on break
+                            String aBarberQueueKey = aBarberQueue.getKey();
+                            if(!aBarberQueueKey.equalsIgnoreCase("online")
+                                    && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
+
+                                List<Customer> customers = new ArrayList<Customer>();
+                                if (!aBarberQueueKey.equalsIgnoreCase("online")) {
+                                    Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
+                                    while (childIterator.hasNext()) {
+                                        DataSnapshot aCustomer = childIterator.next();
+                                        if (!aCustomer.getKey().equalsIgnoreCase("status")
+                                                && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+                                            String aCustomerKey = aCustomer.getKey();
+                                            customers.add(new Customer(aCustomerKey,
+                                                    Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
+                                                    Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
+                                            );
+                                        }
+                                    }
+                                }
+                                Collections.sort(customers, new CustomerComparator());
+                                int avgTimeToCut = 15;
+                                String avgTimeToCutStr = dataSnapshotUserId.child("avgTimeToCut").getValue().toString();
+                                if(avgTimeToCutStr != null) {
+                                    avgTimeToCut = Integer.valueOf(avgTimeToCutStr);
+                                }
+
+                                int prevCustomerTime = 0;
+                                for (int i = 0; i < customers.size(); i++) {
+                                    if (i == 0) {
+                                        int timeToWait = customers.get(i).getTimeToWait();
+                                        if (timeToWait > 0) {
+                                            if (timeToWait > avgTimeToCut) {
+                                                timeToWait = avgTimeToCut;
+                                            }
+                                            int newTimeToWait = timeToWait - 1;
+                                            aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
+                                            prevCustomerTime = newTimeToWait;
+                                        }
+                                    } else {
+                                        aBarberQueue.getRef().child(customers.get(i).getKey())
+                                                .child("timeToWait").setValue(prevCustomerTime + avgTimeToCut);
+                                        prevCustomerTime = prevCustomerTime + avgTimeToCut;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
 
 
 }

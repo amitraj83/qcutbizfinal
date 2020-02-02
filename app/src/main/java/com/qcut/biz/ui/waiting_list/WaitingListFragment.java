@@ -41,6 +41,7 @@ import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.ShopQueueModel;
 import com.qcut.biz.util.Constants;
+import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
 import com.qcut.biz.util.ViewUtils;
@@ -357,7 +358,10 @@ public class WaitingListFragment extends Fragment {
                                         aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
                                 if(status.equalsIgnoreCase(Status.QUEUE.name())) {
                                 }
-                                models.add(new ShopQueueModel(key, name, timeAdded, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
+                                models.add(new ShopQueueModel(key, name, timeAdded, timeToWait,
+                                        TimeUtil.getDisplayWaitingTime(timeToWait), status,
+                                        Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()))
+                                );
                             }
                         }
                     }
@@ -631,56 +635,11 @@ public class WaitingListFragment extends Fragment {
 
     }
 
-    private void pushCustomerToDB(EditText input, @NonNull DataSnapshot dataSnapshot, String selectedKey, final AlertDialog dialog, String customerId, boolean isAny) {
+    private void pushCustomerToDB(EditText input, @NonNull DataSnapshot dataSnapshot, String selectedKey,
+                                  final AlertDialog dialog, String customerId, boolean isAny) {
         final String name = input.getText().toString();
-        int count = 0;
-        DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
-        Iterator<DataSnapshot> iterator = queueSnapShot.getChildren().iterator();
-        Object timeServiceStarted = null;
-        while (iterator.hasNext()) {
-            DataSnapshot next = iterator.next();
-            if (next != null && !next.getKey().equalsIgnoreCase("online")) {
-                DataSnapshot statusChild = next.child("status");
-                String status = String.valueOf(statusChild.getValue());
-                if (status.equalsIgnoreCase(Status.QUEUE.name())) {
-                    count++;
-                }
-                if(status.equalsIgnoreCase(Status.PROGRESS.name())) {
-                    timeServiceStarted = next.child("timeServiceStarted").getValue();
-                }
-            }
-        }
 
-        Object avgTimeToCut = dataSnapshot.child("avgTimeToCut").getValue();
-        if(avgTimeToCut != null) {
-            timePerCut = Long.valueOf(avgTimeToCut.toString());
-        }
-        long timeToWait = timePerCut;
-        //timeServiceStarted
-        if(count == 0 && timeServiceStarted != null) {
-            long timePreviousServiceStarted = Long.valueOf(timeServiceStarted.toString());
-            long minutesPassedSinceStarted = ((new Date().getTime() - timePreviousServiceStarted)/1000)/60;
-            timeToWait = Math.max(0, timePerCut - minutesPassedSinceStarted);
-        } else {
-            timeToWait = timePerCut * count;
-        }
-
-        DatabaseReference queue = queueSnapShot.getRef();
-        String key = queue.push().getKey();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", name);
-        map.put("placeInQueue", count);
-        map.put("skipcount", 0);
-        map.put("timeToWait", timeToWait);
-        map.put("status", Status.QUEUE);
-        map.put("timeAdded", new Date().getTime());
-        map.put("timeFirstAddedInQueue", new Date().getTime());
-        map.put("customerId", customerId);
-        map.put("anyBarber", isAny);
-
-
-        Task<Void> voidTask = queue.child(key).setValue(map);
+        Task<Void> voidTask = DBUtils.pushCustomerToDB(dataSnapshot, selectedKey, name, customerId, isAny);
         voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -690,6 +649,7 @@ public class WaitingListFragment extends Fragment {
             }
         });
     }
+
 
 
     private void showQueue() {
@@ -722,7 +682,9 @@ public class WaitingListFragment extends Fragment {
                                     if(status.equalsIgnoreCase(Status.QUEUE.name())) {
                                         isSomeOneInQueue = true;
                                     }
-                                    models.add(new ShopQueueModel(key, name, timeAdded, timeToWait, TimeUtil.getDisplayWaitingTime(timeToWait), status));
+                                    models.add(new ShopQueueModel(key, name, timeAdded, timeToWait,
+                                            TimeUtil.getDisplayWaitingTime(timeToWait), status,
+                                            Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString())));
                                 }
                             }
                         }

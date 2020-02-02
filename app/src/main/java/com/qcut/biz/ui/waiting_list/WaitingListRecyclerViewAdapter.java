@@ -27,12 +27,13 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
     private String userid;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView custName, custStatus;
+        public TextView custName, custStatus, forWho;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             this.custName = itemView.findViewById(R.id.cust_name);
             this.custStatus = itemView.findViewById(R.id.cust_status);
+            this.forWho = itemView.findViewById(R.id.for_who);
         }
     }
 
@@ -67,6 +68,11 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
         ShopQueueModel shopQueueModel = this.dataSet.get(position);
         holder.itemView.setTag(shopQueueModel.getId());
         holder.custName.setText(shopQueueModel.getName());
+        if(shopQueueModel.isAny()) {
+            holder.forWho.setText("Any");
+        } else {
+            holder.forWho.setText("You");
+        }
         if (shopQueueModel.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
             Drawable waitingDrawable = this.mContext.getResources().getDrawable( R.drawable.ic_action_waiting );
             holder.custStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, waitingDrawable, null);

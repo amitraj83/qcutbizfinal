@@ -207,7 +207,7 @@ public class WaitingFragment extends Fragment {
                     final DataSnapshot imagePath = next.child("imagePath");
                     boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
                     if (!bq) {
-                        barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                        barberList.add(next.getValue(Barber.class));
                     } else {
                         boolean tabExists = false;
                         for (int i = 0; i < tabLayout.getTabCount(); i++) {
@@ -234,11 +234,9 @@ public class WaitingFragment extends Fragment {
                                 final List<Barber> barberList = new ArrayList<>();
                                 while (iterator.hasNext()) {
                                     final DataSnapshot next = iterator.next();
-                                    final DataSnapshot name = next.child("name");
-                                    final DataSnapshot imagePath = next.child("imagePath");
                                     boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
                                     if (!bq) {
-                                        barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                                        barberList.add(iterator.next().getValue(Barber.class));
                                     }
                                 }
 
@@ -253,9 +251,9 @@ public class WaitingFragment extends Fragment {
                                     selectBarberDialog.show();
                                     selectBarberDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
                                     int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                            ViewUtils.getDisplayHeight(getActivity().getWindowManager())/4, getResources().getDisplayMetrics());
+                                            ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 4, getResources().getDisplayMetrics());
                                     int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                            ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+                                            ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
                                     selectBarberDialog.getWindow().setLayout(width, height);
 
                                     final Button yesButton = (Button) selectBarberDialog.findViewById(R.id.yes_add_barber_queue);
@@ -345,9 +343,9 @@ public class WaitingFragment extends Fragment {
         takeBreakDialog.show();
         takeBreakDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayHeight(getActivity().getWindowManager())/3, getResources().getDisplayMetrics());
+                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
 
         takeBreakDialog.getWindow().setLayout(width, height);
 
@@ -409,7 +407,7 @@ public class WaitingFragment extends Fragment {
         final PagerAdapter adapter = new PagerAdapter(getActivity().getSupportFragmentManager(), tabLayout.getTabCount(), tabLayout);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        viewPager.setCurrentItem(adapter.getCount()-1);
+        viewPager.setCurrentItem(adapter.getCount() - 1);
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -461,7 +459,7 @@ public class WaitingFragment extends Fragment {
         });
 
 //        tab.setText(name);
-        ((TextView)customView.findViewById(R.id.tab_name)).setText(name);
+        ((TextView) customView.findViewById(R.id.tab_name)).setText(name);
         createBarberQueue(selectedKey);
 
         StorageReference child = storageReference.child(imagePath);
@@ -501,22 +499,22 @@ public class WaitingFragment extends Fragment {
                             Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                             while (iterator.hasNext()) {
                                 aBarber = iterator.next();
-                                if(!aBarber.getKey().equalsIgnoreCase(selectedKey)) {
+                                if (!aBarber.getKey().equalsIgnoreCase(selectedKey)) {
                                     break;
                                 }
                             }
 
-                            if(aBarber != null) {
+                            if (aBarber != null) {
                                 Iterator<DataSnapshot> custIterator = aBarber.getChildren().iterator();
                                 while (custIterator.hasNext()) {
                                     final DataSnapshot aCustomer = custIterator.next();
-                                    if(aCustomer != null && !aCustomer.getKey().toString().equalsIgnoreCase("status")){
-                                    Object isAnyBarberValue = aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue();
-                                    System.out.println("Customer Breaking: " + aCustomer.getKey().toString());
-                                    String status = aCustomer.child(Constants.Customer.STATUS).getValue().toString();
-                                    if (isAnyBarberValue != null) {
-                                        Boolean isAnyBarber = Boolean.valueOf(isAnyBarberValue.toString());
-                                        if (isAnyBarber && !status.equalsIgnoreCase(Status.PROGRESS.name())) {
+                                    if (aCustomer != null && !aCustomer.getKey().toString().equalsIgnoreCase("status")) {
+                                        Object isAnyBarberValue = aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue();
+                                        System.out.println("Customer Breaking: " + aCustomer.getKey().toString());
+                                        String status = aCustomer.child(Constants.Customer.STATUS).getValue().toString();
+                                        if (isAnyBarberValue != null) {
+                                            Boolean isAnyBarber = Boolean.valueOf(isAnyBarberValue.toString());
+                                            if (isAnyBarber && !status.equalsIgnoreCase(Status.PROGRESS.name())) {
 
                                             /*
                                             Map<String, Object> map = new HashMap<>();
@@ -560,34 +558,33 @@ public class WaitingFragment extends Fragment {
 //                                            String newCustKey = queue.child(selectedKey).push().getKey();
 //                                            Task<Void> voidTask = queue.child(selectedKey).child(newCustKey).setValue(map);
 
-                                            DatabaseReference userIDRef = database.getReference().child("barbershops").child(userid);
-                                            userIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    Task<Void> voidTask1 = DBUtils.pushCustomerToDB(dataSnapshot,
-                                                            selectedKey,
-                                                            aCustomer.child(Constants.Customer.NAME).getValue().toString(),
-                                                            aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue().toString(),
-                                                            Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()));
-                                                    voidTask1.addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            TimerService.updateWaitingTimes(database, userid);
-                                                        }
-                                                    });
-                                                }
+                                                DatabaseReference userIDRef = database.getReference().child("barbershops").child(userid);
+                                                userIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        Task<Void> voidTask1 = DBUtils.pushCustomerToDB(dataSnapshot,
+                                                                selectedKey,
+                                                                aCustomer.child(Constants.Customer.NAME).getValue().toString(),
+                                                                aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue().toString(),
+                                                                Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()));
+                                                        voidTask1.addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                TimerService.updateWaitingTimes(database, userid);
+                                                            }
+                                                        });
+                                                    }
 
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                }
-                                            });
+                                                    }
+                                                });
 
 
-
+                                            }
                                         }
                                     }
-                                }
                                 }
                             }
                             //Add All Any customer

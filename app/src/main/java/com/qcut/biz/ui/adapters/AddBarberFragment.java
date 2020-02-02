@@ -127,10 +127,11 @@ public class AddBarberFragment extends Fragment {
                 List<Barber> barberList = new ArrayList<>();
                 while (iterator.hasNext()) {
                     DataSnapshot next = iterator.next();
-                    DataSnapshot name = next.child("name");
-                    DataSnapshot imagePath = next.child("imagePath");
+                    barberList.add(next.getValue(Barber.class));
+//                    DataSnapshot name = next.child("name");
+//                    DataSnapshot imagePath = next.child("imagePath");
 
-                    barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+//                    barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
                 }
                 CustomAdapter customAdapter = new CustomAdapter(barberList);
                 listBarbers.setAdapter(customAdapter);
@@ -145,12 +146,11 @@ public class AddBarberFragment extends Fragment {
     }
 
     private void uploadImage() {
-        if(filePath != null)
-        {
+        if (filePath != null) {
             final ProgressDialog progressDialog = new ProgressDialog(getContext());
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
-            final String path = "images/"+userid+"/"+ UUID.randomUUID().toString();
+            final String path = "images/" + userid + "/" + UUID.randomUUID().toString();
 
             final String name = newBarberName.getText().toString();
 
@@ -161,14 +161,14 @@ public class AddBarberFragment extends Fragment {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
 
-
                             final DatabaseReference barbersRef = database.getReference().child("barbershops").child(userid)
                                     .child("barbers");
-                            if(barbersRef != null) {
+                            if (barbersRef != null) {
                                 String key = barbersRef.push().getKey();
 //                                Uri downloadUrl =
 //                                        taskSnapshot.getStorage().getDownloadUrl().getResult();
-                                barbersRef.child(key).setValue(new Barber(key, name, taskSnapshot.getMetadata().getPath()));
+                                barbersRef.child(key).setValue(Barber.builder().id(key).name(name)
+                                        .imagePath(taskSnapshot.getMetadata().getPath()).build());
                             }
 
 
@@ -182,15 +182,15 @@ public class AddBarberFragment extends Fragment {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             progressDialog.dismiss();
-                            Toast.makeText(getContext(), "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot
                                     .getTotalByteCount());
-                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
+                            progressDialog.setMessage("Uploaded " + (int) progress + "%");
                         }
                     });
         }
@@ -206,14 +206,14 @@ public class AddBarberFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null ){
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
             filePath = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), filePath);
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, false);
                 barberUploadImageView.setImageBitmap(scaledBitmap);
-            } catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -224,7 +224,7 @@ public class AddBarberFragment extends Fragment {
 
         List<Barber> spList;
 
-        public CustomAdapter(List<Barber> spList){
+        public CustomAdapter(List<Barber> spList) {
             this.spList = spList;
         }
 
@@ -256,7 +256,7 @@ public class AddBarberFragment extends Fragment {
             child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful()) {
+                    if (task.isSuccessful()) {
                         Glide.with(getContext())
                                 .load(task.getResult())
                                 .into(photo);
@@ -266,7 +266,6 @@ public class AddBarberFragment extends Fragment {
                     }
                 }
             });
-
 
 
             return listView_layout;

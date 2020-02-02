@@ -46,6 +46,8 @@ import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
 import com.qcut.biz.util.ViewUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -566,20 +568,18 @@ public class WaitingListFragment extends Fragment {
                 if(dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
                     Iterator<DataSnapshot> iterator = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).getChildren().iterator();
                     List<Barber> barberList = new ArrayList<>();
-                    barberList.add(new Barber(Constants.ANY, Constants.ANY, ""));
+                    barberList.add(Barber.builder().id(Constants.ANY).name(Constants.ANY).imagePath("").build());
 
                     while (iterator.hasNext()) {
                         DataSnapshot next = iterator.next();
                         if (next != null && !next.getKey().equalsIgnoreCase("online")) {
-                            String barberKey = next.getKey().toString();
-                            DataSnapshot name = dataSnapshot.child("barbers").child(barberKey).child("name");
-                            DataSnapshot imagePath = dataSnapshot.child("barbers").child(barberKey).child("imagePath");
+                            String barberKey = next.getKey();
+                            Barber barber = dataSnapshot.child("barbers").child(barberKey).getValue(Barber.class);
                             String barberStatus = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY())
                                     .child(barberKey).child("status").getValue().toString();
-                            if(next.getKey() != null && name.getValue() != null
-                                    && imagePath.getValue() != null && !barberStatus.equalsIgnoreCase(Status.STOP.name())){
+                            if(StringUtils.isNotBlank(barberKey) && barber!=null && !barberStatus.equalsIgnoreCase(Status.STOP.name())){
                                 queueBarberIdList.add(next.getKey());
-                                barberList.add(new Barber(next.getKey().toString(), name.getValue().toString(), imagePath.getValue().toString()));
+                                barberList.add(barber);
                             }
                         }
                     }

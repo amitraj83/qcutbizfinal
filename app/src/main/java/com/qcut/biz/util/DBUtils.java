@@ -4,6 +4,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,10 +32,12 @@ public class DBUtils {
             }
         }
 
-        long timePerCut = Long.valueOf(dataSnapshot.child("avgTimeToCut").getValue().toString());
-        Object avgTimeToCut = dataSnapshot.child("avgTimeToCut").getValue();
-        if(avgTimeToCut != null) {
-            timePerCut = Long.valueOf(avgTimeToCut.toString());
+        DataSnapshot avgTimeToCutData = dataSnapshot.child("avgTimeToCut");
+
+        String avgTimeToCut = avgTimeToCutData.exists() ? avgTimeToCutData.getValue().toString():null;
+        long timePerCut = 0;
+        if(StringUtils.isNotBlank(avgTimeToCut)) {
+             timePerCut = Long.valueOf(avgTimeToCut);
         }
         long timeToWait = timePerCut;
         //timeServiceStarted

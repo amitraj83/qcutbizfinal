@@ -20,6 +20,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,8 +32,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TimerService extends Service
-{
+public class TimerService extends Service {
     private static Timer timer = new Timer();
     private Context ctx;
 
@@ -41,14 +42,11 @@ public class TimerService extends Service
 //    int avgTimeToCut = 15;
 
 
-
-    public IBinder onBind(Intent arg0)
-    {
-          return null;
+    public IBinder onBind(Intent arg0) {
+        return null;
     }
 
-    public void onCreate() 
-    {
+    public void onCreate() {
         super.onCreate();
         ctx = this;
         database = FirebaseDatabase.getInstance();
@@ -58,31 +56,25 @@ public class TimerService extends Service
         startService();
     }
 
-    private void startService()
-    {           
-        timer.scheduleAtFixedRate(new mainTask(), 0, 60*1000);
+    private void startService() {
+        timer.scheduleAtFixedRate(new mainTask(), 0, 60 * 1000);
     }
 
-    private class mainTask extends TimerTask
-    { 
-        public void run() 
-        {
+    private class mainTask extends TimerTask {
+        public void run() {
             toastHandler.sendEmptyMessage(0);
         }
-    }    
+    }
 
-    public void onDestroy() 
-    {
-          super.onDestroy();
-          Toast.makeText(this, "Service Stopped ...", Toast.LENGTH_SHORT).show();
+    public void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(this, "Service Stopped ...", Toast.LENGTH_SHORT).show();
     }
 
     @SuppressLint("HandlerLeak")
-    private final Handler toastHandler = new Handler()
-    {
+    private final Handler toastHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             updateWaitingTimes(database, userid);
 
         }
@@ -91,7 +83,7 @@ public class TimerService extends Service
     public static void updateWaitingTimes(FirebaseDatabase database, String userid) {
         final DatabaseReference dbRef = database.getReference().child("barbershops").child(userid);
 //                .child("queues").child(TimeUtil.getTodayDDMMYYYY());
-        if(dbRef != null) {
+        if (dbRef != null) {
             dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshotUserId) {
@@ -104,7 +96,7 @@ public class TimerService extends Service
 
                             //Check if barber is not on break
                             String aBarberQueueKey = aBarberQueue.getKey();
-                            if(!aBarberQueueKey.equalsIgnoreCase("online")
+                            if (!aBarberQueueKey.equalsIgnoreCase("online")
                                     && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
 
                                 List<Customer> customers = new ArrayList<Customer>();
@@ -124,8 +116,10 @@ public class TimerService extends Service
                                 }
                                 Collections.sort(customers, new CustomerComparator());
                                 int avgTimeToCut = 15;
-                                String avgTimeToCutStr = dataSnapshotUserId.child("avgTimeToCut").getValue().toString();
-                                if(avgTimeToCutStr != null) {
+
+                                DataSnapshot avgTimeToCutData = dataSnapshotUserId.child("avgTimeToCut");
+                                String avgTimeToCutStr = avgTimeToCutData.exists() ? avgTimeToCutData.getValue().toString() : null;
+                                if (StringUtils.isNotBlank(avgTimeToCutStr)) {
                                     avgTimeToCut = Integer.valueOf(avgTimeToCutStr);
                                 }
 
@@ -152,6 +146,7 @@ public class TimerService extends Service
                         }
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 

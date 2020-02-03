@@ -40,6 +40,6 @@
         android:layout_weight="1"
         android:id="@+id/tab_name"
         android:gravity="center"
-        android:textColor="@android:color/white"/>
+        android:textColor="@color/colorPrimaryDark"/>
 
 </LinearLayout>

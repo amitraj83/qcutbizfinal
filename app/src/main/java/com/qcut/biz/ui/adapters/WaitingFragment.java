@@ -42,6 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.qcut.biz.R;
 import com.qcut.biz.models.Barber;
+import com.qcut.biz.models.Customer;
 import com.qcut.biz.ui.waiting_list.BarberSelectionArrayAdapter;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
@@ -413,7 +414,7 @@ public class WaitingFragment extends Fragment {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                ((TextView)tab.getCustomView().findViewById(R.id.tab_name)).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+                ((TextView) tab.getCustomView().findViewById(R.id.tab_name)).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
 //                Toast.makeText(mContext, "TabLayout "+tabLayout.getChildCount() +" current position "+tab.getPosition(), Toast.LENGTH_SHORT).show();
 //                if(tabLayout.getChildCount() > 0) {
 //                    tabLayout.getChildAt(0).setBackgroundColor(Color.WHITE);
@@ -495,6 +496,7 @@ public class WaitingFragment extends Fragment {
                 if (!dataSnapshot.child(selectedKey).exists()) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.OPEN);
+                    //TODO map should not be put parallel to customer array
                     Task<Void> voidTask = queue.child(selectedKey).setValue(map);
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -504,6 +506,7 @@ public class WaitingFragment extends Fragment {
                             while (iterator.hasNext()) {
                                 aBarber = iterator.next();
                                 if (!aBarber.getKey().equalsIgnoreCase(selectedKey)) {
+                                    //TODO why are we breaking here
                                     break;
                                 }
                             }
@@ -512,13 +515,9 @@ public class WaitingFragment extends Fragment {
                                 Iterator<DataSnapshot> custIterator = aBarber.getChildren().iterator();
                                 while (custIterator.hasNext()) {
                                     final DataSnapshot aCustomer = custIterator.next();
-                                    if (aCustomer != null && !aCustomer.getKey().toString().equalsIgnoreCase("status")) {
-                                        Object isAnyBarberValue = aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue();
-                                        System.out.println("Customer Breaking: " + aCustomer.getKey().toString());
-                                        String status = aCustomer.child(Constants.Customer.STATUS).getValue().toString();
-                                        if (isAnyBarberValue != null) {
-                                            Boolean isAnyBarber = Boolean.valueOf(isAnyBarberValue.toString());
-                                            if (isAnyBarber && !status.equalsIgnoreCase(Status.PROGRESS.name())) {
+                                    if (aCustomer.exists() && !aCustomer.getKey().equalsIgnoreCase("status")) {
+                                        final Customer customer = aCustomer.getValue(Customer.class);
+                                        if (customer.isAnyBarber() && !Status.PROGRESS.name().equalsIgnoreCase(customer.getStatus())) {
 
                                             /*
                                             Map<String, Object> map = new HashMap<>();
@@ -566,12 +565,9 @@ public class WaitingFragment extends Fragment {
                                             userIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    Task<Void> voidTask1 = DBUtils.pushCustomerToDB(mContext, dataSnapshot,
-                                                            selectedKey,
-                                                            aCustomer.child(Constants.Customer.NAME).getValue().toString(),
-                                                            aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue().toString(),
-                                                            Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()));
-                                                    if(voidTask1 != null) {
+                                                    Task<Void> voidTask1 = DBUtils.pushCustomerToDB(mContext, dataSnapshot, selectedKey,
+                                                            customer.getName(), customer.getCustomerId(), customer.isAnyBarber());
+                                                    if (voidTask1 != null) {
                                                         voidTask1.addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
@@ -581,14 +577,12 @@ public class WaitingFragment extends Fragment {
                                                     }
                                                 }
 
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                    }
-                                                });
+                                                }
+                                            });
 
-
-                                            }
                                         }
                                     }
                                 }

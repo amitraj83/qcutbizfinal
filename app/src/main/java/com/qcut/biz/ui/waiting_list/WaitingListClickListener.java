@@ -62,12 +62,12 @@ public class WaitingListClickListener implements View.OnClickListener {
         changeCustomerStatus(v);
     }
 
-    private void changeCustomerStatus( View v) {
+    private void changeCustomerStatus(View v) {
         final LayoutInflater factory = LayoutInflater.from(mContext);
-        String queueItemStatus = ((TextView)v.findViewById(R.id.cust_status)).getTag().toString();
-        String queueItemName = ((TextView)v.findViewById(R.id.cust_name)).getText().toString();
+        String queueItemStatus = ((TextView) v.findViewById(R.id.cust_status)).getTag().toString();
+        String queueItemName = ((TextView) v.findViewById(R.id.cust_name)).getText().toString();
 //        final ShopQueueModel queueItem = (ShopQueueModel) dynamicListView.getItemAtPosition(position);
-        if(queueItemStatus.equalsIgnoreCase(Status.PROGRESS.name())) {
+        if (queueItemStatus.equalsIgnoreCase(Status.PROGRESS.name())) {
             final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
             TextView custNameTV = (TextView) serviceDoneView.findViewById(R.id.service_done_customer_name);
             custNameTV.setText(queueItemName);
@@ -78,11 +78,11 @@ public class WaitingListClickListener implements View.OnClickListener {
             serviceDoneDialog.show();
             serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/5,
+                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 5,
                     Resources.getSystem().getDisplayMetrics());
             int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/2,
-                    Resources.getSystem().getDisplayMetrics() );
+                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
+                    Resources.getSystem().getDisplayMetrics());
 
             serviceDoneDialog.getWindow().setLayout(width, height);
 
@@ -98,10 +98,10 @@ public class WaitingListClickListener implements View.OnClickListener {
             serviceStartDialog.show();
             serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/4,
+                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 4,
                     Resources.getSystem().getDisplayMetrics());
             int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/2,
+                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
                     Resources.getSystem().getDisplayMetrics());
 
             serviceStartDialog.getWindow().setLayout(width, height);
@@ -109,7 +109,6 @@ public class WaitingListClickListener implements View.OnClickListener {
         }
 
     }
-
 
 
     private void addServiceDoneButtonsClickListener(final AlertDialog serviceDoneDialog, final String queueItemId) {
@@ -139,24 +138,21 @@ public class WaitingListClickListener implements View.OnClickListener {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot aBarberQueue) {
                                     String aBarberQueueKey = aBarberQueue.getKey();
-                                    if(!aBarberQueueKey.equalsIgnoreCase("online")) {
+                                    if (!aBarberQueueKey.equalsIgnoreCase("online")) {
 
                                         List<Customer> customers = new ArrayList<Customer>();
-                                        if (!aBarberQueueKey.equalsIgnoreCase("online")) {
-                                            Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
-                                            while (childIterator.hasNext()) {
-                                                DataSnapshot aCustomer = childIterator.next();
-                                                if (!aCustomer.getKey().equalsIgnoreCase("status")){
+                                        Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
+                                        while (childIterator.hasNext()) {
+                                            DataSnapshot aCustomer = childIterator.next();
+                                            if (!aCustomer.getKey().equalsIgnoreCase("status")) {
 //                                                        && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                                    boolean isStatusQUEUE = aCustomer.child("status").exists() ?
-                                                            aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name()): false;
-                                                    if(isStatusQUEUE) {
-                                                        String aCustomerKey = aCustomer.getKey();
-                                                        customers.add(new Customer(aCustomerKey,
-                                                                Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                                                Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                                        );
-                                                    }
+                                                //it is a customer
+                                                Customer customer = aCustomer.getValue(Customer.class);
+                                                boolean isStatusQUEUE = Status.QUEUE.name().equalsIgnoreCase(customer.getStatus());
+                                                if (isStatusQUEUE) {
+                                                    String aCustomerKey = aCustomer.getKey();
+                                                    customers.add(Customer.builder().key(aCustomerKey).timeToWait(customer.getTimeToWait())
+                                                            .timeAdded(customer.getTimeAdded()).build());
                                                 }
                                             }
                                         }
@@ -212,7 +208,6 @@ public class WaitingListClickListener implements View.OnClickListener {
     }
 
 
-
     private void setCustomerInProgress(final String queuedCustomerId) {
 
         final DatabaseReference queryRef = database.getReference().child("barbershops").child(userid)
@@ -222,23 +217,23 @@ public class WaitingListClickListener implements View.OnClickListener {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                 boolean isSomeoneInProgress = false;
-                String customerId ="";
+                String customerId = "";
                 while (iterator.hasNext()) {
                     DataSnapshot customer = iterator.next();
 
-                    if(customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
+                    if (customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
                         customerId = customer.child("customerId").exists() ? customer.child("customerId").getValue().toString() : "";
                     }
 
-                    if(!customer.getKey().equalsIgnoreCase("status") ){
+                    if (!customer.getKey().equalsIgnoreCase("status")) {
                         boolean isStatusPROGRESS = customer.child("status").exists() ?
                                 customer.child("status").getValue().toString().equalsIgnoreCase(Status.PROGRESS.name()) : false;
-                        if(isStatusPROGRESS) {
+                        if (isStatusPROGRESS) {
                             isSomeoneInProgress = true;
                         }
                     }
                 }
-                if(!isSomeoneInProgress) {
+                if (!isSomeoneInProgress) {
 
                     final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
                             .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
@@ -260,7 +255,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                             dateRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if(dataSnapshot.exists()) {
+                                    if (dataSnapshot.exists()) {
                                         Iterator<DataSnapshot> queueIt = dataSnapshot.getChildren().iterator();
                                         while (queueIt.hasNext()) {
                                             DataSnapshot queueSnapshot = queueIt.next();
@@ -272,7 +267,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                                                         if (customerDataSnapshot.child(Constants.Customer.NAME).exists() &&
                                                                 customerDataSnapshot.child("customerId").exists() &&
                                                                 customerDataSnapshot.child("customerId").getValue().toString()
-                                                                .equalsIgnoreCase(customerIdForAnyBarber)) {
+                                                                        .equalsIgnoreCase(customerIdForAnyBarber)) {
                                                             queueSnapshot.getRef().child(customerDataSnapshot.getKey()).removeValue();
                                                         } else {
 //                                                            Toast.makeText(mContext, "Customer "

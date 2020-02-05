@@ -245,10 +245,11 @@ public class WaitingListClickListener implements View.OnClickListener {
 
 
                     Map<String, Object> map = new HashMap<>();
-                    map.put("status", Status.PROGRESS);
-                    map.put("timeToWait", 0);
-                    map.put("timeServiceStarted", new Date().getTime());
-                    map.put("placeInQueue", -1);
+                    map.put(Constants.Customer.STATUS, Status.PROGRESS);
+                    map.put(Constants.Customer.TIME_TO_WAIT, 0);
+                    map.put(Constants.Customer.TIME_ADDED, -1);
+                    map.put(Constants.Customer.TIME_SERVICE_STARTED, new Date().getTime());
+                    map.put(Constants.Customer.PLACE_IN_QUEUE, -1);
                     Task<Void> voidTask = queue.updateChildren(map);
                     final String customerIdForAnyBarber = customerId;
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {

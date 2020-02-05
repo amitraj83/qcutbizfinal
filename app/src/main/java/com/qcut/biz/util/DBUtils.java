@@ -1,5 +1,8 @@
 package com.qcut.biz.util;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -13,7 +16,7 @@ import java.util.Map;
 
 public class DBUtils {
 
-    public static Task<Void> pushCustomerToDB (DataSnapshot dataSnapshot, String selectedKey, String name, String customerId, boolean isAny) {
+    public static Task<Void> pushCustomerToDB(Context mContext, DataSnapshot dataSnapshot, String selectedKey, String name, String customerId, boolean isAny) {
         int count = 0;
         DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
         Iterator<DataSnapshot> iterator = queueSnapShot.getChildren().iterator();
@@ -33,6 +36,11 @@ public class DBUtils {
         }
 
         DataSnapshot avgTimeToCutData = dataSnapshot.child("avgTimeToCut");
+
+        if(!avgTimeToCutData.exists()) {
+            Toast.makeText(mContext, "Failed - Avg. Cut time not set. Set this in Shop Details. ", Toast.LENGTH_SHORT).show();
+            return null;
+        }
 
         String avgTimeToCut = avgTimeToCutData.exists() ? avgTimeToCutData.getValue().toString():null;
         long timePerCut = 0;

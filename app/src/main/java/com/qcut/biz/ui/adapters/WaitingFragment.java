@@ -562,15 +562,16 @@ public class WaitingFragment extends Fragment {
 //                                            String newCustKey = queue.child(selectedKey).push().getKey();
 //                                            Task<Void> voidTask = queue.child(selectedKey).child(newCustKey).setValue(map);
 
-                                                DatabaseReference userIDRef = database.getReference().child("barbershops").child(userid);
-                                                userIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        Task<Void> voidTask1 = DBUtils.pushCustomerToDB(dataSnapshot,
-                                                                selectedKey,
-                                                                aCustomer.child(Constants.Customer.NAME).getValue().toString(),
-                                                                aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue().toString(),
-                                                                Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()));
+                                            DatabaseReference userIDRef = database.getReference().child("barbershops").child(userid);
+                                            userIDRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    Task<Void> voidTask1 = DBUtils.pushCustomerToDB(mContext, dataSnapshot,
+                                                            selectedKey,
+                                                            aCustomer.child(Constants.Customer.NAME).getValue().toString(),
+                                                            aCustomer.child(Constants.Customer.CUSTOMER_ID).getValue().toString(),
+                                                            Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString()));
+                                                    if(voidTask1 != null) {
                                                         voidTask1.addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
@@ -578,6 +579,7 @@ public class WaitingFragment extends Fragment {
                                                             }
                                                         });
                                                     }
+                                                }
 
                                                     @Override
                                                     public void onCancelled(@NonNull DatabaseError databaseError) {

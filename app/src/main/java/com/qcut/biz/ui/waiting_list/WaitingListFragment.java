@@ -663,15 +663,17 @@ public class WaitingListFragment extends Fragment {
                                   final AlertDialog dialog, String customerId, boolean isAny) {
         final String name = input.getText().toString();
 
-        Task<Void> voidTask = DBUtils.pushCustomerToDB(dataSnapshot, selectedKey, name, customerId, isAny);
-        voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                dialog.dismiss();
-                Toast.makeText(mContext, name + " added to queue", Toast.LENGTH_SHORT).show();
+        Task<Void> voidTask = DBUtils.pushCustomerToDB(mContext, dataSnapshot, selectedKey, name, customerId, isAny);
+        if(voidTask != null) {
+            voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    dialog.dismiss();
+                    Toast.makeText(mContext, name + " added to queue", Toast.LENGTH_SHORT).show();
 
-            }
-        });
+                }
+            });
+        }
     }
 
 

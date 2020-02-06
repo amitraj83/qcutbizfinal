@@ -88,7 +88,6 @@ public class WaitingListFragment extends Fragment {
     }
 
 
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         waitingListModel =
@@ -117,7 +116,7 @@ public class WaitingListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    if(dataSnapshot.getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
+                    if (dataSnapshot.getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
                         root.findViewById(R.id.barber_on_break_message).setVisibility(View.VISIBLE);
                         root.findViewById(R.id.next_customer_card).setVisibility(View.INVISIBLE);
                         root.findViewById(R.id.cardView).setBackgroundColor(Color.YELLOW);
@@ -180,15 +179,16 @@ public class WaitingListFragment extends Fragment {
         dynamicListView.setLayoutManager(mLayoutManager);
         dynamicListView.setItemAnimator(new DefaultItemAnimator());
         final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
-        adapter= new WaitingListRecyclerViewAdapter(models, mContext, tag, database, userid);
+        adapter = new WaitingListRecyclerViewAdapter(models, mContext, tag, database, userid);
         dynamicListView.setAdapter(adapter);
 
         ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
             int dragFrom = -1;
             int dragTo = -1;
+
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN,0);
+                return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0);
             }
 
             @Override
@@ -196,22 +196,22 @@ public class WaitingListFragment extends Fragment {
                                   @NonNull final RecyclerView.ViewHolder target) {
                 Query barberRef = database.getReference().child("barbershops").child(userid)
                         .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).
-                        orderByChild(Constants.Customer.STATUS).equalTo(Status.PROGRESS.name());
+                                orderByChild(Constants.Customer.STATUS).equalTo(Status.PROGRESS.name());
                 barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()) {
+                        if (dataSnapshot.exists()) {
                             Toast.makeText(mContext, "A customer in chair. Cannot drag or drop others.", Toast.LENGTH_SHORT).show();
                         } else {
 
                             final int position_dragged = dragged.getAdapterPosition();
-                            final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder)recyclerView.findViewHolderForAdapterPosition(position_dragged))
+                            final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder) recyclerView.findViewHolderForAdapterPosition(position_dragged))
                                     .custStatus.getTag().toString();
-                            if(status.equalsIgnoreCase(Status.QUEUE.name())) {
+                            if (status.equalsIgnoreCase(Status.QUEUE.name())) {
                                 final int position_target = target.getAdapterPosition();
                                 Collections.swap(adapter.getDataSet(), position_dragged, position_target);
-                                if(dragFrom == -1) {
-                                    dragFrom =  position_dragged;
+                                if (dragFrom == -1) {
+                                    dragFrom = position_dragged;
                                 }
                                 dragTo = position_target;
                                 adapter.notifyItemMoved(position_dragged, position_target);
@@ -233,10 +233,12 @@ public class WaitingListFragment extends Fragment {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
             }
+
             @Override
             public boolean isLongPressDragEnabled() {
                 return true;
             }
+
             @Override
             public void clearView(final RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 super.clearView(recyclerView, viewHolder);
@@ -244,52 +246,51 @@ public class WaitingListFragment extends Fragment {
                         .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
 
                 barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                     @Override
-                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                         List<Customer> customers = new ArrayList<Customer>();
-                         Iterator<DataSnapshot> childIterator = dataSnapshot.getChildren().iterator();
-                         while (childIterator.hasNext()) {
-                             DataSnapshot aCustomer = childIterator.next();
-                             if (!aCustomer.getKey().equalsIgnoreCase("status")) {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<Customer> customers = new ArrayList<Customer>();
+                        Iterator<DataSnapshot> childIterator = dataSnapshot.getChildren().iterator();
+                        while (childIterator.hasNext()) {
+                            DataSnapshot aCustomer = childIterator.next();
+                            //TODO customers can be added to customers array
+                            if (!aCustomer.getKey().equalsIgnoreCase("status")) {
 //                                     && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                 boolean isStatusQUEUE = aCustomer.child("status").exists() ?
-                                         aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name()) : false;
-                                 if(isStatusQUEUE) {
-                                     String aCustomerKey = aCustomer.getKey();
-                                     customers.add(new Customer(aCustomerKey,
-                                             Long.valueOf(aCustomer.child("timeAdded").getValue().toString()),
-                                             Integer.valueOf(aCustomer.child("timeToWait").getValue().toString()))
-                                     );
-                                 }
-                             }
-                         }
-                         Collections.sort(customers, new CustomerComparator());
+                                //if not a status then it is a customer
+                                Customer customer = aCustomer.getValue(Customer.class);
+                                if (Status.QUEUE.name().equalsIgnoreCase(customer.getStatus())) {
+                                    customers.add(Customer.builder().key(aCustomer.getKey())
+                                            .timeAdded(customer.getTimeAdded())
+                                            .timeToWait(customer.getTimeToWait()).build());
+                                }
+                            }
+                        }
+                        Collections.sort(customers, new CustomerComparator());
 
-                            int count = 0;
-                         int itemCount = recyclerView.getAdapter().getItemCount();
-                         Map<String, Object> timeToUpdate = new HashMap<>();
-                         for (int i = 0; i < itemCount; i++) {
-                             final String sourceTag = recyclerView.findViewHolderForAdapterPosition(i)
-                                     .itemView.getTag().toString();
-                             final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder)recyclerView.findViewHolderForAdapterPosition(i))
-                                     .custStatus.getTag().toString();
+                        int count = 0;
+                        int itemCount = recyclerView.getAdapter().getItemCount();
+                        Map<String, Object> timeToUpdate = new HashMap<>();
+                        for (int i = 0; i < itemCount; i++) {
+                            final String sourceTag = recyclerView.findViewHolderForAdapterPosition(i)
+                                    .itemView.getTag().toString();
+                            final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder) recyclerView.findViewHolderForAdapterPosition(i))
+                                    .custStatus.getTag().toString();
 
-                             if(status.equalsIgnoreCase(Status.QUEUE.name())) {
-                                 timeToUpdate.put(sourceTag + "/timeAdded", i);
-                                 timeToUpdate.put(sourceTag + "/timeToWait", customers.get(count++).getTimeToWait());
-                             }
+                            if (status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                timeToUpdate.put(sourceTag + "/timeAdded", i);
+                                timeToUpdate.put(sourceTag + "/timeToWait", customers.get(count++).getTimeToWait());
+                            }
 
-                         }
-                         barberRef.updateChildren(timeToUpdate);
+                        }
+                        barberRef.updateChildren(timeToUpdate);
 
-                     }
+                    }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
 
-                }
+            }
 
         });
 
@@ -322,12 +323,12 @@ public class WaitingListFragment extends Fragment {
 
     private void showSkipServiceDialog(LayoutInflater factory) {
         final String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
-        if(queuedCustomerId != null &&
+        if (queuedCustomerId != null &&
                 queuedCustomerId.trim().equalsIgnoreCase("none") ||
                 queuedCustomerId.trim().equalsIgnoreCase("")) {
-            Toast toast= Toast.makeText(mContext,
+            Toast toast = Toast.makeText(mContext,
                     "No Customer in the queue", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+            toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
             toast.show();
         } else {
             final View skipCustomerView = factory.inflate(R.layout.skip_customer_dialog, null);
@@ -366,13 +367,15 @@ public class WaitingListFragment extends Fragment {
         queue.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()) {
+                if (dataSnapshot.exists()) {
                     final ArrayList<ShopQueueModel> models = new ArrayList<ShopQueueModel>();
                     Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
                     while (snapshotIterator.hasNext()) {
                         DataSnapshot aCustomer = snapshotIterator.next();
                         String key = aCustomer.getKey();
-                        if(!key.equalsIgnoreCase("online")) {
+                        if (!key.equalsIgnoreCase("online")) {
+                            //if key is not online then it will be a barber queue
+                            //TODO verify: this is barber queue customer will be not at this level, it will be furthur nested
                             if (aCustomer.child("name").getValue() != null) {
                                 String name = aCustomer.child("name").getValue().toString();
                                 long timeToWait = aCustomer.child("timeToWait").exists() ?
@@ -380,7 +383,7 @@ public class WaitingListFragment extends Fragment {
                                 long timeAdded = Long.valueOf(aCustomer.child("timeAdded").getValue().toString());
                                 String status = aCustomer.child("status").exists() ?
                                         aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
-                                if(status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                if (status.equalsIgnoreCase(Status.QUEUE.name())) {
                                 }
                                 models.add(new ShopQueueModel(key, name, timeAdded, timeToWait,
                                         TimeUtil.getDisplayWaitingTime(timeToWait), status,
@@ -394,19 +397,19 @@ public class WaitingListFragment extends Fragment {
                     ShopQueueModel prev = null;
                     ShopQueueModel next = null;
                     for (ShopQueueModel model : models) {
-                        if(model.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
-                            if(model.getId().equalsIgnoreCase(nextCustomerId)) {
+                        if (model.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+                            if (model.getId().equalsIgnoreCase(nextCustomerId)) {
                                 prev = model;
                                 continue;
                             }
-                            if(prev != null) {
+                            if (prev != null) {
                                 next = model;
                                 break;
                             }
 
                         }
                     }
-                    if(prev != null && next != null) {
+                    if (prev != null && next != null) {
                         Map<String, Object> prevData = new HashMap<>();
                         prevData.put("timeToWait", next.getTimeToWait());
                         Map<String, Object> nextData = new HashMap<>();
@@ -433,12 +436,12 @@ public class WaitingListFragment extends Fragment {
 
     private void showStartServiceDialog(LayoutInflater factory) {
         String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
-        if(queuedCustomerId != null &&
+        if (queuedCustomerId != null &&
                 queuedCustomerId.trim().equalsIgnoreCase("none") ||
                 queuedCustomerId.trim().equalsIgnoreCase("")) {
-            Toast toast= Toast.makeText(mContext,
+            Toast toast = Toast.makeText(mContext,
                     "No Customer in the queue", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 0);
+            toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
             toast.show();
         } else {
             final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
@@ -450,9 +453,9 @@ public class WaitingListFragment extends Fragment {
             startServiceDialog.show();
             startServiceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayHeight(getActivity().getWindowManager())/4, getResources().getDisplayMetrics());
+                    ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 4, getResources().getDisplayMetrics());
             int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+                    ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
 
             startServiceDialog.getWindow().setLayout(width, height);
 
@@ -486,20 +489,24 @@ public class WaitingListFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                 boolean isSomeoneInProgress = false;
-                String customerId ="";
+                String customerId = "";
                 while (iterator.hasNext()) {
                     DataSnapshot customer = iterator.next();
 
-                    if(customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
-                        customerId = customer.child("customerId").getValue().toString();
-                    }
+                    if (!customer.getKey().equalsIgnoreCase("status")) {
+                        //its a customer
+                        Customer c = customer.getValue(Customer.class);
 
-                    if(!customer.getKey().equalsIgnoreCase("status") &&
-                            customer.child("status").getValue().toString().equalsIgnoreCase(Status.PROGRESS.name())) {
-                        isSomeoneInProgress = true;
+                        if (customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
+                            customerId = c.getCustomerId();
+                        }
+
+                        if (Status.PROGRESS.name().equalsIgnoreCase(c.getStatus())) {
+                            isSomeoneInProgress = true;
+                        }
                     }
                 }
-                if(!isSomeoneInProgress) {
+                if (!isSomeoneInProgress) {
 
                     final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
                             .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
@@ -524,12 +531,13 @@ public class WaitingListFragment extends Fragment {
                                     Iterator<DataSnapshot> queueIt = dataSnapshot.getChildren().iterator();
                                     while (queueIt.hasNext()) {
                                         DataSnapshot queueSnapshot = queueIt.next();
-                                        if(!queueSnapshot.getKey().equalsIgnoreCase(tag) && !queueSnapshot.getKey().equalsIgnoreCase("online")) {
+                                        if (!queueSnapshot.getKey().equalsIgnoreCase(tag) && !queueSnapshot.getKey().equalsIgnoreCase("online")) {
                                             Iterator<DataSnapshot> customersIt = queueSnapshot.getChildren().iterator();
                                             while (customersIt.hasNext()) {
                                                 DataSnapshot customerDataSnapshot = customersIt.next();
-                                                if(!customerDataSnapshot.getKey().equalsIgnoreCase("status")){
-                                                    if(customerDataSnapshot.child("customerId").getValue().toString()
+                                                if (!customerDataSnapshot.getKey().equalsIgnoreCase("status")) {
+                                                    //it is a customer
+                                                    if (customerDataSnapshot.getValue(Customer.class).getCustomerId()
                                                             .equalsIgnoreCase(customerIdForAnyBarber)) {
                                                         queueSnapshot.getRef().child(customerDataSnapshot.getKey()).removeValue();
                                                     }
@@ -570,9 +578,9 @@ public class WaitingListFragment extends Fragment {
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayHeight(getActivity().getWindowManager())/3, getResources().getDisplayMetrics());
+                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayWidth(getActivity().getWindowManager())/2, getResources().getDisplayMetrics());
+                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
 
         dialog.getWindow().setLayout(width, height);
 
@@ -589,7 +597,7 @@ public class WaitingListFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
                 final List<String> queueBarberIdList = new ArrayList<String>();
-                if(dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
+                if (dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
                     Iterator<DataSnapshot> iterator = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).getChildren().iterator();
                     List<Barber> barberList = new ArrayList<>();
                     barberList.add(Barber.builder().id(Constants.ANY).name(Constants.ANY).imagePath("").build());
@@ -601,15 +609,15 @@ public class WaitingListFragment extends Fragment {
                             Barber barber = dataSnapshot.child("barbers").child(barberKey).getValue(Barber.class);
                             String barberStatus = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY())
                                     .child(barberKey).child("status").getValue().toString();
-                            if(StringUtils.isNotBlank(barberKey) && barber!=null && !barberStatus.equalsIgnoreCase(Status.STOP.name())){
+                            if (StringUtils.isNotBlank(barberKey) && barber != null && !barberStatus.equalsIgnoreCase(Status.STOP.name())) {
                                 queueBarberIdList.add(next.getKey());
                                 barberList.add(barber);
                             }
                         }
                     }
 
-                BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
-                ddSpinner.setAdapter(customAdapter);
+                    BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, barberList);
+                    ddSpinner.setAdapter(customAdapter);
                 }
                 ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -622,8 +630,8 @@ public class WaitingListFragment extends Fragment {
 
                                 if (input != null && !input.getText().toString().trim().equalsIgnoreCase("")) {
                                     String customerId = UUID.randomUUID().toString();
-                                    if(selectedKey.equalsIgnoreCase(Constants.ANY)) {
-                                        for (String barberKey: queueBarberIdList) {
+                                    if (selectedKey.equalsIgnoreCase(Constants.ANY)) {
+                                        for (String barberKey : queueBarberIdList) {
                                             pushCustomerToDB(input, dataSnapshot, barberKey, dialog, customerId, true);
                                         }
                                     } else {
@@ -635,6 +643,7 @@ public class WaitingListFragment extends Fragment {
                             }
                         });
                     }
+
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -647,7 +656,6 @@ public class WaitingListFragment extends Fragment {
 
             }
         });
-
 
 
         noButton.setOnClickListener(new View.OnClickListener() {
@@ -677,12 +685,11 @@ public class WaitingListFragment extends Fragment {
     }
 
 
-
     private void showQueue() {
 
         DatabaseReference dbRef = database.getReference().child("barbershops")
                 .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
-        if(dbRef != null) {
+        if (dbRef != null) {
             dbRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -693,35 +700,35 @@ public class WaitingListFragment extends Fragment {
                         while (snapshotIterator.hasNext()) {
                             DataSnapshot aCustomer = snapshotIterator.next();
                             String key = aCustomer.getKey();
-                            if(!key.equalsIgnoreCase("status")) {
-                                boolean isCustomerNameNotNull = aCustomer.child("name").exists()
-                                        ? aCustomer.child("name").getValue() != null : false;
-                                boolean isCustomerNotDone = aCustomer.child("status").exists() ?
-                                        !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.DONE.name()) : false;
-                                boolean isCustomerNotRemoved = aCustomer.child("status").exists() ?
-                                        !aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.REMOVED.name()) : false;
+                            if (!key.equalsIgnoreCase("status")) {
+                                Customer customer = aCustomer.getValue(Customer.class);
+                                boolean isCustomerNameNotNull = StringUtils.isNotBlank(customer.getName());
+                                boolean isCustomerNotDone = !Status.DONE.name().equalsIgnoreCase(customer.getStatus());
+                                boolean isCustomerNotRemoved = !Status.REMOVED.name().equalsIgnoreCase(customer.getStatus());
 
-                                if (isCustomerNameNotNull && ( isCustomerNotDone && isCustomerNotRemoved) ) {
-                                    String name = aCustomer.child("name").getValue().toString();
-                                    long timeToWait = aCustomer.child("timeToWait").exists()?
-                                            Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
-                                    long timeAdded = Long.valueOf(aCustomer.child("timeAdded").exists() ?
-                                            aCustomer.child("timeAdded").getValue().toString() : "3");
-                                    String status = aCustomer.child("status").exists() ?
-                                            aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
-                                    if(status.equalsIgnoreCase(Status.QUEUE.name())) {
+                                if (isCustomerNameNotNull && (isCustomerNotDone && isCustomerNotRemoved)) {
+                                    //TODO DEFAULT VALUE
+//                                    long timeToWait = aCustomer.child("timeToWait").exists() ?
+//                                            Long.valueOf(aCustomer.child("timeToWait").getValue().toString()) : 180L;
+                                    //TODO DEFAULT VALUE
+//                                    long timeAdded = Long.valueOf(aCustomer.child("timeAdded").exists() ?
+//                                            aCustomer.child("timeAdded").getValue().toString() : "3");
+                                    //TODO DEFAULT VALUE
+//                                    String status = aCustomer.child("status").exists() ?
+//                                            aCustomer.child("status").getValue().toString() : Status.QUEUE.name();
+                                    if (Status.QUEUE.name().equalsIgnoreCase(customer.getStatus())) {
                                         isSomeOneInQueue = true;
                                     }
-                                    models.add(new ShopQueueModel(key, name, timeAdded, timeToWait,
-                                            TimeUtil.getDisplayWaitingTime(timeToWait), status,
+                                    models.add(new ShopQueueModel(key, customer.getName(), customer.getTimeAdded(), customer.getTimeToWait(),
+                                            TimeUtil.getDisplayWaitingTime(customer.getTimeToWait()), customer.getStatus(),
                                             Boolean.valueOf(aCustomer.child(Constants.Customer.IS_ANY_BARBER).getValue().toString())));
                                 }
                             }
                         }
-                        if(isSomeOneInQueue && models.size() > 0) {
+                        if (isSomeOneInQueue && models.size() > 0) {
                             Collections.sort(models, new DataComparator());
                             for (ShopQueueModel model : models) {
-                                if(model.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+                                if (model.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
                                     nextCustomerTV.setText(model.getName());
                                     nextCustomerTV.setTag(model.getId());
                                     break;
@@ -744,7 +751,7 @@ public class WaitingListFragment extends Fragment {
         }
     }
 
-    public void queueChangeListener(){
+    public void queueChangeListener() {
         //showQueue();
 //        DatabaseReference dbRef = database.getReference().child("barbershops")
 //                .child(userid).child("queues").child(TimeUtil.getTodayDDMMYYYY());

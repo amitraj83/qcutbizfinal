@@ -30,6 +30,7 @@ import com.qcut.biz.models.ShopQueueModel;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
+import com.qcut.biz.util.TimerService;
 import com.qcut.biz.util.ViewUtils;
 
 import java.util.ArrayList;
@@ -62,10 +63,10 @@ public class WaitingListClickListener implements View.OnClickListener {
         changeCustomerStatus(v);
     }
 
-    private void changeCustomerStatus(View v) {
+    private void changeCustomerStatus(final View v) {
         final LayoutInflater factory = LayoutInflater.from(mContext);
-        String queueItemStatus = ((TextView) v.findViewById(R.id.cust_status)).getTag().toString();
-        String queueItemName = ((TextView) v.findViewById(R.id.cust_name)).getText().toString();
+        final String queueItemStatus = ((TextView) v.findViewById(R.id.cust_status)).getTag().toString();
+        final String queueItemName = ((TextView) v.findViewById(R.id.cust_name)).getText().toString();
 //        final ShopQueueModel queueItem = (ShopQueueModel) dynamicListView.getItemAtPosition(position);
         if (queueItemStatus.equalsIgnoreCase(Status.PROGRESS.name())) {
             final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
@@ -89,23 +90,46 @@ public class WaitingListClickListener implements View.OnClickListener {
             addServiceDoneButtonsClickListener(serviceDoneDialog, v.getTag().toString());
 
         } else if (queueItemStatus.equalsIgnoreCase(Status.QUEUE.name())) {
-            final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
-            TextView custNameTV = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
-            custNameTV.setText(queueItemName);
-            final AlertDialog serviceStartDialog = new AlertDialog.Builder(mContext).create();
-            serviceStartDialog.setView(startServiceView);
 
-            serviceStartDialog.show();
-            serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 4,
-                    Resources.getSystem().getDisplayMetrics());
-            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
-                    Resources.getSystem().getDisplayMetrics());
+            final DatabaseReference barberRef = database.getReference().child("barbershops").child(userid)
+                    .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
+            barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()) {
+                        if(dataSnapshot.child(Constants.Barber.STATUS).exists()) {
+                            if(dataSnapshot.child(Constants.Barber.STATUS).getValue().toString().equalsIgnoreCase(Status.OPEN.name())) {
 
-            serviceStartDialog.getWindow().setLayout(width, height);
-            addServiceStartButtonsClickListener(serviceStartDialog, v.getTag().toString());
+                                final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
+                                TextView custNameTV = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
+                                custNameTV.setText(queueItemName);
+                                final AlertDialog serviceStartDialog = new AlertDialog.Builder(mContext).create();
+                                serviceStartDialog.setView(startServiceView);
+
+                                serviceStartDialog.show();
+                                serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                        ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/4,
+                                        Resources.getSystem().getDisplayMetrics());
+                                int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                        ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/2,
+                                        Resources.getSystem().getDisplayMetrics());
+
+                                serviceStartDialog.getWindow().setLayout(width, height);
+                                addServiceStartButtonsClickListener(serviceStartDialog, v.getTag().toString());
+                            } else {
+                                Toast.makeText(mContext, "Cannot start services. May be barber is on break or his queue is stopped.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
         }
 
     }
@@ -164,6 +188,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                                             break;
                                         }
                                     }
+                                    TimerService.updateWaitingTimes(database, userid);
                                 }
 
                                 @Override
@@ -188,7 +213,7 @@ public class WaitingListClickListener implements View.OnClickListener {
 
     private void addServiceStartButtonsClickListener(final AlertDialog serviceStartDialog, final String queueItemId) {
 
-        Button yesButton = (Button) serviceStartDialog.findViewById(R.id.yes_start_service);
+        final Button yesButton = (Button) serviceStartDialog.findViewById(R.id.yes_start_service);
         Button noButton = (Button) serviceStartDialog.findViewById(R.id.no_start_service);
 
         yesButton.setOnClickListener(new View.OnClickListener() {
@@ -197,6 +222,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                 String queuedCustomerId = String.valueOf(queueItemId);
                 setCustomerInProgress(queuedCustomerId);
                 serviceStartDialog.dismiss();
+                TimerService.updateWaitingTimes(database, userid);
             }
         });
         noButton.setOnClickListener(new View.OnClickListener() {

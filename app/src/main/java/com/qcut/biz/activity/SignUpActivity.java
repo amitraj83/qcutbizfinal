@@ -67,6 +67,10 @@ public class SignUpActivity extends AppCompatActivity {
                 if(shopPassET == null || shopPassET.getText().toString().trim().equalsIgnoreCase("")){
                     Toast.makeText(SignUpActivity.this, "Password cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
+                } else if (shopPassET == null || shopPassET.getText().toString().trim().length() < 8) {
+                    Toast.makeText(SignUpActivity.this,
+                            "Password must be at least 8 character long", Toast.LENGTH_LONG).show();
+
                 }
                 String shopPassword = shopPassET.getText() != null ? shopPassET.getText().toString().trim() : "";
 

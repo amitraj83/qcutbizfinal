@@ -92,7 +92,7 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:background="@drawable/rounded_button_red"
-                    android:text="@string/skip_customer"
+                    android:text="Finish Service"
                     android:fontFamily="@font/montserrat_regular"
                     android:textColor="@android:color/white"
                     android:layout_weight="0.9"

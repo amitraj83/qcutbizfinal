@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -45,6 +46,7 @@ import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
+import com.qcut.biz.util.TimerService;
 import com.qcut.biz.util.ViewUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +66,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class WaitingListFragment extends Fragment {
 
     private WaitingListModel waitingListModel;
-    Button startService, skipCostumer;
+    Button startService, finishService;
     FloatingActionButton addCustomer;
     private FirebaseDatabase database = null;
     private SharedPreferences sp;
@@ -305,13 +307,33 @@ public class WaitingListFragment extends Fragment {
         startService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showStartServiceDialog(factory);
+                final DatabaseReference barberRef = database.getReference().child("barbershops").child(userid)
+                        .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
+                barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists()) {
+                            if(dataSnapshot.child(Constants.Barber.STATUS).exists()) {
+                                if(dataSnapshot.child(Constants.Barber.STATUS).getValue().toString().equalsIgnoreCase(Status.OPEN.name())) {
+                                    showStartServiceDialog(factory);
+                                } else {
+                                    Toast.makeText(mContext, "Cannot start services. May be barber is on break or his queue is stopped.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
 
-        skipCostumer = root.findViewById(R.id.skip_customer);
-        skipCostumer.setOnClickListener(new View.OnClickListener() {
+        finishService = root.findViewById(R.id.skip_customer);
+        finishService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //showSkipServiceDialog(factory);
@@ -459,8 +481,8 @@ public class WaitingListFragment extends Fragment {
 
             startServiceDialog.getWindow().setLayout(width, height);
 
-            Button yesButton = (Button) startServiceDialog.findViewById(R.id.yes_start_service);
-            Button noButton = (Button) startServiceDialog.findViewById(R.id.no_start_service);
+            final Button yesButton = (Button) startServiceDialog.findViewById(R.id.yes_start_service);
+            final Button noButton = (Button) startServiceDialog.findViewById(R.id.no_start_service);
 
             yesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -627,7 +649,7 @@ public class WaitingListFragment extends Fragment {
                         yesButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-
+                                yesButton.setEnabled(false);
                                 if (input != null && !input.getText().toString().trim().equalsIgnoreCase("")) {
                                     String customerId = UUID.randomUUID().toString();
                                     if (selectedKey.equalsIgnoreCase(Constants.ANY)) {
@@ -637,6 +659,7 @@ public class WaitingListFragment extends Fragment {
                                     } else {
                                         pushCustomerToDB(input, dataSnapshot, selectedKey, dialog, customerId, false);
                                     }
+                                    yesButton.playSoundEffect(0);
                                 } else {
                                     Toast.makeText(mContext, "Cannot add customer. No name provided", Toast.LENGTH_SHORT).show();
                                 }
@@ -670,14 +693,16 @@ public class WaitingListFragment extends Fragment {
     private void pushCustomerToDB(EditText input, @NonNull DataSnapshot dataSnapshot, String selectedKey,
                                   final AlertDialog dialog, String customerId, boolean isAny) {
         final String name = input.getText().toString();
-
+        dialog.dismiss();
         Task<Void> voidTask = DBUtils.pushCustomerToDB(mContext, dataSnapshot, selectedKey, name, customerId, isAny);
         if(voidTask != null) {
             voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    dialog.dismiss();
+                    TimerService.updateWaitingTimes(database, userid);
                     Toast.makeText(mContext, name + " added to queue", Toast.LENGTH_SHORT).show();
+                    MediaPlayer mediaPlayer = MediaPlayer.create(mContext, R.raw.door_bell);
+                    mediaPlayer.start();
 
                 }
             });

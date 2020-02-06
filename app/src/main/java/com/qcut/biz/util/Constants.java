@@ -17,4 +17,10 @@ public interface Constants {
         String TIME_SERVICE_STARTED = "timeServiceStarted";
 
     }
+
+    public interface Barber {
+        String STATUS = "status";
+        String NAME = "name";
+        String IMAGE_PATH = "imagePath";
+    }
 }

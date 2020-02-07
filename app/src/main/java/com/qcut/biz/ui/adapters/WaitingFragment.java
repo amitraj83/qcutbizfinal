@@ -237,7 +237,7 @@ public class WaitingFragment extends Fragment {
                                     final DataSnapshot next = iterator.next();
                                     boolean bq = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(next.getKey()).exists();
                                     if (!bq) {
-                                        barberList.add(Barber.builder().id(next.getKey())
+                                        barberList.add(Barber.builder().key(next.getKey())
                                                 .name(next.child("name").getValue().toString())
                                                 .imagePath(next.child("imagePath").getValue().toString()).build());
                                     }

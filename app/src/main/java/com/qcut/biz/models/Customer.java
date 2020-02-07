@@ -1,6 +1,7 @@
 package com.qcut.biz.models;
 
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,17 +18,30 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@IgnoreExtraProperties
 public class Customer {
 
     private String key;
+    private String name;
+    private long arrivalTime;
+    private long expectedWaitingTime;
+    private long serviceStartTime;
+    private long actualProcessingTime;
+    private long lastPositionChangedTime;
+    private String status;
+    private String preferredBarberKey;
+    private int placeInQueue;
+
+    //history
+    private long departureTime;
+    private long serviceTime;
+    private String actualBarberId;
+
+    //old
     private long timeAdded;
     private int timeToWait;
     private boolean anyBarber;
     private String customerId;
-    private String name;
-    private int placeInQueue;
-    private int skipcount;
-    private String status;
     private long timeFirstAddedInQueue;
     private long timeServiceStarted;
 
@@ -41,7 +55,6 @@ public class Customer {
         result.put("customerId", customerId);
         result.put("name", name);
         result.put("placeInQueue", placeInQueue);
-        result.put("skipcount", skipcount);
         result.put("status", status);
         result.put("timeFirstAddedInQueue", timeFirstAddedInQueue);
         result.put("timeServiceStarted", timeServiceStarted);

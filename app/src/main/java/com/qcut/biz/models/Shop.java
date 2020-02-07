@@ -2,13 +2,13 @@ package com.qcut.biz.models;
 
 public class Shop {
 
-    String id = "";
-    public String email = "";
-    public String name = "";
-    public String shopname = "";
-    public String password = "";
-    public String phone = "";
-    public String address = "";
+    String id ;
+    public String email ;
+    public String name ;
+    public String shopname ;
+    public String password ;
+    public String phone ;
+    public String address ;
     public String sunOpen = "9:00 AM";
     public String monOpen = "9:00 AM";
     public String tueOpen = "9:00 AM";

@@ -74,7 +74,7 @@ public class BarberSelectionArrayAdapter extends ArrayAdapter<String> {
             });
         }
         name.setText(barberList.get(position).getName());
-        convertView.setTag(barberList.get(position).getId());
+        convertView.setTag(barberList.get(position).getKey());
         return convertView;
     }
 }

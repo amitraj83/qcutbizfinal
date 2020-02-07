@@ -1,10 +1,8 @@
 package com.qcut.biz.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -21,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.multidex.MultiDex;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -35,10 +32,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.models.ShopDetails;
+import com.qcut.biz.models.ShopStatus;
+import com.qcut.biz.util.DBUtils;
+import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.TimeUtil;
 import com.qcut.biz.util.TimerService;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SharedPreferences sp;
     private String userid;
     private FirebaseDatabase database = null;
-    private TextView statusChangeTV;
+    private TextView statusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         FirebaseApp.initializeApp(this);
         database = FirebaseDatabase.getInstance();
-        sp = getSharedPreferences("login",MODE_PRIVATE);
+        sp = getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
 
         startService(new Intent(getBaseContext(), TimerService.class));
@@ -80,26 +81,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         animation.cancel();
         animation.reset();
         blinkingDot.startAnimation(animation);
+        final String OFFLINE = MainActivity.this.getString(R.string.status_offline);
+        final String ONLINE = MainActivity.this.getString(R.string.status_online);
+        statusView = findViewById(R.id.status_change);
+        DatabaseReference shopStatusRef = DBUtils.getDbRefShopStatus(database, userid);
+        updateStatus(OFFLINE);
 
-        statusChangeTV = findViewById(R.id.status_change);
-
-        final DatabaseReference online = database.getReference().child("barbershops").child(userid).child("queues")
-                .child(TimeUtil.getTodayDDMMYYYY()).child("online");
-        online.addListenerForSingleValueEvent(new ValueEventListener() {
+        shopStatusRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                LogUtils.info("Status changed to: ");
                 if (dataSnapshot.exists()) {
-                    if (dataSnapshot.getValue() != null &&
-                            dataSnapshot.getValue().toString().equalsIgnoreCase("true")) {
-                        statusChangeTV.setText(MainActivity.this.getString(R.string.status_online));
+                    String status = dataSnapshot.getValue(String.class);
+                    if (ShopStatus.valueOf(status) == ShopStatus.ONLINE) {
+                        statusView.setText(ONLINE);
                         animation.start();
                     } else {
-                        statusChangeTV.setText(MainActivity.this.getString(R.string.status_offline));
+                        statusView.setText(OFFLINE);
                         animation.cancel();
                         animation.reset();
                     }
+                    LogUtils.info("Status changed to: {0}", status);
                 } else {
-                    statusChangeTV.setText(MainActivity.this.getString(R.string.status_offline));
+                    statusView.setText(OFFLINE);
                     animation.cancel();
                     animation.reset();
                 }
@@ -107,56 +111,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                LogUtils.error("Error while changing shop status: {0}", databaseError.getMessage());
             }
         });
 
-        statusChangeTV.setOnClickListener(new View.OnClickListener() {
+        statusView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(userid == null) {
+                if (userid == null) {
                     Toast.makeText(MainActivity.this, "Problem. Please logout and Login again. ", Toast.LENGTH_SHORT).show();
+                    LogUtils.error("UserId is null: {0}", userid);
                     return;
                 }
 
-                final TextView statusTV = (TextView) v;
-                final String currentStatus = String.valueOf(statusTV.getText());
+                final TextView statusView = (TextView) v;
+                final String currentStatus = String.valueOf(statusView.getText());
 
-                final DatabaseReference online = database.getReference().child("barbershops").child(userid).child("queues")
-                        .child(TimeUtil.getTodayDDMMYYYY()).child("online");
-                online.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        String OFFLINE = MainActivity.this.getString(R.string.status_offline);
-                        String ONLINE = MainActivity.this.getString(R.string.status_online);
+                if (currentStatus.equalsIgnoreCase(OFFLINE)) {
+                    //go online
+                    updateStatus(ONLINE);
+                    blinkingDot.startAnimation(animation);
+                    statusView.setText(ONLINE);
 
-                        if (dataSnapshot.exists()) {
-                                if(currentStatus.equalsIgnoreCase(OFFLINE)) {
-                                    //go online
-                                    online.setValue(true);
-                                    blinkingDot.startAnimation(animation);
-                                    statusTV.setText(ONLINE);
-
-                                } else {
-                                    //go offline
-                                    online.setValue(false);
-                                    statusTV.setText(OFFLINE);
-                                    animation.cancel();
-                                    animation.reset();
-                                }
-                        } else {
-                            online.setValue(false);
-                            statusTV.setText(OFFLINE);
-                            animation.cancel();
-                            animation.reset();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
+                } else {
+                    //go offline
+                    updateStatus(OFFLINE);
+                    statusView.setText(OFFLINE);
+                    animation.cancel();
+                    animation.reset();
+                }
             }
         });
 
@@ -165,8 +148,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
     }
 
-
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(final MenuItem item) {
         // Handle navigation view item clicks here.
@@ -191,9 +172,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navController.navigate(R.id.nav_go_shop_add_services);
         } else if (id == R.id.nav_log_out) {
 
-            sp.edit().putBoolean("isLoggedIn",false).apply();
+            sp.edit().putBoolean("isLoggedIn", false).apply();
             sp.edit().putString("userid", null).apply();
-            setOffline();
+
+            updateStatus(MainActivity.this.getString(R.string.status_offline));
             Intent intent = new Intent(MainActivity.this, StartActivity.class);
             startActivity(intent);
             finish();
@@ -204,28 +186,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void setOffline() {
-        final DatabaseReference online = database.getReference().child("barbershops").child(userid).child("queues")
-                .child(TimeUtil.getTodayDDMMYYYY()).child("online");
-        online.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String OFFLINE = MainActivity.this.getString(R.string.status_offline);
-                String ONLINE = MainActivity.this.getString(R.string.status_online);
-
-                if (dataSnapshot.exists()) {
-
-                        //go offline
-                        online.setValue(false);
-
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
+    private void updateStatus(String status) {
+        DatabaseReference shopStatusRef = DBUtils.getDbRefShopStatus(database, userid);
+        shopStatusRef.setValue(status);
     }
 
     @Override
@@ -234,5 +197,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
 }

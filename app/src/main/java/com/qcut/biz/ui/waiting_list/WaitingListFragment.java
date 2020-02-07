@@ -312,9 +312,9 @@ public class WaitingListFragment extends Fragment {
                 barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists()) {
-                            if(dataSnapshot.child(Constants.Barber.STATUS).exists()) {
-                                if(dataSnapshot.child(Constants.Barber.STATUS).getValue().toString().equalsIgnoreCase(Status.OPEN.name())) {
+                        if (dataSnapshot.exists()) {
+                            if (dataSnapshot.child(Constants.Barber.STATUS).exists()) {
+                                if (dataSnapshot.child(Constants.Barber.STATUS).getValue().toString().equalsIgnoreCase(Status.OPEN.name())) {
                                     showStartServiceDialog(factory);
                                 } else {
                                     Toast.makeText(mContext, "Cannot start services. May be barber is on break or his queue is stopped.", Toast.LENGTH_SHORT).show();
@@ -622,7 +622,7 @@ public class WaitingListFragment extends Fragment {
                 if (dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).exists()) {
                     Iterator<DataSnapshot> iterator = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).getChildren().iterator();
                     List<Barber> barberList = new ArrayList<>();
-                    barberList.add(Barber.builder().id(Constants.ANY).name(Constants.ANY).imagePath("").build());
+                    barberList.add(Barber.builder().key(Constants.ANY).name(Constants.ANY).imagePath("").build());
 
                     while (iterator.hasNext()) {
                         DataSnapshot next = iterator.next();
@@ -695,7 +695,7 @@ public class WaitingListFragment extends Fragment {
         final String name = input.getText().toString();
         dialog.dismiss();
         Task<Void> voidTask = DBUtils.pushCustomerToDB(mContext, dataSnapshot, selectedKey, name, customerId, isAny);
-        if(voidTask != null) {
+        if (voidTask != null) {
             voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {

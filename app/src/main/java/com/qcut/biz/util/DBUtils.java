@@ -6,6 +6,8 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.qcut.biz.models.ShopDetails;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +18,10 @@ import java.util.Map;
 
 public class DBUtils {
 
+
+    public static DatabaseReference getDbRefShopStatus(FirebaseDatabase database, String userid) {
+        return database.getReference().child(ShopDetails.SHOP_DETAILS).child(userid).child(ShopDetails.STATUS);
+    }
     public static Task<Void> pushCustomerToDB(Context mContext, DataSnapshot dataSnapshot, String selectedKey, String name, String customerId, boolean isAny) {
         int count = 0;
         DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);

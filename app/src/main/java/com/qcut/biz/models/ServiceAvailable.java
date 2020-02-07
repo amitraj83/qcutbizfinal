@@ -1,5 +1,7 @@
 package com.qcut.biz.models;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +15,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class Barber {
-    private String key;
-    private String name;
-    private String imagePath;
+@IgnoreExtraProperties
+public class ServiceAvailable {
+
+    private String serviceName;
+    private String servicePrice;
 }

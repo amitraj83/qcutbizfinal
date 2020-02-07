@@ -167,7 +167,7 @@ public class AddBarberFragment extends Fragment {
                                 String key = barbersRef.push().getKey();
 //                                Uri downloadUrl =
 //                                        taskSnapshot.getStorage().getDownloadUrl().getResult();
-                                barbersRef.child(key).setValue(Barber.builder().id(key).name(name)
+                                barbersRef.child(key).setValue(Barber.builder().key(key).name(name)
                                         .imagePath(taskSnapshot.getMetadata().getPath()).build());
                             }
 

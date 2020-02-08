@@ -1,7 +1,6 @@
 package com.qcut.biz.activity;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
@@ -19,24 +18,17 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
-import androidx.multidex.MultiDex;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.presenters.SignInPresenter;
+import com.qcut.biz.views.SignInView;
 
-public class SignInActivity extends AppCompatActivity {
+public class SignInActivity extends AppCompatActivity implements SignInView {
 
-    Button signIn;
-    private TextView emailText;
-    private TextView passwordText;
-    private FirebaseDatabase database = null;
-    private SharedPreferences sp;
-
+    private Button signIn;
+    private TextView emailTextBox;
+    private TextView passwordTextbox;
+    private SignInPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +39,16 @@ public class SignInActivity extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.action_bar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        SharedPreferences sp = getSharedPreferences("login", MODE_PRIVATE);
+        presenter = new SignInPresenter(this, sp, this);
+        emailTextBox = findViewById(R.id.sign_in_email);
+        passwordTextbox = findViewById(R.id.sign_in_password);
 
-        emailText = findViewById(R.id.sign_in_email);
-        passwordText = findViewById(R.id.sign_in_password);
-
-        FirebaseApp.initializeApp(this);
-        database = FirebaseDatabase.getInstance();
-
-        sp = getSharedPreferences("login",MODE_PRIVATE);
-
-        passwordText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        passwordTextbox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    signIn();
+                    presenter.onSignInClick();
                     return true;
                 }
                 return false;
@@ -71,9 +59,9 @@ public class SignInActivity extends AppCompatActivity {
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                signIn();
-            }});
+                presenter.onSignInClick();
+            }
+        });
 
         LayoutInflater factory = LayoutInflater.from(SignInActivity.this);
         final View forgotPasswordView = factory.inflate(R.layout.forgot_password, null);
@@ -93,40 +81,6 @@ public class SignInActivity extends AppCompatActivity {
 
     }
 
-    private void signIn() {
-        Query query = database.getReference().child("barbershops").
-                orderByChild("email").equalTo(emailText.getText().toString().trim());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot shopData : dataSnapshot.getChildren()) {
-                        String email = shopData.child("email").getValue().toString().trim();
-                        String password = shopData.child("password").getValue().toString().trim();
-                        if (email.equalsIgnoreCase(emailText.getText().toString().trim()) &&
-                                password.equalsIgnoreCase(passwordText.getText().toString().trim())) {
-                            Toast.makeText(SignInActivity.this, "Login Successful.", Toast.LENGTH_LONG).show();
-                            sp.edit().putBoolean("isLoggedIn",true).apply();
-                            sp.edit().putString("userid", shopData.getKey().toString()).apply();
-                            Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                            startActivity(intent);
-
-                        } else {
-                            Toast.makeText(SignInActivity.this, "Login unsuccessful.", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                } else {
-                    Toast.makeText(SignInActivity.this, "Login Does not exist.", Toast.LENGTH_LONG).show();
-
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-    });
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -139,4 +93,25 @@ public class SignInActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void showMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public String getEmail() {
+        return emailTextBox.getText().toString();
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordTextbox.getText().toString();
+    }
+
+    @Override
+    public void startActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

@@ -20,6 +20,7 @@ public class ShopDetails {
 
     public static final String SHOP_DETAILS="shopDetails";
     public static final String STATUS="status";
+    public static final String EMAIL="email";
     private String key;
     private String email;
     private String name;

@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.activity.StartActivity;
 import com.qcut.biz.views.activities.MainView;
 import com.qcut.biz.models.ShopStatus;
 import com.qcut.biz.util.DBUtils;
@@ -111,7 +112,7 @@ public class MainPresenter {
             preferences.edit().putString("userid", null).apply();
 
             updateStatus(context.getString(R.string.status_offline));
-            view.startActivity();
+            view.startActivity(StartActivity.class);
         }
         view.closeDrawer();
     }

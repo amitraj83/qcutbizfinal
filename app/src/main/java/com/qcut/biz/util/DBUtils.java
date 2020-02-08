@@ -28,6 +28,11 @@ public class DBUtils {
         return database.getReference().child(Barber.BARBERS).child(userid);
     }
 
+
+    public static DatabaseReference getDbRefShopDetails(FirebaseDatabase database) {
+        return database.getReference().child(ShopDetails.SHOP_DETAILS);
+    }
+
     public static Task<Void> pushCustomerToDB(Context mContext, DataSnapshot dataSnapshot, String selectedKey, String name, String customerId, boolean isAny) {
         int count = 0;
         DataSnapshot queueSnapShot = dataSnapshot.child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(selectedKey);
@@ -86,4 +91,5 @@ public class DBUtils {
         return queue.child(key).setValue(map);
 
     }
+
 }

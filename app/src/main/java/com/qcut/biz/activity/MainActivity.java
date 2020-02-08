@@ -137,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void startActivity() {
-        Intent intent = new Intent(this, StartActivity.class);
+    public void startActivity(Class clazz) {
+        Intent intent = new Intent(this, clazz);
         startActivity(intent);
         finish();
     }

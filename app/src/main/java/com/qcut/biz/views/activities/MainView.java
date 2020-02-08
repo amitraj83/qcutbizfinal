@@ -1,5 +1,7 @@
 package com.qcut.biz.views.activities;
 
+import com.qcut.biz.activity.StartActivity;
+
 public interface MainView {
 
     void setShopStatusOnline();
@@ -12,7 +14,7 @@ public interface MainView {
 
     void navigateToId(int id);
 
-    void startActivity();
-
     void closeDrawer();
+
+    void startActivity(Class<StartActivity> startActivityClass);
 }

@@ -1,8 +1,6 @@
 package com.qcut.biz.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,23 +11,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
-import androidx.multidex.MultiDex;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.R;
-import com.qcut.biz.models.Shop;
+import com.qcut.biz.presenters.activities.SignUpPresenter;
+import com.qcut.biz.views.activities.SignUpView;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements SignUpView {
 
     private Button signUp;
-    private FirebaseDatabase database = null;
     private EditText shopContactName;
     private EditText shopNameET;
     private EditText shopEmailET;
     private EditText shopPassET;
-    private SharedPreferences sp;
+    private SignUpPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,63 +32,21 @@ public class SignUpActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        shopContactName = (EditText) findViewById(R.id.user_name);
-        shopNameET = (EditText) findViewById(R.id.shop_name);
-        shopEmailET = (EditText) findViewById(R.id.sign_up_email);
-        shopPassET = (EditText) findViewById(R.id.sign_up_password);
-
-        FirebaseApp.initializeApp(this);
-        database = FirebaseDatabase.getInstance();
-
-        sp = getSharedPreferences("login",MODE_PRIVATE);
-
-
+        shopContactName = findViewById(R.id.user_name);
+        shopNameET = findViewById(R.id.shop_name);
+        shopEmailET = findViewById(R.id.sign_up_email);
+        shopPassET = findViewById(R.id.sign_up_password);
+        presenter = new SignUpPresenter(this, this);
         signUp = findViewById(R.id.sign_up_screen);
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                String userName = shopContactName != null ? shopContactName.getText().toString().trim() : "";
-                String shopName = shopNameET != null ? shopNameET.getText().toString().trim() : "";
-                if(shopEmailET == null || shopEmailET.getText().toString().trim().equalsIgnoreCase("")) {
-                    Toast.makeText(SignUpActivity.this, "Email cannot be empty", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                String shopEmail = shopEmailET.getText() != null ? shopEmailET.getText().toString().trim() : "";
-                if(shopPassET == null || shopPassET.getText().toString().trim().equalsIgnoreCase("")){
-                    Toast.makeText(SignUpActivity.this, "Password cannot be empty", Toast.LENGTH_SHORT).show();
-                    return;
-                } else if (shopPassET == null || shopPassET.getText().toString().trim().length() < 8) {
-                    Toast.makeText(SignUpActivity.this,
-                            "Password must be at least 8 character long", Toast.LENGTH_LONG).show();
-
-                }
-                String shopPassword = shopPassET.getText() != null ? shopPassET.getText().toString().trim() : "";
-
-                DatabaseReference dbRef = database.getReference().child("barbershops");
-
-                if (dbRef != null) {
-                    String key = dbRef.push().getKey();
-                    Shop shop = new Shop(key, shopEmail, userName, shopName, shopPassword);
-                    dbRef.child(key).setValue(shop);
-                    sp.edit().putBoolean("isLoggedIn",true).apply();
-                    sp.edit().putString("userid", key).apply();
-                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(SignUpActivity.this, "User Already exists.", Toast.LENGTH_SHORT).show();
-
-                }
+                presenter.onSignUpClick();
 
             }
         });
-
-
-
-
     }
 
     @Override
@@ -105,8 +57,38 @@ public class SignUpActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
+    @Override
+    public void startActivity(Class clazz) {
+        Intent intent = new Intent(this, clazz);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public String getShopContactName() {
+        return shopContactName.getText().toString().trim();
+    }
+
+    @Override
+    public String getShopName() {
+        return shopNameET.getText().toString().trim();
+    }
+
+    @Override
+    public void showMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public String getEmail() {
+        return shopEmailET.getText().toString().trim();
+    }
+
+    @Override
+    public String getPassword() {
+        return shopPassET.getText().toString().trim();
+    }
 }

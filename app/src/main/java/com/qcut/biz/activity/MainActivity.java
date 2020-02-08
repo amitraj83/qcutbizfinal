@@ -26,9 +26,9 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.R;
-import com.qcut.biz.presenters.MainPresenter;
+import com.qcut.biz.presenters.activities.MainPresenter;
 import com.qcut.biz.util.TimerService;
-import com.qcut.biz.views.MainView;
+import com.qcut.biz.views.activities.MainView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
 
@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavController navController;
     private ImageView blinkingDot;
     private TextView statusView;
-    private SharedPreferences sp;
     private String userid;
     private FirebaseDatabase database = null;
     private Animation animation;
@@ -48,10 +47,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        sp = getSharedPreferences("login", MODE_PRIVATE);
         statusView = findViewById(R.id.status_change);
 
-        mainPresenter = new MainPresenter(this, sp, this);
+        mainPresenter = new MainPresenter(this, this);
 
         startService(new Intent(getBaseContext(), TimerService.class));
 

@@ -14,6 +14,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class Barber {
+    public static final String BARBERS = "barbers";
     private String key;
     private String name;
     private String imagePath;

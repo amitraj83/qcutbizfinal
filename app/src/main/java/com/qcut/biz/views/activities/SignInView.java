@@ -1,4 +1,4 @@
-package com.qcut.biz.views;
+package com.qcut.biz.views.activities;
 
 public interface SignInView {
 

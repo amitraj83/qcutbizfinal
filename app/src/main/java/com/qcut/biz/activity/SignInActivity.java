@@ -20,8 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
 import com.qcut.biz.R;
-import com.qcut.biz.presenters.SignInPresenter;
-import com.qcut.biz.views.SignInView;
+import com.qcut.biz.presenters.activities.SignInPresenter;
+import com.qcut.biz.views.activities.SignInView;
 
 public class SignInActivity extends AppCompatActivity implements SignInView {
 
@@ -39,8 +39,7 @@ public class SignInActivity extends AppCompatActivity implements SignInView {
         getSupportActionBar().setCustomView(R.layout.action_bar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        SharedPreferences sp = getSharedPreferences("login", MODE_PRIVATE);
-        presenter = new SignInPresenter(this, sp, this);
+        presenter = new SignInPresenter(this, this);
         emailTextBox = findViewById(R.id.sign_in_email);
         passwordTextbox = findViewById(R.id.sign_in_password);
 

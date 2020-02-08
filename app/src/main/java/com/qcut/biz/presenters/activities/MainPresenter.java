@@ -1,4 +1,4 @@
-package com.qcut.biz.presenters;
+package com.qcut.biz.presenters.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,10 +12,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
-import com.qcut.biz.views.MainView;
+import com.qcut.biz.views.activities.MainView;
 import com.qcut.biz.models.ShopStatus;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class MainPresenter {
 
@@ -25,10 +27,10 @@ public class MainPresenter {
     private Context context;
     private FirebaseDatabase database;
 
-    public MainPresenter(MainView mainView, SharedPreferences preferences, Context context) {
+    public MainPresenter(MainView mainView, Context context) {
         this.view = mainView;
-        this.preferences = preferences;
         this.context = context;
+        this.preferences = context.getSharedPreferences("login", MODE_PRIVATE);
         FirebaseApp.initializeApp(context);
         database = FirebaseDatabase.getInstance();
         userid = preferences.getString("userid", null);

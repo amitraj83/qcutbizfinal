@@ -1,4 +1,4 @@
-package com.qcut.biz.presenters;
+package com.qcut.biz.presenters.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,7 +11,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.views.SignInView;
+import com.qcut.biz.views.activities.SignInView;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SignInPresenter {
 
@@ -20,10 +22,10 @@ public class SignInPresenter {
     private Context context;
     private FirebaseDatabase database;
 
-    public SignInPresenter(SignInView view, SharedPreferences preferences, Context context) {
+    public SignInPresenter(SignInView view, Context context) {
         this.view = view;
-        this.preferences = preferences;
         this.context = context;
+        this.preferences = context.getSharedPreferences("login", MODE_PRIVATE);
         FirebaseApp.initializeApp(context);
         database = FirebaseDatabase.getInstance();
     }

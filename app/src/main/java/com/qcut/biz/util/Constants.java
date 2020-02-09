@@ -3,7 +3,12 @@ package com.qcut.biz.util;
 public interface Constants {
 
     String ANY = "Any";
-    
+    String STOPPED = "STOPPED";
+    String STOP_QUEUE = "Stop Q";
+    String ON_BREAK = "On Break";
+    String BREAK = "Break";
+
+
     public interface Customer {
         String NAME = "name";
         String PLACE_IN_QUEUE = "placeInQueue";

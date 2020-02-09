@@ -119,7 +119,7 @@ public class AddBarberFragment extends Fragment implements AddBarberView {
     }
 
     @Override
-    public void displayImage(ImageView photo, Uri result) {
+    public void setPhotoUrl(ImageView photo, Uri result) {
         Glide.with(getContext()).load(result).into(photo);
     }
 
@@ -170,7 +170,7 @@ public class AddBarberFragment extends Fragment implements AddBarberView {
             final ImageView photo = listView_layout.findViewById(R.id.barber_photo_lv);
             TextView name = listView_layout.findViewById(R.id.barber_name_lv);
             name.setText(barbers.get(i).getName());
-            presenter.getDownloadUrlAndDisplayImage(photo, barbers.get(i).getImagePath());
+            presenter.getDownloadUrlAndSetInView(photo, barbers.get(i).getImagePath());
             return listView_layout;
         }
     }

@@ -20,7 +20,7 @@ import lombok.Setter;
 @Builder
 @IgnoreExtraProperties
 public class Customer {
-
+    public static final String BARBER_WAITING_QUEUES = "barberWaitingQueues";
     private String key;
     private String name;
     private long arrivalTime;
@@ -31,6 +31,7 @@ public class Customer {
     private String status;
     private String preferredBarberKey;
     private int placeInQueue;
+    private boolean absent;
 
     //history
     private long departureTime;

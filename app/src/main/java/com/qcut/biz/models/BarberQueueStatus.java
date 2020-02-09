@@ -15,8 +15,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-@IgnoreExtraProperties
+//@IgnoreExtraProperties
 public class BarberQueueStatus {
 
+    public static final String BARBER_QUEUES_STATUSES = "barberQueuesStatuses";
     private String queueStatus;
 }

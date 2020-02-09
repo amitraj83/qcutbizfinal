@@ -134,13 +134,13 @@ public class AddBarberPresenter {
         });
     }
 
-    public void getDownloadUrlAndDisplayImage(final ImageView photo, final String imagePath) {
+    public void getDownloadUrlAndSetInView(final ImageView photo, final String imagePath) {
         StorageReference child = storageReference.child(imagePath);
         child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
-                    view.displayImage(photo, task.getResult());
+                    view.setPhotoUrl(photo, task.getResult());
                 } else {
                     String message = task.getException().getMessage();
                     view.showMessage(message);

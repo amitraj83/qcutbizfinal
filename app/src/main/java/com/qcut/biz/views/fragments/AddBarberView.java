@@ -25,5 +25,5 @@ public interface AddBarberView {
 
     void resetFileUploadBox();
 
-    void displayImage(ImageView photo, Uri result);
+    void setPhotoUrl(ImageView photo, Uri result);
 }

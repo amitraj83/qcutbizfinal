@@ -15,32 +15,27 @@ import com.qcut.biz.models.Customer;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-public class FindBarberQueueTask implements Continuation<List<BarberQueue>, Task<BarberQueue>> {
+public class FindCustomerTask implements Continuation<BarberQueue, Task<Customer>> {
 
-    private FirebaseDatabase database;
-    private String userid;
-    private String barberKey;
+    private String customerKey;
 
-    public FindBarberQueueTask(FirebaseDatabase database, String userid, String barberKey) {
-        this.database = database;
-        this.userid = userid;
-        this.barberKey = barberKey;
+    public FindCustomerTask(String customerKey) {
+        this.customerKey = customerKey;
     }
 
     @Override
-    public Task<BarberQueue> then(@NonNull final Task<List<BarberQueue>> barbersQueues) throws Exception {
-        final TaskCompletionSource<BarberQueue> tcs = new TaskCompletionSource<>();
+    public Task<Customer> then(@NonNull Task<BarberQueue> task) throws Exception {
+        final TaskCompletionSource<Customer> tcs = new TaskCompletionSource<>();
+        final BarberQueue barberQueue = task.getResult();
         boolean found = false;
-        for (BarberQueue bq : barbersQueues.getResult()) {
-            if (bq.getBarberKey().equalsIgnoreCase(barberKey)) {
-                tcs.setResult(bq);
+        for (Customer c : barberQueue.getCustomers()) {
+            if (c.getKey().equalsIgnoreCase(customerKey)) {
                 found = true;
-                break;
+                tcs.setResult(c);
             }
         }
         if (!found) {

@@ -27,11 +27,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.qcut.biz.R;
 import com.qcut.biz.models.Barber;
-import com.qcut.biz.models.BarberQueueStatus;
 import com.qcut.biz.presenters.fragments.WaitingPresenter;
 import com.qcut.biz.ui.waiting_list.BarberSelectionArrayAdapter;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.LogUtils;
+import com.qcut.biz.util.Status;
 import com.qcut.biz.util.ViewUtils;
 import com.qcut.biz.views.fragments.WaitingView;
 
@@ -51,6 +51,8 @@ public class WaitingFragment extends Fragment implements WaitingView {
     private AlertDialog barberSelectionDialog;
     private Spinner ddSpinner;
     private String selectedBarberKeyFromBarberDialog;
+    private View yesButton;
+    private View noButton;
 
     @Override
     public void onAttach(Context context) {
@@ -93,7 +95,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
     }
 
     public void showDialog(String dialogTitle, String dialogText, String confirmText,
-                           final BarberQueueStatus newStatus, String photoPath) {
+                           final Status newStatus, String photoPath) {
         if (dialog == null) {
             final LayoutInflater factory = LayoutInflater.from(mContext);
             final View takeBreakView = factory.inflate(R.layout.take_break_dialog, null);
@@ -153,6 +155,21 @@ public class WaitingFragment extends Fragment implements WaitingView {
             barberSelectionDialog.setView(selectBarberView);
             barberSelectionDialog.show();
             ddSpinner = barberSelectionDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
+            yesButton = barberSelectionDialog.findViewById(R.id.yes_add_barber_queue);
+            noButton = barberSelectionDialog.findViewById(R.id.no_add_barber_queue);
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onBarberSelectionClick();
+
+                }
+            });
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hideBarberSelectDialog();
+                }
+            });
         }
         barberSelectionDialog.show();
         BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, remainingBarbers);
@@ -164,22 +181,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
         barberSelectionDialog.getWindow().setLayout(width, height);
-
-        final Button yesButton = (Button) barberSelectionDialog.findViewById(R.id.yes_add_barber_queue);
-        final Button noButton = (Button) barberSelectionDialog.findViewById(R.id.no_add_barber_queue);
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onBarberSelectionClick(selectedBarberKeyFromBarberDialog);
-
-            }
-        });
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideBarberSelectDialog();
-            }
-        });
+        //TODO create buttons and set listener only once
 
         ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -206,6 +208,11 @@ public class WaitingFragment extends Fragment implements WaitingView {
     @Override
     public String getTakeBreakButtonText() {
         return takeBreakButton.getText().toString();
+    }
+
+    @Override
+    public String getSelectedBarberKey() {
+        return selectedBarberKeyFromBarberDialog;
     }
 
     @Override

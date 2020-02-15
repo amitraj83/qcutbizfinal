@@ -34,7 +34,7 @@ public class FetchBarbersTask implements Continuation<Void, Task<Map<String, Bar
         DBUtils.getDbRefBarbers(database, userid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                LogUtils.info("Location loaded");
+                LogUtils.info("Barbers loaded");
                 Iterator<DataSnapshot> childrenIterator = dataSnapshot.getChildren().iterator();
                 Map<String, Barber> barbersMap = new HashMap<>();
                 while (childrenIterator.hasNext()) {

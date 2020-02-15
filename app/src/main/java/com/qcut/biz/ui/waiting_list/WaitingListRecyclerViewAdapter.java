@@ -10,21 +10,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.R;
-import com.qcut.biz.models.ShopQueueModel;
+import com.qcut.biz.models.Customer;
 import com.qcut.biz.util.Status;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<WaitingListRecyclerViewAdapter.MyViewHolder> {
 
-    private ArrayList<ShopQueueModel> dataSet;
-    Context mContext;
-    private String barberTtag;
-    private FirebaseDatabase database;
-    private String userid;
+    private List<Customer> dataSet;
+    private Context mContext;
+    private View.OnClickListener waitingListClickListener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView custName, custStatus, forWho;
@@ -37,20 +34,18 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
         }
     }
 
-    public WaitingListRecyclerViewAdapter(ArrayList<ShopQueueModel> dataSet, Context mContext,
-                                          String tag, FirebaseDatabase database, String userid) {
+    public WaitingListRecyclerViewAdapter(List<Customer> dataSet, Context mContext,
+                                          View.OnClickListener waitingListClickListener) {
         this.dataSet = dataSet;
         this.mContext = mContext;
-        this.barberTtag = tag;
-        this.database = database;
-        this.userid = userid;
+        this.waitingListClickListener = waitingListClickListener;
     }
 
-    public void setDataSet(ArrayList<ShopQueueModel> dataSet) {
+    public void setDataSet(List<Customer> dataSet) {
         this.dataSet = dataSet;
     }
 
-    public ArrayList<ShopQueueModel> getDataSet() {
+    public List<Customer> getDataSet() {
         return this.dataSet;
     }
 
@@ -59,27 +54,27 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.queue_row, parent, false);
-        itemView.setOnClickListener(new WaitingListClickListener(mContext, itemView, this.barberTtag, database, userid));
+        itemView.setOnClickListener(waitingListClickListener);
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        ShopQueueModel shopQueueModel = this.dataSet.get(position);
-        holder.itemView.setTag(shopQueueModel.getId());
-        holder.custName.setText(shopQueueModel.getName());
-        if(shopQueueModel.isAny()) {
+        Customer customer = this.dataSet.get(position);
+        holder.itemView.setTag(customer.getKey());
+        holder.custName.setText(customer.getName());
+        if (customer.isAnyBarber()) {
             holder.forWho.setText("Any");
         } else {
             holder.forWho.setText("You");
         }
-        if (shopQueueModel.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
-            Drawable waitingDrawable = this.mContext.getResources().getDrawable( R.drawable.ic_action_waiting );
+        if (customer.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+            Drawable waitingDrawable = this.mContext.getResources().getDrawable(R.drawable.ic_action_waiting);
             holder.custStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, waitingDrawable, null);
-            holder.custStatus.setText(shopQueueModel.getDisplayTimeToWait());
+            holder.custStatus.setText(String.valueOf(customer.getExpectedWaitingTime()));
             holder.custStatus.setTag(Status.QUEUE);
         } else {
-            Drawable progressDrawable = this.mContext.getResources().getDrawable( R.drawable.ic_action_progress );
+            Drawable progressDrawable = this.mContext.getResources().getDrawable(R.drawable.ic_action_progress);
             holder.custStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, progressDrawable, null);
             holder.custStatus.setText("In Chair");
             holder.custStatus.setTag(Status.PROGRESS);

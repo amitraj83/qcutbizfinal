@@ -3,7 +3,6 @@ package com.qcut.biz.listeners;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -11,7 +10,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
-import com.qcut.biz.models.BarberQueueStatus;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.Status;
@@ -35,20 +33,14 @@ public class BarberQueueStatusChangeListener implements ChildEventListener {
         }
         LogUtils.info("dataSnapshot: {0}", dataSnapshot.getValue());
 
-        final BarberQueueStatus queueStatus = dataSnapshot.getValue(BarberQueueStatus.class);
-        if (Status.OPEN.name().equalsIgnoreCase(queueStatus.getQueueStatus())) {
-            LogUtils.info("queueStatus: {0}", queueStatus);
-            final String barberKey = dataSnapshot.getKey();
-            DBUtils.getBarber(database, userid, barberKey, new OnSuccessListener<Barber>() {
-                @Override
-                public void onSuccess(Barber barber) {
-                    if (!view.isTabExists(barber.getKey())) {
-                        view.addBarberQueueTab(barber);
-                        final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barberKey);
-                        queueRef.push().setValue(BarberQueue.builder().build());
-                    }
-                }
-            });
+        final Barber barber = dataSnapshot.getValue(Barber.class);
+        if (Status.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
+            LogUtils.info("queueStatus: {0}", barber.getQueueStatus());
+            if (!view.isTabExists(barber.getKey())) {
+                view.addBarberQueueTab(barber);
+                final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barber.getKey());
+                queueRef.push().setValue(BarberQueue.builder().build());
+            }
         }
     }
 

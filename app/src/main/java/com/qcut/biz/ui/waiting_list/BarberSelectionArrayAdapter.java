@@ -25,7 +25,7 @@ import java.util.List;
 
 public class BarberSelectionArrayAdapter extends ArrayAdapter<String> {
     private List<Barber> barberList;
-    Context mContext;
+    private Context mContext;
 
     public BarberSelectionArrayAdapter(@NonNull Context context, List<Barber> barberList) {
         super(context, R.layout.add_customer_dialog_dropdown);
@@ -43,21 +43,14 @@ public class BarberSelectionArrayAdapter extends ArrayAdapter<String> {
         return getView(position, convertView, parent);
     }
 
-    private static class ViewHolder {
-        ImageView photo;
-        TextView name;
-    }
-
-
-
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater mInflater = (LayoutInflater) mContext.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = mInflater.inflate(R.layout.add_customer_dialog_dropdown, parent, false);
-        final ImageView photo = (ImageView) convertView.findViewById(R.id.barber_photo_dd);
-        TextView name = (TextView) convertView.findViewById(R.id.barber_name_dd);
+        final ImageView photo = convertView.findViewById(R.id.barber_photo_dd);
+        TextView name =  convertView.findViewById(R.id.barber_name_dd);
 
         if(!barberList.get(position).getName().equalsIgnoreCase("any")) {
             StorageReference child = FirebaseStorage.getInstance().getReference().child(barberList.get(position).getImagePath());

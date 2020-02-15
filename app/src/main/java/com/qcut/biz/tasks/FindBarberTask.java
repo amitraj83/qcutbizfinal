@@ -28,9 +28,9 @@ public class FindBarberTask implements Continuation<Map<String, Barber>, Task<Ba
     @Override
     public Task<Barber> then(@NonNull Task<Map<String, Barber>> task) throws Exception {
 
-        final TaskCompletionSource<Barber> tcs = new TaskCompletionSource();
+        final TaskCompletionSource<Barber> tcs = new TaskCompletionSource<>();
         tcs.setResult(task.getResult().get(barberKey));
-        LogUtils.info("FindBarberTask: barberKey:{0}",barberKey);
+        LogUtils.info("FindBarberTask: barberKey:{0}", barberKey);
         return tcs.getTask();
     }
 }

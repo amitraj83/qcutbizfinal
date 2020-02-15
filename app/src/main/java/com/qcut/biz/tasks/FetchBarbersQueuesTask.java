@@ -11,9 +11,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
-import com.qcut.biz.models.Customer;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
+import com.qcut.biz.util.MappingUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,9 +38,9 @@ public class FetchBarbersQueuesTask implements Continuation<Map<String, Barber>,
         DBUtils.getDbRefAllBarberQueues(database, userid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                LogUtils.info("Location loaded");
+                LogUtils.info("Queues loaded");
                 List<BarberQueue> barbersQueues = buildBarberQueue(dataSnapshot, barberMap);
-                LogUtils.info("FetchBarbersQueuesTask: {0}",barbersQueues);
+                LogUtils.info("FetchBarbersQueuesTask: {0}", barbersQueues);
                 tcs.setResult(barbersQueues);
             }
 
@@ -57,18 +57,9 @@ public class FetchBarbersQueuesTask implements Continuation<Map<String, Barber>,
         List<BarberQueue> barbersQueues = new ArrayList<>();
         while (qSnapIterator.hasNext()) {
             final DataSnapshot queueSnapshot = qSnapIterator.next();
-            Iterator<DataSnapshot> custSnapIterator = queueSnapshot.getChildren().iterator();
-            List<Customer> customers = new ArrayList<>();
-
-            while (custSnapIterator.hasNext()) {
-                DataSnapshot custSnapshot = custSnapIterator.next();
-                Customer customer = custSnapshot.getValue(Customer.class);
-                customer.setKey(custSnapshot.getKey());
-                customers.add(customer);
-            }
-            String barberKey = queueSnapshot.getKey();
-            barbersQueues.add(BarberQueue.builder().barberKey(barberKey)
-                    .customers(customers).barber(barberMap.get(barberKey)).build());
+            final BarberQueue barberQueue = MappingUtils.mapToBarberQueue(queueSnapshot);
+            barberQueue.setBarber(barberMap.get(barberQueue.getBarberKey()));
+            barbersQueues.add(barberQueue);
         }
         return barbersQueues;
     }

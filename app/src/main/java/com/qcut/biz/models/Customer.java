@@ -2,6 +2,9 @@ package com.qcut.biz.models;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+import com.qcut.biz.util.Status;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,6 +24,11 @@ import lombok.Setter;
 @IgnoreExtraProperties
 public class Customer {
     public static final String BARBER_WAITING_QUEUES = "barberWaitingQueues";
+    //    public static final String STATUS = ;
+//    public static final String TIME_TO_WAIT = ;
+//    public static final String TIME_ADDED = ;
+//    public static final String TIME_SERVICE_STARTED = ;
+//    public static final String PLACE_IN_QUEUE = ;
     private String key;
     private String name;
     private long arrivalTime;
@@ -40,11 +48,32 @@ public class Customer {
 
     //old
     private long timeAdded;
-    private int timeToWait;
+    private long timeToWait;
     private boolean anyBarber;
     private String customerId;
     private long timeFirstAddedInQueue;
     private long timeServiceStarted;
+
+    @Exclude
+    public boolean isDone() {
+        return StringUtils.isNotBlank(status) && Status.DONE.name().equalsIgnoreCase(status);
+    }
+
+    @Exclude
+    public boolean isInProgress() {
+        return StringUtils.isNotBlank(status) && Status.PROGRESS.name().equalsIgnoreCase(status);
+    }
+
+    @Exclude
+    public boolean isInQueue() {
+        return StringUtils.isNotBlank(status) && Status.QUEUE.name().equalsIgnoreCase(status);
+    }
+
+    @Exclude
+    public boolean isRemoved() {
+        return StringUtils.isNotBlank(status) && Status.REMOVED.name().equalsIgnoreCase(status);
+    }
+
 
     @Exclude
     public Map<String, Object> toMap() {

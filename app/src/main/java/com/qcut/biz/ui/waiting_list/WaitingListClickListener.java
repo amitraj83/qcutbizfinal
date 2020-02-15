@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,10 +25,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.models.Barber;
+import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.ShopQueueModel;
 import com.qcut.biz.util.Constants;
+import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimeUtil;
 import com.qcut.biz.util.TimerService;
@@ -44,15 +48,18 @@ import java.util.Map;
 public class WaitingListClickListener implements View.OnClickListener {
 
     private Context mContext;
-    private View itemView;
     private String tag;
     private FirebaseDatabase database = null;
     private String userid;
+    private Customer selectedCustomer;
+    private AlertDialog serviceDoneDialog;
+    private TextView custNameTVServiceDone;
+    private TextView custNameTVServiceStart;
+    private AlertDialog serviceStartDialog;
 
 
-    public WaitingListClickListener(Context mContext, View itemView, String tag, FirebaseDatabase database, String userid) {
+    public WaitingListClickListener(Context mContext, String tag, FirebaseDatabase database, String userid) {
         this.mContext = mContext;
-        this.itemView = itemView;
         this.tag = tag;
         this.database = database;
         this.userid = userid;
@@ -61,21 +68,34 @@ public class WaitingListClickListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         changeCustomerStatus(v);
+        final LayoutInflater factory = LayoutInflater.from(mContext);
+        if (serviceDoneDialog == null) {
+            final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
+            custNameTVServiceDone = serviceDoneView.findViewById(R.id.service_done_customer_name);
+            serviceDoneDialog = new AlertDialog.Builder(mContext).create();
+            serviceDoneDialog.setView(serviceDoneView);
+            serviceDoneDialog.show();
+            addServiceDoneButtonsClickListener();
+            serviceDoneDialog.hide();
+        }
+        if (serviceStartDialog == null) {
+            final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
+            custNameTVServiceStart = startServiceView.findViewById(R.id.start_service_cust_name);
+            serviceStartDialog = new AlertDialog.Builder(mContext).create();
+            serviceStartDialog.setView(startServiceView);
+            serviceStartDialog.show();
+            addServiceStartButtonsClickListener();
+            serviceStartDialog.hide();
+        }
     }
 
     private void changeCustomerStatus(final View v) {
-        final LayoutInflater factory = LayoutInflater.from(mContext);
-        final String queueItemStatus = ((TextView) v.findViewById(R.id.cust_status)).getTag().toString();
+        final String queueItemStatus = v.findViewById(R.id.cust_status).getTag().toString();
         final String queueItemName = ((TextView) v.findViewById(R.id.cust_name)).getText().toString();
-//        final ShopQueueModel queueItem = (ShopQueueModel) dynamicListView.getItemAtPosition(position);
+        selectedCustomer = Customer.builder().status(queueItemStatus).name(queueItemName)
+                .key(v.getTag().toString()).actualBarberId(tag).build();
         if (queueItemStatus.equalsIgnoreCase(Status.PROGRESS.name())) {
-            final View serviceDoneView = factory.inflate(R.layout.service_done_dialog, null);
-            TextView custNameTV = (TextView) serviceDoneView.findViewById(R.id.service_done_customer_name);
-            custNameTV.setText(queueItemName);
-            final AlertDialog serviceDoneDialog = new AlertDialog.Builder(mContext).create();
-            serviceDoneDialog.setView(serviceDoneView);
-
-
+            custNameTVServiceDone.setText(queueItemName);
             serviceDoneDialog.show();
             serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -86,120 +106,52 @@ public class WaitingListClickListener implements View.OnClickListener {
                     Resources.getSystem().getDisplayMetrics());
 
             serviceDoneDialog.getWindow().setLayout(width, height);
-
-            addServiceDoneButtonsClickListener(serviceDoneDialog, v.getTag().toString());
-
         } else if (queueItemStatus.equalsIgnoreCase(Status.QUEUE.name())) {
-
-            final DatabaseReference barberRef = database.getReference().child("barbershops").child(userid)
-                    .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
-            barberRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            //TODO not need to get barbers if we disable button when barber status is on break or close
+            DBUtils.getBarber(database, userid, tag, new OnSuccessListener<Barber>() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.exists()) {
-                        if(dataSnapshot.child(Constants.Barber.STATUS).exists()) {
-                            if(dataSnapshot.child(Constants.Barber.STATUS).getValue().toString().equalsIgnoreCase(Status.OPEN.name())) {
+                public void onSuccess(Barber barber) {
+                    if (Status.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
+                        custNameTVServiceStart.setText(selectedCustomer.getName());
+                        serviceStartDialog.show();
+                        serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 4,
+                                Resources.getSystem().getDisplayMetrics());
+                        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
+                                Resources.getSystem().getDisplayMetrics());
 
-                                final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
-                                TextView custNameTV = (TextView) startServiceView.findViewById(R.id.start_service_cust_name);
-                                custNameTV.setText(queueItemName);
-                                final AlertDialog serviceStartDialog = new AlertDialog.Builder(mContext).create();
-                                serviceStartDialog.setView(startServiceView);
-
-                                serviceStartDialog.show();
-                                serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                                int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                        ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/4,
-                                        Resources.getSystem().getDisplayMetrics());
-                                int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                        ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)))/2,
-                                        Resources.getSystem().getDisplayMetrics());
-
-                                serviceStartDialog.getWindow().setLayout(width, height);
-                                addServiceStartButtonsClickListener(serviceStartDialog, v.getTag().toString());
-                            } else {
-                                Toast.makeText(mContext, "Cannot start services. May be barber is on break or his queue is stopped.", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                        serviceStartDialog.getWindow().setLayout(width, height);
+                    } else {
+                        Toast.makeText(mContext, "Cannot start services. May be barber is on break or his queue is stopped.", Toast.LENGTH_SHORT).show();
                     }
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
             });
-
         }
-
     }
 
-
-    private void addServiceDoneButtonsClickListener(final AlertDialog serviceDoneDialog, final String queueItemId) {
-
-        Button yesButton = (Button) serviceDoneDialog.findViewById(R.id.yes_done_service);
-        Button noButton = (Button) serviceDoneDialog.findViewById(R.id.no_done_service);
+    private void addServiceDoneButtonsClickListener() {
+        Button yesButton = serviceDoneDialog.findViewById(R.id.yes_done_service);
+        Button noButton = serviceDoneDialog.findViewById(R.id.no_done_service);
 
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String queuedCustomerId = String.valueOf(queueItemId);
-                if (queuedCustomerId != null) {
-                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
-
+                serviceDoneDialog.dismiss();
+                if (selectedCustomer != null) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("status", Status.DONE);
-                    map.put("timeToWait", 0);
+                    map.put("expectedWaitingTime", 0);
                     map.put("placeInQueue", -1);
-                    Task<Void> voidTask = queue.updateChildren(map);
+                    Task<Void> voidTask = DBUtils.getDbRefCustomer(database, userid, tag, selectedCustomer.getKey()).updateChildren(map);
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            DatabaseReference databaseReference = database.getReference().child("barbershops").child(userid)
-                                    .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
-                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot aBarberQueue) {
-                                    String aBarberQueueKey = aBarberQueue.getKey();
-                                    if (!aBarberQueueKey.equalsIgnoreCase("online")) {
-
-                                        List<Customer> customers = new ArrayList<Customer>();
-                                        Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
-                                        while (childIterator.hasNext()) {
-                                            DataSnapshot aCustomer = childIterator.next();
-                                            if (!aCustomer.getKey().equalsIgnoreCase("status")) {
-//                                                        && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
-                                                //it is a customer
-                                                Customer customer = aCustomer.getValue(Customer.class);
-                                                boolean isStatusQUEUE = Status.QUEUE.name().equalsIgnoreCase(customer.getStatus());
-                                                if (isStatusQUEUE) {
-                                                    String aCustomerKey = aCustomer.getKey();
-                                                    customers.add(Customer.builder().key(aCustomerKey).timeToWait(customer.getTimeToWait())
-                                                            .timeAdded(customer.getTimeAdded()).build());
-                                                }
-                                            }
-                                        }
-                                        Collections.sort(customers, new CustomerComparator());
-
-                                        for (int i = 0; i < customers.size(); i++) {
-                                            aBarberQueue.getRef().child(customers.get(i).getKey())
-                                                    .child("timeToWait").setValue(0);
-                                            break;
-                                        }
-                                    }
-                                    TimerService.updateWaitingTimes(database, userid);
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
+                            TimerService.updateWaitingTimes(database, userid);
                         }
                     });
                 }
-                serviceDoneDialog.dismiss();
             }
         });
 
@@ -211,16 +163,14 @@ public class WaitingListClickListener implements View.OnClickListener {
         });
     }
 
-    private void addServiceStartButtonsClickListener(final AlertDialog serviceStartDialog, final String queueItemId) {
-
-        final Button yesButton = (Button) serviceStartDialog.findViewById(R.id.yes_start_service);
-        Button noButton = (Button) serviceStartDialog.findViewById(R.id.no_start_service);
+    private void addServiceStartButtonsClickListener() {
+        final Button yesButton = serviceStartDialog.findViewById(R.id.yes_start_service);
+        Button noButton = serviceStartDialog.findViewById(R.id.no_start_service);
 
         yesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String queuedCustomerId = String.valueOf(queueItemId);
-                setCustomerInProgress(queuedCustomerId);
+                setCustomerInProgress();
                 serviceStartDialog.dismiss();
                 TimerService.updateWaitingTimes(database, userid);
             }
@@ -234,98 +184,32 @@ public class WaitingListClickListener implements View.OnClickListener {
     }
 
 
-    private void setCustomerInProgress(final String queuedCustomerId) {
-
-        final DatabaseReference queryRef = database.getReference().child("barbershops").child(userid)
-                .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag);
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void setCustomerInProgress() {
+        DBUtils.getBarberQueue(database, userid, tag, new OnSuccessListener<BarberQueue>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+            public void onSuccess(BarberQueue barberQueue) {
                 boolean isSomeoneInProgress = false;
-                String customerId = "";
-                while (iterator.hasNext()) {
-                    DataSnapshot customer = iterator.next();
-
-                    if (customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
-                        customerId = customer.child("customerId").exists() ? customer.child("customerId").getValue().toString() : "";
+                Customer c = null;
+                for (Customer customer : barberQueue.getCustomers()) {
+                    if (Status.PROGRESS.name().equalsIgnoreCase(customer.getStatus())) {
+                        isSomeoneInProgress = true;
                     }
-
-                    if (!customer.getKey().equalsIgnoreCase("status")) {
-                        boolean isStatusPROGRESS = customer.child("status").exists() ?
-                                customer.child("status").getValue().toString().equalsIgnoreCase(Status.PROGRESS.name()) : false;
-                        if (isStatusPROGRESS) {
-                            isSomeoneInProgress = true;
-                        }
+                    if (customer.getKey().equalsIgnoreCase(selectedCustomer.getKey())) {
+                        c = customer;
                     }
                 }
                 if (!isSomeoneInProgress) {
-
-                    final DatabaseReference queue = database.getReference().child("barbershops").child(userid)
-                            .child("queues").child(TimeUtil.getTodayDDMMYYYY()).child(tag).child(queuedCustomerId);
-
-
                     Map<String, Object> map = new HashMap<>();
-                    map.put(Constants.Customer.STATUS, Status.PROGRESS);
-                    map.put(Constants.Customer.TIME_TO_WAIT, 0);
-                    map.put(Constants.Customer.TIME_ADDED, -1);
-                    map.put(Constants.Customer.TIME_SERVICE_STARTED, new Date().getTime());
-                    map.put(Constants.Customer.PLACE_IN_QUEUE, -1);
-                    Task<Void> voidTask = queue.updateChildren(map);
-                    final String customerIdForAnyBarber = customerId;
-                    voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            DatabaseReference dateRef = database.getReference().child("barbershops").child(userid)
-                                    .child("queues").child(TimeUtil.getTodayDDMMYYYY());
-                            dateRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        Iterator<DataSnapshot> queueIt = dataSnapshot.getChildren().iterator();
-                                        while (queueIt.hasNext()) {
-                                            DataSnapshot queueSnapshot = queueIt.next();
-                                            if (!queueSnapshot.getKey().equalsIgnoreCase(tag) && !queueSnapshot.getKey().equalsIgnoreCase("online")) {
-                                                Iterator<DataSnapshot> customersIt = queueSnapshot.getChildren().iterator();
-                                                while (customersIt.hasNext()) {
-                                                    DataSnapshot customerDataSnapshot = customersIt.next();
-                                                    if (!customerDataSnapshot.getKey().equalsIgnoreCase("status")) {
-                                                        if (customerDataSnapshot.child(Constants.Customer.NAME).exists() &&
-                                                                customerDataSnapshot.child("customerId").exists() &&
-                                                                customerDataSnapshot.child("customerId").getValue().toString()
-                                                                        .equalsIgnoreCase(customerIdForAnyBarber)) {
-                                                            queueSnapshot.getRef().child(customerDataSnapshot.getKey()).removeValue();
-                                                        } else {
-//                                                            Toast.makeText(mContext, "Customer "
-//                                                                    +customerDataSnapshot.getKey()+
-//                                                                    " does not exists. Delete it from UI. Create new and drag drop.", Toast.LENGTH_LONG).show();
-                                                        }
-                                                    }
-
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-                    });
-
+                    c.setStatus(Status.PROGRESS.name());
+                    c.setTimeAdded(-1);
+                    c.setTimeToWait(0);
+                    c.setServiceStartTime(new Date().getTime());
+                    c.setPlaceInQueue(-1);
+                    DBUtils.getDbRefCustomer(database, userid, tag, selectedCustomer.getKey()).setValue(c);
                 } else {
                     Toast.makeText(mContext, "Cannot start services. A customer is already in progress.", Toast.LENGTH_LONG).show();
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
         });
     }
-
 }

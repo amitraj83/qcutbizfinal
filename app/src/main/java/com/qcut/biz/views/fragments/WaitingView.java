@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import com.qcut.biz.models.Barber;
-import com.qcut.biz.models.BarberQueueStatus;
 import com.qcut.biz.util.Status;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public interface WaitingView {
 
     void setPhotoUrl(ImageView photo, Uri result);
 
-    void showDialog(String dialogTitle, String dialogText, String confirmText, BarberQueueStatus newStatus, String imagePath);
+    void showDialog(String dialogTitle, String dialogText, String confirmText, Status newStatus, String imagePath);
 
     boolean isTabExists(String key);
 
@@ -40,4 +39,6 @@ public interface WaitingView {
     String getStopButtonText();
 
     String getTakeBreakButtonText();
+
+    String getSelectedBarberKey();
 }

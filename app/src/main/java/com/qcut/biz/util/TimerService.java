@@ -129,16 +129,16 @@ public class TimerService extends Service {
                                     avgTimeToCut = Integer.valueOf(avgTimeToCutStr);
                                 }
                                 //TODO need to revisit this logic
-                                int prevCustomerTime = 0;
+                                long prevCustomerTime = 0;
                                 for (int i = 0; i < customers.size(); i++) {
                                     if (i == 0) {
                                         if (isSomeOneInProgress) {
-                                            int timeToWait = customers.get(i).getTimeToWait();
+                                            long timeToWait = customers.get(i).getTimeToWait();
                                             if (timeToWait > 0) {
                                                 if (timeToWait > avgTimeToCut) {
                                                     timeToWait = avgTimeToCut;
                                                 }
-                                                int newTimeToWait = timeToWait - 1;
+                                                long newTimeToWait = timeToWait - 1;
                                                 aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
                                                 prevCustomerTime = newTimeToWait;
                                             }

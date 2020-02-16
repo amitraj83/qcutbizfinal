@@ -5,16 +5,9 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.models.Barber;
-import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class FindBarberTask implements Continuation<Map<String, Barber>, Task<Barber>> {

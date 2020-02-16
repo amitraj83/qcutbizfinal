@@ -1,25 +1,16 @@
 package com.qcut.biz.presenters.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.qcut.biz.activity.MainActivity;
-import com.qcut.biz.activity.SignUpActivity;
-import com.qcut.biz.models.Shop;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.views.activities.SignInView;
-import com.qcut.biz.views.activities.SignUpView;
+import com.qcut.biz.views.SignUpView;
+import com.qcut.biz.views.activities.MainActivity;
 
 import org.apache.commons.lang3.StringUtils;
 

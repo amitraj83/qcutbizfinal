@@ -2,11 +2,9 @@ package com.qcut.biz.models;
 
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.qcut.biz.util.Status;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,22 +54,22 @@ public class Customer {
 
     @Exclude
     public boolean isDone() {
-        return StringUtils.isNotBlank(status) && Status.DONE.name().equalsIgnoreCase(status);
+        return StringUtils.isNotBlank(status) && CustomerStatus.DONE.name().equalsIgnoreCase(status);
     }
 
     @Exclude
     public boolean isInProgress() {
-        return StringUtils.isNotBlank(status) && Status.PROGRESS.name().equalsIgnoreCase(status);
+        return StringUtils.isNotBlank(status) && CustomerStatus.PROGRESS.name().equalsIgnoreCase(status);
     }
 
     @Exclude
     public boolean isInQueue() {
-        return StringUtils.isNotBlank(status) && Status.QUEUE.name().equalsIgnoreCase(status);
+        return StringUtils.isNotBlank(status) && CustomerStatus.QUEUE.name().equalsIgnoreCase(status);
     }
 
     @Exclude
     public boolean isRemoved() {
-        return StringUtils.isNotBlank(status) && Status.REMOVED.name().equalsIgnoreCase(status);
+        return StringUtils.isNotBlank(status) && CustomerStatus.REMOVED.name().equalsIgnoreCase(status);
     }
 
 

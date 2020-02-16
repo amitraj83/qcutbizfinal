@@ -17,18 +17,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
+import com.qcut.biz.models.CustomerStatus;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -97,7 +96,7 @@ public class TimerService extends Service {
                             //Check if barber is not on break
                             String aBarberQueueKey = aBarberQueue.getKey();
                             if (!aBarberQueueKey.equalsIgnoreCase("online")
-                                    && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(Status.BREAK.name())) {
+                                    && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(BarberStatus.BREAK.name())) {
 
                                 List<Customer> customers = new ArrayList<Customer>();
                                 boolean isSomeOneInProgress = false;
@@ -106,14 +105,14 @@ public class TimerService extends Service {
                                     while (childIterator.hasNext()) {
                                         DataSnapshot aCustomer = childIterator.next();
                                         if (!aCustomer.getKey().equalsIgnoreCase("status")) {
-//                                                && aCustomer.child("status").getValue().toString().equalsIgnoreCase(Status.QUEUE.name())) {
+//                                                && aCustomer.child("status").getValue().toString().equalsIgnoreCase(BarberStatus.QUEUE.name())) {
                                             //it is a customer
                                             Customer customer = aCustomer.getValue(Customer.class);
                                             if (StringUtils.isNotBlank(customer.getStatus())) {
-                                                if (customer.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+                                                if (customer.getStatus().equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
                                                     customers.add(Customer.builder().key(aCustomer.getKey()).timeToWait(customer.getTimeToWait())
                                                             .timeAdded(customer.getTimeAdded()).name(customer.getName()).build());
-                                                } else if (customer.getStatus().equalsIgnoreCase(Status.PROGRESS.name())) {
+                                                } else if (customer.getStatus().equalsIgnoreCase(CustomerStatus.PROGRESS.name())) {
                                                     isSomeOneInProgress = true;
                                                 }
                                             }

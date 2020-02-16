@@ -12,11 +12,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
-import com.qcut.biz.activity.StartActivity;
-import com.qcut.biz.views.activities.MainView;
 import com.qcut.biz.models.ShopStatus;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
+import com.qcut.biz.views.MainView;
+import com.qcut.biz.views.activities.StartActivity;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -63,7 +63,7 @@ public class MainPresenter {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                LogUtils.info("Status changed to: ");
+                LogUtils.info("BarberStatus changed to: ");
                 if (dataSnapshot.exists()) {
                     String status = dataSnapshot.getValue(String.class);
                     if (ShopStatus.valueOf(status) == ShopStatus.ONLINE) {
@@ -71,7 +71,7 @@ public class MainPresenter {
                     } else {
                         view.setShopStatusOffline();
                     }
-                    LogUtils.info("Status changed to: {0}", status);
+                    LogUtils.info("BarberStatus changed to: {0}", status);
                 } else {
                     view.setShopStatusOffline();
                 }

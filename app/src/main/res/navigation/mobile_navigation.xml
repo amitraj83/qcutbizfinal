@@ -7,48 +7,48 @@
 
     <fragment
         android:id="@+id/nav_profile"
-        android:name="com.qcut.biz.ui.profile.ProfileFragment"
+        android:name="com.qcut.biz.views.fragments.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 
     <fragment
         android:id="@+id/nav_waiting_list"
-        android:name="com.qcut.biz.ui.waiting_list.WaitingListFragment"
+        android:name="com.qcut.biz.views.fragments.WaitingListFragment"
         android:label="Waiting List"
         tools:layout="@layout/fragment_waiting_list" />
 
     <fragment
         android:id="@+id/nav_go_online"
-        android:name="com.qcut.biz.ui.go_online.GoOnlineFragment"
+        android:name="com.qcut.biz.views.fragments.GoOnlineFragment"
         android:label="Go Online"
         tools:layout="@layout/fragment_go_online" />
     <fragment
         android:id="@+id/nav_go_shop_details"
-        android:name="com.qcut.biz.ui.adapters.ShopDetailsFragment"
+        android:name="com.qcut.biz.views.fragments.ShopDetailsFragment"
         android:label="Shop Details"
         tools:layout="@layout/fragment_shop_details" />
 
     <fragment
         android:id="@+id/nav_go_shop_opening_hours"
-        android:name="com.qcut.biz.ui.adapters.ShopOpeningHoursFragment"
+        android:name="com.qcut.biz.views.fragments.ShopOpeningHoursFragment"
         android:label="Shop opening hours"
         tools:layout="@layout/fragment_shop_details" />
 
     <fragment
         android:id="@+id/nav_go_shop_add_services"
-        android:name="com.qcut.biz.ui.adapters.ShopAddServicesFragment"
+        android:name="com.qcut.biz.views.fragments.ShopAddServicesFragment"
         android:label="Shop Add Services"
         tools:layout="@layout/fragment_shop_details" />
 
     <fragment
         android:id="@+id/nav_add_barber"
-        android:name="com.qcut.biz.ui.adapters.AddBarberFragment"
+        android:name="com.qcut.biz.views.fragments.AddBarberFragment"
         android:label="Add Barber"
         tools:layout="@layout/fragment_add_barber" />
 
     <fragment
         android:id="@+id/temp_fragment"
-        android:name="com.qcut.biz.ui.adapters.WaitingFragment"
+        android:name="com.qcut.biz.views.fragments.WaitingFragment"
         android:label="Temp Fragment"
         tools:layout="@layout/waiting_queue" />
 

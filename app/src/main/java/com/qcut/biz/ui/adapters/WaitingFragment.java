@@ -53,6 +53,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
     private String selectedBarberKeyFromBarberDialog;
     private View yesButton;
     private View noButton;
+    private Status barberNewStatus;
 
     @Override
     public void onAttach(Context context) {
@@ -63,7 +64,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.waiting_queue, container, false);
-        tabLayout = (TabLayout) root.findViewById(R.id.tab_layout);
+        tabLayout = root.findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         presenter = new WaitingPresenter(this, getContext());
         addBarber = root.findViewById(R.id.addTab);
@@ -91,63 +92,30 @@ public class WaitingFragment extends Fragment implements WaitingView {
                 presenter.onAddBarberQueueTabClick();
             }
         });
-        return root;
-    }
-
-    public void showDialog(String dialogTitle, String dialogText, String confirmText,
-                           final Status newStatus, String photoPath) {
         if (dialog == null) {
             final LayoutInflater factory = LayoutInflater.from(mContext);
             final View takeBreakView = factory.inflate(R.layout.take_break_dialog, null);
             dialog = new AlertDialog.Builder(mContext).create();
             dialog.setView(takeBreakView);
+            dialog.show();
+            final Button yesButton = dialog.findViewById(R.id.take_break_dialog_yes);
+            final Button noButton = dialog.findViewById(R.id.take_break_dialog_no);
+
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onDialogYesButtonClick(barberNewStatus);
+                }
+            });
+
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hideDialog();
+                }
+            });
+            dialog.hide();
         }
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-
-        dialog.getWindow().setLayout(width, height);
-
-        ((TextView) dialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
-        ((TextView) dialog.findViewById(R.id.take_break_text)).setText(dialogText);
-        ((TextView) dialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
-
-        final ImageView photoView = dialog.findViewById(R.id.take_break_photo);
-        presenter.getDownloadUrlAndSetInView(photoView, photoPath);
-
-        final Button yesButton = dialog.findViewById(R.id.take_break_dialog_yes);
-        final Button noButton = dialog.findViewById(R.id.take_break_dialog_no);
-
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onDialogYesButtonClick(newStatus);
-            }
-        });
-
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideDialog();
-            }
-        });
-    }
-
-    @Override
-    public boolean isTabExists(String key) {
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            if (tabLayout.getTabAt(i).getTag().toString().equalsIgnoreCase(key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void showBarberSelectionDialog(List<Barber> remainingBarbers) {
         if (barberSelectionDialog == null) {
             LayoutInflater factory = LayoutInflater.from(mContext);
             View selectBarberView = factory.inflate(R.layout.select_barber, null);
@@ -170,7 +138,44 @@ public class WaitingFragment extends Fragment implements WaitingView {
                     hideBarberSelectDialog();
                 }
             });
+            barberSelectionDialog.hide();
         }
+        return root;
+    }
+
+    public void showDialog(String dialogTitle, String dialogText, String confirmText,
+                           final Status newStatus, String photoPath) {
+        this.barberNewStatus = newStatus;
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
+
+        dialog.getWindow().setLayout(width, height);
+
+        ((TextView) dialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
+        ((TextView) dialog.findViewById(R.id.take_break_text)).setText(dialogText);
+        ((TextView) dialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
+
+        final ImageView photoView = dialog.findViewById(R.id.take_break_photo);
+        presenter.getDownloadUrlAndSetInView(photoView, photoPath);
+
+    }
+
+    @Override
+    public boolean isTabExists(String key) {
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            if (tabLayout.getTabAt(i).getTag().toString().equalsIgnoreCase(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void showBarberSelectionDialog(List<Barber> remainingBarbers) {
         barberSelectionDialog.show();
         BarberSelectionArrayAdapter customAdapter = new BarberSelectionArrayAdapter(mContext, remainingBarbers);
         ddSpinner.setAdapter(customAdapter);

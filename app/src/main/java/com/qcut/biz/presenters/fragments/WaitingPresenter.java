@@ -125,23 +125,23 @@ public class WaitingPresenter {
 
     public void onTakeBreakButtonClick() {
         final String selectedBarberKey = view.getSelectedTabId();
-        final String dialogTitle, confirmText;
-        final Status newStatus;
-        if (Constants.ON_BREAK.equalsIgnoreCase(view.getTakeBreakButtonText())) {
-            //if already on break, new status will be open
-            view.setButtonToBarberOnBreak();
-            dialogTitle = "Resume Work";
-            confirmText = "Do you want to resume your work?";
-            newStatus = Status.OPEN;
-        } else {
-            view.resetBarberBreakButton();
-            dialogTitle = "Take A Break";
-            confirmText = "Do you want to take a break from work?";
-            newStatus = Status.BREAK;
-        }
         DBUtils.getBarber(database, userid, selectedBarberKey, new OnSuccessListener<Barber>() {
             @Override
             public void onSuccess(Barber barber) {
+                final String dialogTitle, confirmText;
+                final Status newStatus;
+                if (barber.isOnBreak()) {
+                    //if already on break, new status will be open
+                    view.setButtonToBarberOnBreak();
+                    dialogTitle = "Resume Work";
+                    confirmText = "Do you want to resume your work?";
+                    newStatus = Status.OPEN;
+                } else {
+                    view.resetBarberBreakButton();
+                    dialogTitle = "Take A Break";
+                    confirmText = "Do you want to take a break from work?";
+                    newStatus = Status.BREAK;
+                }
                 String dialogText = "Dear Barber " + barber.getName();
                 view.showDialog(dialogTitle, dialogText, confirmText, newStatus, barber.getImagePath());
             }
@@ -162,6 +162,9 @@ public class WaitingPresenter {
                     }
                     if (remainingBarbers.size() > 0) {
                         view.showBarberSelectionDialog(remainingBarbers);
+                    } else {
+                        view.showMessage("No barber to add.");
+                        LogUtils.info("No barber to add.");
                     }
                 }
 

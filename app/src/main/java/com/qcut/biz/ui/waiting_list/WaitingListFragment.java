@@ -58,8 +58,6 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     private EditText customerNameInput;
     private LayoutInflater factory;
     private String selectedBarberKey;
-    private WaitingListClickListener waitingListClickListener;
-    private AlertDialog startServiceDialog;
     private View root;
 
     @Override
@@ -149,111 +147,8 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
         return root;
     }
 
-//    private void cardViewStartSkipService(View root, final LayoutInflater factory) {
-//        startService = root.findViewById(R.id.start_service);
-//        DBUtils.getBarber(database, userid, tag, new OnSuccessListener<Barber>() {
-//            @Override
-//            public void onSuccess(Barber barber) {
-//                if (barber != null && Status.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
-//                    showStartServiceDialog(factory);
-//                } else {
-//                    showMessage("Cannot start services. May be barber is on break or his queue is stopped.");
-//                }
-//            }
-//        });
-//
-//        finishService = root.findViewById(R.id.skip_customer);
-//        finishService.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //showSkipServiceDialog(factory);
-//            }
-//        });
-//
-//    }
-//
-//    private void showStartServiceDialog(LayoutInflater factory) {
-//        String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
-//        if (queuedCustomerId != null &&
-//                queuedCustomerId.trim().equalsIgnoreCase("none") ||
-//                queuedCustomerId.trim().equalsIgnoreCase("")) {
-//            Toast toast = Toast.makeText(mContext,
-//                    "No Customer in the queue", Toast.LENGTH_SHORT);
-//            toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
-//            toast.show();
-//        } else {
-//            final View startServiceView = factory.inflate(R.layout.start_service_dialog, null);
-//            TextView startServiceCustName = startServiceView.findViewById(R.id.start_service_cust_name);
-//            startServiceCustName.setText(nextCustomerTV.getText());
-//            startServiceDialog = new AlertDialog.Builder(mContext).create();
-//            startServiceDialog.setView(startServiceView);
-//
-//            startServiceDialog.show();
-//            startServiceDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                    ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 4, getResources().getDisplayMetrics());
-//            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                    ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-//
-//            startServiceDialog.getWindow().setLayout(width, height);
-//
-//            final Button yesButton = startServiceDialog.findViewById(R.id.yes_start_service);
-//            final Button noButton = startServiceDialog.findViewById(R.id.no_start_service);
-//
-//            yesButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    String queuedCustomerId = String.valueOf(nextCustomerTV.getTag());
-//                    setCustomerInProgress(queuedCustomerId);
-//                    startServiceDialog.dismiss();
-//                }
-//            });
-//            noButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    startServiceDialog.dismiss();
-//                }
-//            });
-//
-//        }
-//    }
-//
-//    private void setCustomerInProgress(final String queuedCustomerId) {
-//        DBUtils.getBarberQueue(database, userid, tag, new OnSuccessListener<BarberQueue>() {
-//            @Override
-//            public void onSuccess(BarberQueue barberQueue) {
-//                boolean isSomeoneInProgress = false;
-//                Customer customerToBeUpdated = null;
-//                for (Customer customer : barberQueue.getCustomers()) {
-//                    if (Status.PROGRESS.name().equalsIgnoreCase(customer.getStatus())) {
-//                        isSomeoneInProgress = true;
-//                        break;
-//                    }
-//                    if (customer.getKey().equalsIgnoreCase(queuedCustomerId)) {
-//                        customerToBeUpdated = customer;
-//                    }
-//                }
-//                if (!isSomeoneInProgress) {
-//                    customerToBeUpdated.setPlaceInQueue(-1);
-//                    customerToBeUpdated.setServiceStartTime(new Date().getTime());
-//                    customerToBeUpdated.setTimeToWait(0);
-//                    customerToBeUpdated.setStatus(Status.PROGRESS.name());
-//                    customerToBeUpdated.setTimeAdded(-1);
-//                    DBUtils.getDbRefCustomer(database, userid, tag, queuedCustomerId)
-//                            .setValue(queuedCustomerId, customerToBeUpdated);
-//                } else {
-//                    showMessage("Cannot start services. A customer is already in progress.");
-//                }
-//            }
-//        });
-//    }
-
     @Override
     public void showAddCustomerDialog() {
-        if (addCustomerView == null) {
-
-        }
-
         addCustomerDialog.show();
         addCustomerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -319,7 +214,6 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
         yesButton.setEnabled(enabled);
         yesButton.playSoundEffect(0);
     }
-
 
     @Override
     public void showMessage(String msg) {

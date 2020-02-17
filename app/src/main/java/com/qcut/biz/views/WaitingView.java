@@ -26,7 +26,7 @@ public interface WaitingView {
 
     void setPhotoUrl(ImageView photo, Uri result);
 
-    void showDialog(String dialogTitle, String dialogText, String confirmText, BarberStatus newStatus, String imagePath);
+    void showBarberStatusConfirmationDialog(String dialogTitle, String dialogText, String confirmText, BarberStatus newStatus, String imagePath);
 
     boolean isTabExists(String key);
 

@@ -43,17 +43,13 @@ public class WaitingFragment extends Fragment implements WaitingView {
     private Context mContext;
     private Button takeBreakButton;
     private Button stopQButton;
-    private Button closeQButton;
-    private View addBarber;
     private WaitingPresenter presenter;
     private TabLayout tabLayout;
-    private AlertDialog dialog;
+    private AlertDialog barberStatusChangeDialog;
     private View root;
     private AlertDialog barberSelectionDialog;
     private Spinner ddSpinner;
     private String selectedBarberKeyFromBarberDialog;
-    private View yesButton;
-    private View noButton;
     private BarberStatus barberNewStatus;
 
     @Override
@@ -68,7 +64,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
         tabLayout = root.findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         presenter = new WaitingPresenter(this, getContext());
-        addBarber = root.findViewById(R.id.addTab);
+        View addBarber = root.findViewById(R.id.addTab);
         takeBreakButton = root.findViewById(R.id.tab_index_test);
         stopQButton = root.findViewById(R.id.stop_queue);
 
@@ -93,19 +89,19 @@ public class WaitingFragment extends Fragment implements WaitingView {
                 presenter.onAddBarberQueueTabClick();
             }
         });
-        if (dialog == null) {
+        if (barberStatusChangeDialog == null) {
             final LayoutInflater factory = LayoutInflater.from(mContext);
             final View takeBreakView = factory.inflate(R.layout.take_break_dialog, null);
-            dialog = new AlertDialog.Builder(mContext).create();
-            dialog.setView(takeBreakView);
-            dialog.show();
-            final Button yesButton = dialog.findViewById(R.id.take_break_dialog_yes);
-            final Button noButton = dialog.findViewById(R.id.take_break_dialog_no);
+            barberStatusChangeDialog = new AlertDialog.Builder(mContext).create();
+            barberStatusChangeDialog.setView(takeBreakView);
+            barberStatusChangeDialog.show();
+            final Button yesButton = barberStatusChangeDialog.findViewById(R.id.take_break_dialog_yes);
+            final Button noButton = barberStatusChangeDialog.findViewById(R.id.take_break_dialog_no);
 
             yesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    presenter.onDialogYesButtonClick(barberNewStatus);
+                    presenter.onBarberStatusChangeYesClick(barberNewStatus);
                 }
             });
 
@@ -115,7 +111,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
                     hideDialog();
                 }
             });
-            dialog.hide();
+            barberStatusChangeDialog.hide();
         }
         if (barberSelectionDialog == null) {
             LayoutInflater factory = LayoutInflater.from(mContext);
@@ -124,8 +120,8 @@ public class WaitingFragment extends Fragment implements WaitingView {
             barberSelectionDialog.setView(selectBarberView);
             barberSelectionDialog.show();
             ddSpinner = barberSelectionDialog.findViewById(R.id.spinner_select_barber_to_start_queue);
-            yesButton = barberSelectionDialog.findViewById(R.id.yes_add_barber_queue);
-            noButton = barberSelectionDialog.findViewById(R.id.no_add_barber_queue);
+            View yesButton = barberSelectionDialog.findViewById(R.id.yes_add_barber_queue);
+            View noButton = barberSelectionDialog.findViewById(R.id.no_add_barber_queue);
             yesButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -144,23 +140,23 @@ public class WaitingFragment extends Fragment implements WaitingView {
         return root;
     }
 
-    public void showDialog(String dialogTitle, String dialogText, String confirmText,
-                           final BarberStatus newStatus, String photoPath) {
+    public void showBarberStatusConfirmationDialog(String dialogTitle, String dialogText, String confirmText,
+                                                   final BarberStatus newStatus, String photoPath) {
         this.barberNewStatus = newStatus;
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        barberStatusChangeDialog.show();
+        barberStatusChangeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
 
-        dialog.getWindow().setLayout(width, height);
+        barberStatusChangeDialog.getWindow().setLayout(width, height);
 
-        ((TextView) dialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
-        ((TextView) dialog.findViewById(R.id.take_break_text)).setText(dialogText);
-        ((TextView) dialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
+        ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
+        ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_text)).setText(dialogText);
+        ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
 
-        final ImageView photoView = dialog.findViewById(R.id.take_break_photo);
+        final ImageView photoView = barberStatusChangeDialog.findViewById(R.id.take_break_photo);
         presenter.getDownloadUrlAndSetInView(photoView, photoPath);
 
     }
@@ -291,7 +287,7 @@ public class WaitingFragment extends Fragment implements WaitingView {
 
     @Override
     public void hideDialog() {
-        dialog.dismiss();
+        barberStatusChangeDialog.dismiss();
     }
 
     @Override

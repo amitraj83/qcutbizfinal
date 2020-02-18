@@ -24,7 +24,7 @@ import com.google.firebase.storage.UploadTask;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.views.fragments.AddBarberView;
+import com.qcut.biz.views.AddBarberView;
 
 import org.apache.commons.lang3.StringUtils;
 

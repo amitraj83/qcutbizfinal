@@ -19,23 +19,23 @@
             android:label="Timer" >
         </service>
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".views.activities.MainActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"></activity>
-        <activity android:name=".activity.SignUpActivity"
+        <activity android:name=".views.activities.SignUpActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.qcut.biz.activity.StartActivity" />
+                android:value=".views.activities.StartActivity" />
         </activity>
-        <activity android:name=".activity.SignInActivity"
+        <activity android:name=".views.activities.SignInActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.qcut.biz.activity.StartActivity" />
+                android:value=".views.activities.StartActivity" />
         </activity>
-        <activity android:name=".activity.StartActivity"
+        <activity android:name=".views.activities.StartActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

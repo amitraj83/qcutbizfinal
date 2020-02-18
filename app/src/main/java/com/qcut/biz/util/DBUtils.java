@@ -11,6 +11,7 @@ import com.google.firebase.storage.StorageReference;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
+import com.qcut.biz.models.CustomerStatus;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.tasks.FetchBarbersQueuesTask;
 import com.qcut.biz.tasks.FetchBarbersTask;
@@ -108,10 +109,10 @@ public class DBUtils {
         Long timeServiceStarted = null;
         if (queue != null) {
             for (Customer customer : queue.getCustomers()) {
-                if (customer.getStatus().equalsIgnoreCase(Status.QUEUE.name())) {
+                if (customer.getStatus().equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
                     count++;
                 }
-                if (customer.getStatus().equalsIgnoreCase(Status.PROGRESS.name())) {
+                if (customer.getStatus().equalsIgnoreCase(CustomerStatus.PROGRESS.name())) {
                     timeServiceStarted = customer.getTimeServiceStarted();
                 }
             }
@@ -136,7 +137,7 @@ public class DBUtils {
             timeToWait = avgTimeToCut * count;
         }
         String key = queueRef.push().getKey();
-        customerBuilder.key(key).placeInQueue(count).timeToWait(timeToWait).status(Status.QUEUE.name())
+        customerBuilder.key(key).placeInQueue(count).timeToWait(timeToWait).status(CustomerStatus.QUEUE.name())
                 .timeAdded(new Date().getTime()).timeFirstAddedInQueue(new Date().getTime());
         final Customer customer = customerBuilder.build();
         LogUtils.info("DbUtils: pushCustomerToDB adding customer:{0}", customer);

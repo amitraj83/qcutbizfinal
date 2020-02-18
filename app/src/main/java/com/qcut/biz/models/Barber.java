@@ -1,7 +1,6 @@
 package com.qcut.biz.models;
 
 import com.google.firebase.database.Exclude;
-import com.qcut.biz.util.Status;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,17 +27,17 @@ public class Barber {
 
     @Exclude
     public boolean isStopped() {
-        return StringUtils.isNotBlank(queueStatus) && Status.STOP.name().equalsIgnoreCase(queueStatus);
+        return StringUtils.isNotBlank(queueStatus) && BarberStatus.STOP.name().equalsIgnoreCase(queueStatus);
     }
 
     @Exclude
     public boolean isOpen() {
-        return StringUtils.isNotBlank(queueStatus) && Status.OPEN.name().equalsIgnoreCase(queueStatus);
+        return StringUtils.isNotBlank(queueStatus) && BarberStatus.OPEN.name().equalsIgnoreCase(queueStatus);
     }
 
 
     @Exclude
     public boolean isOnBreak() {
-        return StringUtils.isNotBlank(queueStatus) && Status.BREAK.name().equalsIgnoreCase(queueStatus);
+        return StringUtils.isNotBlank(queueStatus) && BarberStatus.BREAK.name().equalsIgnoreCase(queueStatus);
     }
 }

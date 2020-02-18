@@ -10,15 +10,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
+import com.qcut.biz.models.CustomerStatus;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimerService;
-import com.qcut.biz.views.fragments.WaitingView;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -149,6 +147,6 @@ public class BarberQueueChangeListener implements ChildEventListener {
      * @return
      */
     private boolean isEligibleToCompare(Customer c) {
-        return !c.getStatus().equalsIgnoreCase(Status.PROGRESS.name()) && c.isAnyBarber();
+        return !c.getStatus().equalsIgnoreCase(CustomerStatus.PROGRESS.name()) && c.isAnyBarber();
     }
 }

@@ -16,21 +16,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.adaptors.BarberSelectionArrayAdapter;
+import com.qcut.biz.adaptors.WaitingListRecyclerViewAdapter;
 import com.qcut.biz.listeners.BarbersChangeListener;
+import com.qcut.biz.listeners.WaitingListClickListener;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
+import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
-import com.qcut.biz.ui.waiting_list.BarberSelectionArrayAdapter;
-import com.qcut.biz.ui.waiting_list.WaitingListClickListener;
-import com.qcut.biz.ui.waiting_list.WaitingListRecyclerViewAdapter;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.MappingUtils;
-import com.qcut.biz.util.Status;
 import com.qcut.biz.util.TimerService;
-import com.qcut.biz.views.fragments.WaitingListView;
+import com.qcut.biz.views.WaitingListView;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -101,7 +101,7 @@ public class WaitingListPresenter {
                             .name(customerName).customerId(customerId);
                     if (selectedBarberKey.equalsIgnoreCase(Constants.ANY)) {
                         for (Barber barber : barbersMap.values()) {
-                            if (Status.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
+                            if (BarberStatus.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
                                 final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barber.getKey());
                                 pushCustomerToDB(customerBuilder, queueRef, barber);
                             }

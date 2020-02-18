@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.tabs_tages.ServicesFragment">
+    tools:context=".views.fragments.ServicesFragment">
 
     <ListView
         android:id="@+id/add_service_list_services"

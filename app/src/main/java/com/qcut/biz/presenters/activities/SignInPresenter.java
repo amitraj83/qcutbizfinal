@@ -11,7 +11,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.views.activities.SignInView;
+import com.qcut.biz.views.SignInView;
 
 import static android.content.Context.MODE_PRIVATE;
 

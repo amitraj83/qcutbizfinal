@@ -10,10 +10,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
+import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.util.Status;
-import com.qcut.biz.views.fragments.WaitingView;
+import com.qcut.biz.views.WaitingView;
 
 public class BarberQueueStatusChangeListener implements ChildEventListener {
 
@@ -34,7 +34,7 @@ public class BarberQueueStatusChangeListener implements ChildEventListener {
         LogUtils.info("dataSnapshot: {0}", dataSnapshot.getValue());
 
         final Barber barber = dataSnapshot.getValue(Barber.class);
-        if (Status.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
+        if (BarberStatus.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
             LogUtils.info("queueStatus: {0}", barber.getQueueStatus());
             if (!view.isTabExists(barber.getKey())) {
                 view.addBarberQueueTab(barber);

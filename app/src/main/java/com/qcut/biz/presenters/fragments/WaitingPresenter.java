@@ -18,11 +18,11 @@ import com.qcut.biz.listeners.BarberQueueChangeListener;
 import com.qcut.biz.listeners.BarberQueueStatusChangeListener;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
+import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.util.Status;
-import com.qcut.biz.views.fragments.WaitingView;
+import com.qcut.biz.views.WaitingView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,24 +70,24 @@ public class WaitingPresenter {
     public void onStopButtonClick() {
         final String selectedBarberKey = view.getSelectedTabId();
         final String dialogTitle, confirmText;
-        final Status queueStatus;
+        final BarberStatus queueStatus;
         if (Constants.STOPPED.equalsIgnoreCase(view.getStopButtonText())) {
             //is queue is already stopped then new status will be open
             view.updateButtonToStopped();
             dialogTitle = "Resume Queue";
             confirmText = "Want to resume your Queue? After this, customers will be added to your queue";
-            queueStatus = Status.OPEN;
+            queueStatus = BarberStatus.OPEN;
         } else {
             view.updateButtonToStopQ();
             dialogTitle = "Stop Queue";
             confirmText = "Want to stop your queue? After this, no customer will be added to your queue";
-            queueStatus = Status.STOP;
+            queueStatus = BarberStatus.STOP;
         }
         DBUtils.getBarber(database, userid, selectedBarberKey, new OnSuccessListener<Barber>() {
             @Override
             public void onSuccess(Barber barber) {
                 String dialogText = "Dear Barber " + barber.getName();
-                view.showDialog(dialogTitle, dialogText, confirmText, queueStatus, barber.getImagePath());
+                view.showBarberStatusConfirmationDialog(dialogTitle, dialogText, confirmText, queueStatus, barber.getImagePath());
             }
         });
 
@@ -109,41 +109,42 @@ public class WaitingPresenter {
         });
     }
 
-    public void onDialogYesButtonClick(Status status) {
+    public void onBarberStatusChangeYesClick(BarberStatus status) {
         Map<String, Object> map = new HashMap<>();
         map.put(Barber.QUEUE_STATUS, status.name());
-        final Task<Void> voidTask = DBUtils.getDbRefBarber(database, userid, view.getSelectedTabId())
-                .updateChildren(map);
-        voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                view.hideDialog();
-            }
-        });
+        DBUtils.getDbRefBarber(database, userid, view.getSelectedTabId()).updateChildren(map);
+        view.hideDialog();
+        if (status == BarberStatus.BREAK) {
+            view.setButtonToBarberOnBreak();
+        } else {
+            view.resetBarberBreakButton();
+        }
+        if (status == BarberStatus.STOP) {
+            view.updateButtonToStopped();
+        } else {
+            view.updateButtonToStopQ();
+        }
     }
 
     public void onTakeBreakButtonClick() {
         final String selectedBarberKey = view.getSelectedTabId();
-        final String dialogTitle, confirmText;
-        final Status newStatus;
-        if (Constants.ON_BREAK.equalsIgnoreCase(view.getTakeBreakButtonText())) {
-            //if already on break, new status will be open
-            view.setButtonToBarberOnBreak();
-            dialogTitle = "Resume Work";
-            confirmText = "Do you want to resume your work?";
-            newStatus = Status.OPEN;
-        } else {
-            view.resetBarberBreakButton();
-            dialogTitle = "Take A Break";
-            confirmText = "Do you want to take a break from work?";
-            newStatus = Status.BREAK;
-        }
         DBUtils.getBarber(database, userid, selectedBarberKey, new OnSuccessListener<Barber>() {
             @Override
             public void onSuccess(Barber barber) {
+                final String dialogTitle, confirmText;
+                final BarberStatus newStatus;
+                if (barber.isOnBreak()) {
+                    //if already on break, new status will be open
+                    dialogTitle = "Resume Work";
+                    confirmText = "Do you want to resume your work?";
+                    newStatus = BarberStatus.OPEN;
+                } else {
+                    dialogTitle = "Take A Break";
+                    confirmText = "Do you want to take a break from work?";
+                    newStatus = BarberStatus.BREAK;
+                }
                 String dialogText = "Dear Barber " + barber.getName();
-                view.showDialog(dialogTitle, dialogText, confirmText, newStatus, barber.getImagePath());
+                view.showBarberStatusConfirmationDialog(dialogTitle, dialogText, confirmText, newStatus, barber.getImagePath());
             }
         });
     }
@@ -162,6 +163,9 @@ public class WaitingPresenter {
                     }
                     if (remainingBarbers.size() > 0) {
                         view.showBarberSelectionDialog(remainingBarbers);
+                    } else {
+                        view.showMessage("No barber to add.");
+                        LogUtils.info("No barber to add.");
                     }
                 }
 
@@ -173,13 +177,13 @@ public class WaitingPresenter {
         DBUtils.getBarber(database, userid, selectedBarberKey, new OnSuccessListener<Barber>() {
             @Override
             public void onSuccess(Barber barber) {
-                if (barber.getQueueStatus().equalsIgnoreCase(Status.BREAK.name())) {
+                if (barber.getQueueStatus().equalsIgnoreCase(BarberStatus.BREAK.name())) {
                     view.setButtonToBarberOnBreak();
                 } else {
                     view.resetBarberBreakButton();
                 }
 
-                if (barber.getQueueStatus().equalsIgnoreCase(Status.STOP.name())) {
+                if (barber.getQueueStatus().equalsIgnoreCase(BarberStatus.STOP.name())) {
                     view.updateButtonToStopped();
                 } else {
                     view.updateButtonToStopQ();
@@ -212,7 +216,7 @@ public class WaitingPresenter {
 
     public void updateBarberStatus(final String selectedKey) {
         Map<String, Object> map = new HashMap<>();
-        map.put(Barber.QUEUE_STATUS, Status.OPEN.name());
+        map.put(Barber.QUEUE_STATUS, BarberStatus.OPEN.name());
         DBUtils.getDbRefBarber(database, userid, selectedKey).updateChildren(map);
     }
 }

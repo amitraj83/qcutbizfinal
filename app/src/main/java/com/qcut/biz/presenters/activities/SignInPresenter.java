@@ -3,6 +3,7 @@ package com.qcut.biz.presenters.activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -10,8 +11,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.models.ShopDetails;
+import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.views.SignInView;
+
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -31,39 +35,27 @@ public class SignInPresenter {
     }
 
     public void onSignInClick() {
-        Query query = database.getReference().child(ShopDetails.SHOP_DETAILS).
-                orderByChild(ShopDetails.EMAIL).equalTo(view.getEmail().trim());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        final String email = view.getEmail();
+        DBUtils.getShopsDetails(database, new OnSuccessListener<List<ShopDetails>>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                final String emailText = view.getEmail();
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot shopData : dataSnapshot.getChildren()) {
-                        ShopDetails shopDetails = shopData.getValue(ShopDetails.class);
-                        String email = shopDetails.getEmail().trim();
-                        String password = shopDetails.getPassword().trim();
-                        if (email.equalsIgnoreCase(emailText.trim()) &&
-                                password.equalsIgnoreCase(view.getPassword().trim())) {
-                            view.showMessage("Login Successful.");
-                            LogUtils.info("Login successful with email: {0}", emailText);
-                            preferences.edit().putBoolean("isLoggedIn", true).apply();
-                            preferences.edit().putString("userid", shopData.getKey().toString()).apply();
-                            view.startActivity();
-
-                        } else {
-                            view.showMessage("Login unsuccessful.");
-                            LogUtils.error("Login unsuccessful with email: {0}", emailText);
-                        }
+            public void onSuccess(List<ShopDetails> shopsDetails) {
+                ShopDetails shopDetails = null;
+                for (ShopDetails details : shopsDetails) {
+                    if (details.getEmail().equalsIgnoreCase(email)) {
+                        shopDetails = details;
+                        break;
                     }
-                } else {
-                    view.showMessage("Login Does not exist.");
-                    LogUtils.error("Login email does not exists: {0}", emailText);
                 }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                LogUtils.error("Error while quering email in db: {0}", databaseError.getMessage());
+                if (shopDetails != null) {
+                    view.showMessage("Login Successful.");
+                    LogUtils.info("Login successful with email: {0}", shopDetails.getEmail());
+                    preferences.edit().putBoolean("isLoggedIn", true).apply();
+                    preferences.edit().putString("userid", shopDetails.getKey()).apply();
+                    view.startActivity();
+                } else {
+                    view.showMessage("Login unsuccessful.");
+                    LogUtils.error("Login unsuccessful with email: {0}", email);
+                }
             }
         });
     }

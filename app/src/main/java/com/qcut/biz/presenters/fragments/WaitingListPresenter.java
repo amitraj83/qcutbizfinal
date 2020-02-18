@@ -15,7 +15,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.qcut.biz.R;
 import com.qcut.biz.adaptors.BarberSelectionArrayAdapter;
 import com.qcut.biz.adaptors.WaitingListRecyclerViewAdapter;
 import com.qcut.biz.listeners.BarbersChangeListener;
@@ -25,6 +24,7 @@ import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
+import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
@@ -50,6 +50,11 @@ public class WaitingListPresenter {
     private String barberKey;
     private Context context;
     private FirebaseDatabase database;
+    private ValueEventListener barbersChangeListener;
+    private DatabaseReference dbRefBarbers;
+    private DatabaseReference dbRefBarberQueue;
+    private ValueEventListener barberQueueChangeListener;
+    int lc = 0;
 
     public WaitingListPresenter(WaitingListView view, Context context, String barberKey) {
         this.view = view;
@@ -59,28 +64,22 @@ public class WaitingListPresenter {
         FirebaseApp.initializeApp(context);
         database = FirebaseDatabase.getInstance();
         userid = preferences.getString("userid", null);
+        dbRefBarbers = DBUtils.getDbRefBarbers(database, userid);
+        barbersChangeListener = new BarbersChangeListener(this);
+        dbRefBarberQueue = DBUtils.getDbRefBarberQueue(database, userid, barberKey);
+        barberQueueChangeListener = new BarberQueuesListener(view);
     }
 
     public void onAddCustomerClick() {
         LogUtils.info("onAddCustomerClick");
-        DBUtils.getDbRefShopStatus(database, userid).addListenerForSingleValueEvent(new ValueEventListener() {
+        DBUtils.getShopDetails(database, userid, new OnSuccessListener<ShopDetails>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    String shopStatus = dataSnapshot.getValue().toString();
-                    if (shopStatus.equalsIgnoreCase(context.getString(R.string.status_online))) {
-                        view.showAddCustomerDialog();
-                    } else {
-                        view.showMessage("Cannot add customer. First get online.");
-                    }
+            public void onSuccess(ShopDetails shopDetails) {
+                if (shopDetails.isOnline()) {
+                    view.showAddCustomerDialog();
                 } else {
                     view.showMessage("Cannot add customer. First get online.");
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
@@ -152,10 +151,6 @@ public class WaitingListPresenter {
 
     }
 
-    public void setBarbersChangeListener() {
-        DBUtils.getDbRefBarbers(database, userid).addValueEventListener(
-                new BarbersChangeListener(this));
-    }
 
     public void setBarberList(List<Barber> barberList) {
         view.setBarberList(new BarberSelectionArrayAdapter(context, barberList));
@@ -165,43 +160,6 @@ public class WaitingListPresenter {
         return barberKey;
     }
 
-    public void addQueueOnChangeListener() {
-        DBUtils.getDbRefBarberQueue(database, userid, barberKey).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                final List<Customer> models = new ArrayList<>();
-                final BarberQueue barberQueue = MappingUtils.mapToBarberQueue(dataSnapshot);
-                boolean isSomeOneInQueue = false;
-                for (Customer customer : barberQueue.getCustomers()) {
-                    if (!customer.isDone() && !customer.isRemoved()) {
-                        if (customer.isInQueue()) {
-                            isSomeOneInQueue = true;
-                        }
-                        models.add(customer);
-                    }
-                }
-                if (isSomeOneInQueue && models.size() > 0) {
-                    Collections.sort(models, new CustomerComparator());
-                    for (Customer model : models) {
-                        if (model.isInQueue()) {
-                            //just set name of first queued customer
-                            view.updateNextCustomerView(model.getName(), model.getKey());
-                            break;
-                        }
-                    }
-                } else {
-                    view.updateNextCustomerView("No customer.", "NONE");
-                }
-                LogUtils.info("Refreshing queue view");
-                view.updateAndRefreshQueue(models);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     public void updateBarberStatus(boolean onBreak) {
         view.updateBarberStatus(onBreak);
@@ -222,5 +180,67 @@ public class WaitingListPresenter {
 
     public void showMessage(String msg) {
         view.showMessage(msg);
+    }
+
+    public void addBarbersChangeListener() {
+        LogUtils.info("{1} addBarbersChangeListener: {0}", barberKey);
+        dbRefBarbers.addValueEventListener(barbersChangeListener);
+    }
+
+    public void addQueueOnChangeListener() {
+        LogUtils.info("addQueueOnChangeListener: {0}", barberKey);
+        dbRefBarberQueue.addValueEventListener(barberQueueChangeListener);
+    }
+
+    public void removeQueueOnChangeListener() {
+        LogUtils.info("removeQueueOnChangeListener: {0}", barberKey);
+        dbRefBarberQueue.removeEventListener(barberQueueChangeListener);
+    }
+
+    public void removeBarbersChangeListener() {
+        LogUtils.info("{1} removeBarbersChangeListener: {0}", barberKey);
+        dbRefBarbers.removeEventListener(barbersChangeListener);
+    }
+
+    public static class BarberQueuesListener implements ValueEventListener {
+        private WaitingListView view;
+
+        public BarberQueuesListener(WaitingListView view) {
+            this.view = view;
+        }
+
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            final List<Customer> models = new ArrayList<>();
+            final BarberQueue barberQueue = MappingUtils.mapToBarberQueue(dataSnapshot);
+            boolean isSomeOneInQueue = false;
+            for (Customer customer : barberQueue.getCustomers()) {
+                if (!customer.isDone() && !customer.isRemoved()) {
+                    if (customer.isInQueue()) {
+                        isSomeOneInQueue = true;
+                    }
+                    models.add(customer);
+                }
+            }
+            if (isSomeOneInQueue && models.size() > 0) {
+                Collections.sort(models, new CustomerComparator());
+                for (Customer model : models) {
+                    if (model.isInQueue()) {
+                        //just set name of first queued customer
+                        view.updateNextCustomerView(model.getName(), model.getKey());
+                        break;
+                    }
+                }
+            } else {
+                view.updateNextCustomerView("No customer.", "NONE");
+            }
+            LogUtils.info("Refreshing queue view");
+            view.updateAndRefreshQueue(models);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+        }
     }
 }

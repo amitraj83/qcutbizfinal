@@ -43,7 +43,7 @@ public class FetchBarbersTask implements Continuation<Void, Task<Map<String, Bar
                     barber.setKey(next.getKey());
                     barbersMap.put(barber.getKey(), barber);
                 }
-                LogUtils.info("FetchBarbersTask: {0}",barbersMap);
+                LogUtils.info("FetchBarbersTask: {0}, userid: {1}", barbersMap, userid);
                 tcs.setResult(barbersMap);
             }
 

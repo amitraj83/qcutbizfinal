@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.StorageReference;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
@@ -15,6 +16,8 @@ import com.qcut.biz.models.CustomerStatus;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.tasks.FetchBarbersQueuesTask;
 import com.qcut.biz.tasks.FetchBarbersTask;
+import com.qcut.biz.tasks.FetchShopDetailsTask;
+import com.qcut.biz.tasks.FetchShopsDetailsTask;
 import com.qcut.biz.tasks.FindBarberQueueTask;
 import com.qcut.biz.tasks.FindBarberTask;
 import com.qcut.biz.tasks.FindCustomerTask;
@@ -29,6 +32,10 @@ public class DBUtils {
 
     public static DatabaseReference getDbRefShopStatus(FirebaseDatabase database, String userid) {
         return database.getReference().child(ShopDetails.SHOP_DETAILS).child(userid).child(ShopDetails.STATUS);
+    }
+
+    public static DatabaseReference getDbRefShopDetails(FirebaseDatabase database, String userid) {
+        return database.getReference().child(ShopDetails.SHOP_DETAILS).child(userid);
     }
 
     public static DatabaseReference getDbRefBarbers(FirebaseDatabase database, String userid) {
@@ -51,6 +58,21 @@ public class DBUtils {
     public static DatabaseReference getDbRefCustomer(FirebaseDatabase database, String userid, String barberKey, String customerKey) {
         return database.getReference().child(BarberQueue.BARBER_WAITING_QUEUES)
                 .child(buildShopIdForToday(userid)).child(barberKey).child(customerKey);
+    }
+
+    public static DatabaseReference getDbRefShopsDetails(FirebaseDatabase database) {
+        return database.getReference().child(ShopDetails.SHOP_DETAILS);
+    }
+
+
+    public static void getShopDetails(FirebaseDatabase database, String userid, OnSuccessListener<ShopDetails> onSuccessListener) {
+        Tasks.<Void>forResult(null).continueWithTask(new FetchShopDetailsTask(database, userid))
+                .addOnSuccessListener(onSuccessListener);
+    }
+
+    public static void getShopsDetails(FirebaseDatabase database, OnSuccessListener<List<ShopDetails>> onSuccessListener) {
+        Tasks.<Void>forResult(null).continueWithTask(new FetchShopsDetailsTask(database))
+                .addOnSuccessListener(onSuccessListener);
     }
 
     public static void getBarbersQueues(FirebaseDatabase database, String userid, OnSuccessListener<List<BarberQueue>> onSuccessListener) {
@@ -82,18 +104,6 @@ public class DBUtils {
                 .continueWithTask(new FindBarberQueueTask(database, userid, barberKey))
                 .continueWithTask(new FindCustomerTask(customerKey))
                 .addOnSuccessListener(onSuccessListener);
-    }
-//    public static void getBarberQueueStatus(FirebaseDatabase database, String userid, String barberKey, OnSuccessListener<BarberQueueStatus> onSuccessListener) {
-//        Tasks.<Void>forResult(null).continueWithTask(new FetchBarberStatusTask(database, userid, barberKey))
-//                .addOnSuccessListener(onSuccessListener);
-//    }
-
-    public static DatabaseReference getDbRefShopDetails(FirebaseDatabase database) {
-        return database.getReference().child(ShopDetails.SHOP_DETAILS);
-    }
-
-    public static Uri getValueDownloadUri(final StorageReference storageReference, final String imagePath) {
-        return DbSyncUtils.loadUriSynchronous(storageReference, imagePath);
     }
 
     public static String buildShopIdForToday(String userid) {

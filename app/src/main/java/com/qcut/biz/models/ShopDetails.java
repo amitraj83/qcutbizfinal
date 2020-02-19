@@ -1,6 +1,9 @@
 package com.qcut.biz.models;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,9 +21,9 @@ import lombok.ToString;
 @IgnoreExtraProperties
 public class ShopDetails {
 
-    public static final String SHOP_DETAILS="shopDetails";
-    public static final String STATUS="status";
-    public static final String EMAIL="email";
+    public static final String SHOP_DETAILS = "shopDetails";
+    public static final String STATUS = "status";
+    public static final String EMAIL = "email";
     private String key;
     private String email;
     private String name;
@@ -34,4 +37,9 @@ public class ShopDetails {
     private String city;
     private String country;
     private String status;
+
+    @Exclude
+    public boolean isOnline() {
+        return StringUtils.isNotBlank(status) && ShopStatus.ONLINE.name().equalsIgnoreCase(status);
+    }
 }

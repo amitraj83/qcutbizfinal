@@ -42,8 +42,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class WaitingListFragment extends Fragment implements WaitingListView {
 
-    //    private WaitingListModel waitingListModel;
-//    private Button startService, finishService;
     private FloatingActionButton addCustomer;
     private SharedPreferences sp;
     private WaitingListRecyclerViewAdapter adapter = null;
@@ -63,32 +61,36 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     private String selectedBarberKey;
     private View root;
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mContext = context;
-    }
-
     public WaitingListFragment(String tag) {
         this.tag = tag;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        if (presenter == null) {
+            presenter = new WaitingListPresenter(this, mContext, tag);
+        }
+        presenter.addQueueOnChangeListener();
+        presenter.addBarbersChangeListener();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        presenter.removeQueueOnChangeListener();
+        presenter.removeBarbersChangeListener();
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        presenter = new WaitingListPresenter(this, mContext, tag);
-//        waitingListModel =
-//                ViewModelProviders.of(this).get(WaitingListModel.class);
         root = inflater.inflate(R.layout.fragment_waiting_list, container, false);
         this.rootView = root;
-//        root.setVisibility(30);
-//        root.setBackgroundColor(Color.RED);
-
         sp = mContext.getSharedPreferences("login", MODE_PRIVATE);
         nextCustomerTV = root.findViewById(R.id.next_customer);
         factory = LayoutInflater.from(mContext);
 
-//        cardViewStartSkipService(root, factory);
 
 //TODO remove textview
 //        TextView viewById = root.findViewById(R.id.textView);
@@ -109,7 +111,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
         dynamicListView.setItemAnimator(new DefaultItemAnimator());
         adapter = presenter.createWaitingListViewAdaptor();
         dynamicListView.setAdapter(adapter);
-        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback( presenter, adapter));
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter, adapter));
         helper.attachToRecyclerView(dynamicListView);
 
         addCustomerView = factory.inflate(R.layout.add_customer_dialog, null);
@@ -144,9 +146,6 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
 
             }
         });
-
-        presenter.addQueueOnChangeListener();
-        presenter.setBarbersChangeListener();
         return root;
     }
 

@@ -21,12 +21,7 @@ import lombok.Setter;
 @Builder
 @IgnoreExtraProperties
 public class Customer {
-    public static final String BARBER_WAITING_QUEUES = "barberWaitingQueues";
-    //    public static final String STATUS = ;
-//    public static final String TIME_TO_WAIT = ;
-//    public static final String TIME_ADDED = ;
-//    public static final String TIME_SERVICE_STARTED = ;
-//    public static final String PLACE_IN_QUEUE = ;
+    public static final String EXPECTED_WAITING_TIME = "expectedWaitingTime";
     private String key;
     private String name;
     private long arrivalTime;

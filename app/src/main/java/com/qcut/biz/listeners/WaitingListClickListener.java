@@ -135,7 +135,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            TimerService.updateWaitingTimes(database, userid);
+//                            DBUtils.reAllocateCustomers(database, userid);
                         }
                     });
                 }
@@ -159,7 +159,7 @@ public class WaitingListClickListener implements View.OnClickListener {
             public void onClick(View v) {
                 setCustomerInProgress();
                 serviceStartDialog.dismiss();
-                TimerService.updateWaitingTimes(database, userid);
+//                DBUtils.reAllocateCustomers(database, userid);
             }
         });
         noButton.setOnClickListener(new View.OnClickListener() {

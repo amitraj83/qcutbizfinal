@@ -7,6 +7,7 @@ public interface Constants {
     String STOP_QUEUE = "Stop Q";
     String ON_BREAK = "On Break";
     String BREAK = "Break";
+    String NONE = "NONE";
 
 
     public interface Customer {
@@ -21,11 +22,5 @@ public interface Constants {
         String IS_ANY_BARBER = "anyBarber";
         String TIME_SERVICE_STARTED = "timeServiceStarted";
 
-    }
-
-    public interface Barber {
-        String STATUS = "status";
-        String NAME = "name";
-        String IMAGE_PATH = "imagePath";
     }
 }

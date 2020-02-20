@@ -92,16 +92,11 @@ public class MainPresenter {
     public void onNavigationItemSelected(int id) {
         if (id == R.id.nav_profile) {
             view.navigateToId(R.id.nav_profile);
-
         } else if (id == R.id.addBarber) {
             view.navigateToId(R.id.nav_add_barber);
         } else if (id == R.id.temp) {
             view.navigateToId(R.id.temp_fragment);
-        }
-//        else if (id == R.id.nav_list) {
-//            view.navigateToId(R.id.nav_waiting_list);
-//        }
-        else if (id == R.id.shop_address) {
+        } else if (id == R.id.shop_address) {
             view.navigateToId(R.id.nav_go_shop_details);
         } else if (id == R.id.opening_hours) {
             view.navigateToId(R.id.nav_go_shop_opening_hours);
@@ -110,9 +105,10 @@ public class MainPresenter {
         } else if (id == R.id.nav_log_out) {
             preferences.edit().putBoolean("isLoggedIn", false).apply();
             preferences.edit().putString("userid", null).apply();
-
             updateStatus(context.getString(R.string.status_offline));
             view.startActivity(StartActivity.class);
+        } else if (id == R.id.customer_view) {
+            view.navigateToId(R.id.frag_customer_view);
         }
         view.closeDrawer();
     }

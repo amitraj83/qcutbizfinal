@@ -16,7 +16,11 @@
         android:name="com.qcut.biz.views.fragments.WaitingListFragment"
         android:label="Waiting List"
         tools:layout="@layout/fragment_waiting_list" />
-
+    <fragment
+        android:id="@+id/frag_customer_view"
+        android:name="com.qcut.biz.views.fragments.CustomerViewFragment"
+        android:label="Customer View"
+        tools:layout="@layout/customer_view" />
     <fragment
         android:id="@+id/nav_go_online"
         android:name="com.qcut.biz.views.fragments.GoOnlineFragment"

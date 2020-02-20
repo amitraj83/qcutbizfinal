@@ -46,7 +46,7 @@ public class DBUtils {
         return database.getReference().child(Barber.BARBERS).child(userid).child(barberKey);
     }
 
-    public static DatabaseReference getDbRefAllBarberQueues(FirebaseDatabase database, String userid) {
+    public static DatabaseReference getDbRefBarberQueues(FirebaseDatabase database, String userid) {
         return database.getReference().child(BarberQueue.BARBER_WAITING_QUEUES).child(buildShopIdForToday(userid));
     }
 

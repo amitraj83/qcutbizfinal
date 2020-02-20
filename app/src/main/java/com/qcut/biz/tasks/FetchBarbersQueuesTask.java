@@ -35,7 +35,7 @@ public class FetchBarbersQueuesTask implements Continuation<Map<String, Barber>,
         final TaskCompletionSource<List<BarberQueue>> tcs = new TaskCompletionSource();
         final Map<String, Barber> barberMap = barbersMapTask.getResult();
 
-        DBUtils.getDbRefAllBarberQueues(database, userid).addListenerForSingleValueEvent(new ValueEventListener() {
+        DBUtils.getDbRefBarberQueues(database, userid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 LogUtils.info("Queues loaded");

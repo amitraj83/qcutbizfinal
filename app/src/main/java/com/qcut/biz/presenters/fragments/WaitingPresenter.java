@@ -53,7 +53,7 @@ public class WaitingPresenter {
     public void initializeTab() {
         DBUtils.getDbRefBarbers(database, userid)
                 .addChildEventListener(new BarberQueueStatusChangeListener(database, userid, view));
-        DBUtils.getDbRefAllBarberQueues(database, userid).addChildEventListener(new BarberQueueChangeListener(database, userid));
+        DBUtils.getDbRefBarberQueues(database, userid).addChildEventListener(new BarberQueueChangeListener(database, userid));
         DBUtils.getBarbersQueues(database, userid, new OnSuccessListener<List<BarberQueue>>() {
             @Override
             public void onSuccess(List<BarberQueue> barberQueues) {

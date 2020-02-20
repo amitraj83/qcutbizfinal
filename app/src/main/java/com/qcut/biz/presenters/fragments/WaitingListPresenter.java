@@ -113,7 +113,7 @@ public class WaitingListPresenter {
                             }
                         }
                         final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, selectedBarberKey);
-                        customerBuilder.preferredBarberKey(selectedBarberKey);
+                        customerBuilder.preferredBarberKey(selectedBarberKey).actualBarberId(selectedBarberKey);
                         pushCustomerToDB(customerBuilder, queueRef, bq);
                     }
                 }

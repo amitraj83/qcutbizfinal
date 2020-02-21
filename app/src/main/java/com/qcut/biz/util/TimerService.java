@@ -10,23 +10,18 @@ import android.os.IBinder;
 import android.os.Message;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.qcut.biz.models.BarberStatus;
+import com.qcut.biz.models.Barber;
+import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
-import com.qcut.biz.models.CustomerStatus;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -75,96 +70,59 @@ public class TimerService extends Service {
         @Override
         public void handleMessage(Message msg) {
             updateWaitingTimes(database, userid);
-
         }
     };
 
-    public static void updateWaitingTimes(FirebaseDatabase database, String userid) {
-        final DatabaseReference dbRef = database.getReference().child("barbershops").child(userid);
-//                .child("queues").child(TimeUtil.getTodayDDMMYYYY());
-        if (dbRef != null) {
-            dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshotUserId) {
-                    final DataSnapshot dataSnapshot = dataSnapshotUserId.child("queues").child(TimeUtil.getTodayDDMMYYYY());
-                    if (dataSnapshot.exists()) {
-                        Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
-                        while (snapshotIterator.hasNext()) {
-
-                            DataSnapshot aBarberQueue = snapshotIterator.next();
-
-                            //Check if barber is not on break
-                            String aBarberQueueKey = aBarberQueue.getKey();
-                            if (!aBarberQueueKey.equalsIgnoreCase("online")
-                                    && !aBarberQueue.child("status").getValue().toString().equalsIgnoreCase(BarberStatus.BREAK.name())) {
-
-                                List<Customer> customers = new ArrayList<Customer>();
-                                boolean isSomeOneInProgress = false;
-                                if (!aBarberQueueKey.equalsIgnoreCase("online")) {
-                                    Iterator<DataSnapshot> childIterator = aBarberQueue.getChildren().iterator();
-                                    while (childIterator.hasNext()) {
-                                        DataSnapshot aCustomer = childIterator.next();
-                                        if (!aCustomer.getKey().equalsIgnoreCase("status")) {
-//                                                && aCustomer.child("status").getValue().toString().equalsIgnoreCase(BarberStatus.QUEUE.name())) {
-                                            //it is a customer
-                                            Customer customer = aCustomer.getValue(Customer.class);
-                                            if (StringUtils.isNotBlank(customer.getStatus())) {
-                                                if (customer.getStatus().equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
-                                                    customers.add(Customer.builder().key(aCustomer.getKey()).timeToWait(customer.getTimeToWait())
-                                                            .timeAdded(customer.getTimeAdded()).name(customer.getName()).build());
-                                                } else if (customer.getStatus().equalsIgnoreCase(CustomerStatus.PROGRESS.name())) {
-                                                    isSomeOneInProgress = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                Collections.sort(customers, new CustomerComparator());
-                                int avgTimeToCut = 15;
-                                // TODO clarify there is no avgTimeToCut field in db
-                                DataSnapshot avgTimeToCutData = dataSnapshotUserId.child("avgTimeToCut");
-                                String avgTimeToCutStr = avgTimeToCutData.exists() ? avgTimeToCutData.getValue().toString() : null;
-                                if (StringUtils.isNotBlank(avgTimeToCutStr)) {
-                                    avgTimeToCut = Integer.valueOf(avgTimeToCutStr);
-                                }
-                                //TODO need to revisit this logic
-                                long prevCustomerTime = 0;
-                                for (int i = 0; i < customers.size(); i++) {
-                                    if (i == 0) {
-                                        if (isSomeOneInProgress) {
-                                            long timeToWait = customers.get(i).getTimeToWait();
-                                            if (timeToWait > 0) {
-                                                if (timeToWait > avgTimeToCut) {
-                                                    timeToWait = avgTimeToCut;
-                                                }
-                                                long newTimeToWait = timeToWait - 1;
-                                                aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(newTimeToWait);
-                                                prevCustomerTime = newTimeToWait;
-                                            }
-                                        } else {
-                                            //customer is waiting to be served, there is noone on chair
-                                            aBarberQueue.getRef().child(customers.get(i).getKey()).child("timeToWait").setValue(0);
-                                            prevCustomerTime = 0;
-                                        }
-                                    } else {
-                                        aBarberQueue.getRef().child(customers.get(i).getKey())
-                                                .child("timeToWait").setValue(prevCustomerTime + avgTimeToCut);
-                                        prevCustomerTime = prevCustomerTime + avgTimeToCut;
-                                    }
-                                }
+    public static void updateWaitingTimes(final FirebaseDatabase database, final String userid) {
+        DBUtils.getBarbersQueues(database, userid, new OnSuccessListener<List<BarberQueue>>() {
+            @Override
+            public void onSuccess(List<BarberQueue> barberQueues) {
+                for (BarberQueue barberQueue : barberQueues) {
+                    //Check if barber is not on break
+                    final Barber barber = barberQueue.getBarber();
+                    if (barber.isOnBreak()) {
+                        continue;
+                    }
+                    List<Customer> customers = new ArrayList<>();
+                    boolean isSomeOneInProgress = false;
+                    for (Customer customer : barberQueue.getCustomers()) {
+                        if (StringUtils.isNotBlank(customer.getStatus())) {
+                            if (customer.isInQueue()) {
+                                customers.add(customer);
+                            } else if (customer.isInProgress()) {
+                                isSomeOneInProgress = true;
                             }
-
+                        }
+                    }
+                    Collections.sort(customers, new CustomerComparator());
+                    int avgTimeToCut = 15;
+                    // TODO use avgTimeToCut field in db
+                    long prevCustomerTime = 0;
+                    for (int i = 0; i < customers.size(); i++) {
+                        final DatabaseReference dbRefWaitingTime = DBUtils.getDbRefCustomerExpectedWaitingTime(database, userid,
+                                barber.getKey(), customers.get(i).getKey());
+                        if (i == 0) {
+                            //first customer int the queue
+                            if (isSomeOneInProgress) {
+                                long timeToWait = customers.get(i).getTimeToWait();
+                                if (timeToWait > 0) {
+                                    timeToWait = Math.min(avgTimeToCut, timeToWait);
+                                    long newTimeToWait = timeToWait - 1;
+                                    dbRefWaitingTime.setValue(newTimeToWait);
+                                    prevCustomerTime = newTimeToWait;
+                                }
+                            } else {
+                                //customer is waiting to be served, there is none on chair
+                                dbRefWaitingTime.setValue(0);
+                                prevCustomerTime = 0;
+                            }
+                        } else {
+                            dbRefWaitingTime.setValue(prevCustomerTime + avgTimeToCut);
+                            prevCustomerTime = prevCustomerTime + avgTimeToCut;
                         }
                     }
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
+            }
+        });
     }
-
-
 }

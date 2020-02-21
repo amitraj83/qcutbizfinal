@@ -60,6 +60,11 @@ public class DBUtils {
                 .child(buildShopIdForToday(userid)).child(barberKey).child(customerKey);
     }
 
+    public static DatabaseReference getDbRefCustomerExpectedWaitingTime(FirebaseDatabase database, String userid, String barberKey, String customerKey) {
+        return database.getReference().child(BarberQueue.BARBER_WAITING_QUEUES)
+                .child(buildShopIdForToday(userid)).child(barberKey).child(customerKey).child(Customer.EXPECTED_WAITING_TIME);
+    }
+
     public static DatabaseReference getDbRefShopsDetails(FirebaseDatabase database) {
         return database.getReference().child(ShopDetails.SHOP_DETAILS);
     }

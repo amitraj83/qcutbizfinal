@@ -153,12 +153,12 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     public void showAddCustomerDialog() {
         addCustomerDialog.show();
         addCustomerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-
-        addCustomerDialog.getWindow().setLayout(width, height);
+//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
+//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
+//
+//        addCustomerDialog.getWindow().setLayout(width, height);
     }
 
     public String getEnteredCustomerName() {

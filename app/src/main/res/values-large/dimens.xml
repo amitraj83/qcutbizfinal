@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tableHeadingTextSie">10sp</dimen>
+    <dimen name="dialogHeadingTextSize">22sp</dimen>
+    <dimen name="dialogTextSize">22sp</dimen>
+
+</resources>

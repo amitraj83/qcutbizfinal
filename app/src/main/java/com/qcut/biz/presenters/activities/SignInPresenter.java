@@ -39,18 +39,18 @@ public class SignInPresenter {
         DBUtils.getShopsDetails(database, new OnSuccessListener<List<ShopDetails>>() {
             @Override
             public void onSuccess(List<ShopDetails> shopsDetails) {
-                ShopDetails shopDetails = null;
+                ShopDetails shopDetail = null;
                 for (ShopDetails details : shopsDetails) {
                     if (details.getEmail().equalsIgnoreCase(email)) {
-                        shopDetails = details;
+                        shopDetail = details;
                         break;
                     }
                 }
-                if (shopDetails != null) {
+                if (shopDetail != null) {
                     view.showMessage("Login Successful.");
-                    LogUtils.info("Login successful with email: {0}", shopDetails.getEmail());
+                    LogUtils.info("Login successful with email: {0}", shopDetail.getEmail());
                     preferences.edit().putBoolean("isLoggedIn", true).apply();
-                    preferences.edit().putString("userid", shopDetails.getKey()).apply();
+                    preferences.edit().putString("userid", shopDetail.getKey()).apply();
                     view.startActivity();
                 } else {
                     view.showMessage("Login unsuccessful.");

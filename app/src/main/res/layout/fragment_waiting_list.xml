@@ -84,58 +84,72 @@
         app:layout_constraintStart_toEndOf="@+id/cardView"
         app:layout_constraintTop_toBottomOf="@+id/cardView">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="3"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:padding="15sp"
+            android:background="@color/colorPrimaryDark"
+            >
             <TextView
+                android:id="@+id/header_customer"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
                 android:text="Customer"
+                android:gravity="left"
                 android:fontFamily="@font/montserrat_regular"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
-                android:background="@android:color/darker_gray"/>
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tableHeadingTextSie"
+                android:background="@color/colorPrimaryDark"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/header_barber"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintWidth_percent="0.45"
+                />
 
             <TextView
+                android:id="@+id/header_barber"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
                 android:text="Barber"
                 android:fontFamily="@font/montserrat_regular"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tableHeadingTextSie"
+                app:autoSizeTextType="uniform"
                 android:gravity="center"
-                android:background="@android:color/darker_gray"/>
+                android:background="@color/colorPrimaryDark"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/header_waiting_time"
+                app:layout_constraintLeft_toRightOf="@id/header_customer"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintWidth_percent="0.2"
+                />
 
             <TextView
+                android:id="@+id/header_waiting_time"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:paddingTop="20dp"
                 android:drawablePadding="5dp"
-                android:paddingRight="10dp"
-                android:paddingBottom="20dp"
                 android:text="Waiting Time"
                 android:fontFamily="@font/montserrat_regular"
-                android:textSize="18sp"
+                android:textSize="@dimen/tableHeadingTextSie"
+                app:autoSizeTextType="uniform"
+                android:textColor="@color/white"
                 android:gravity="right"
-                android:background="@android:color/darker_gray"/>
-        </LinearLayout>
+                android:background="@color/colorPrimaryDark"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/header_barber"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintWidth_percent="0.35"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.cardview.widget.CardView>
 
-        <androidx.recyclerview.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/today_queue"
             android:layout_width="match_parent"
             android:layout_height="0dp"

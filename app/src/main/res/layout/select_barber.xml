@@ -2,51 +2,62 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
     app:cardCornerRadius="5dp"
     app:cardElevation="2dp"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp">
+    android:layout_margin="20sp">
 
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="4">
-
-
+        android:layout_height="wrap_content"
+        android:id="@+id/s_b_constraint">
 
         <TextView
             android:id="@+id/dialog_title"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/add_barber"
             android:fontFamily="@font/montserrat_medium"
             android:textColor="#FFF"
             android:textSize="@dimen/dialogHeadingTextSize"
             android:background="@color/backgroundItems"
-            android:layout_weight="1"/>
+            android:paddingBottom="20sp"
+            android:paddingTop="20sp"
+            app:layout_constraintTop_toTopOf="@+id/s_b_constraint"
+            app:layout_constraintRight_toRightOf="@+id/s_b_constraint"
+            app:layout_constraintLeft_toLeftOf="@+id/s_b_constraint"
+            app:layout_constraintBottom_toTopOf="@+id/spinner_select_barber_to_start_queue"
+            />
 
         <Spinner
             android:id="@+id/spinner_select_barber_to_start_queue"
             android:layout_width="match_parent"
             android:layout_margin="30dp"
-            android:layout_height="0dp"
-            android:layout_weight="1.7"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             style="@style/spinner_style"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_title"
+            app:layout_constraintRight_toRightOf="@+id/s_b_constraint"
+            app:layout_constraintLeft_toLeftOf="@+id/s_b_constraint"
+            app:layout_constraintBottom_toTopOf="@+id/buttons_layout"
             />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="1"
-            android:weightSum="3"
-            android:layout_margin="10dp">
+            android:layout_height="wrap_content"
+            android:id="@+id/buttons_layout"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_select_barber_to_start_queue"
+            app:layout_constraintRight_toRightOf="@+id/s_b_constraint"
+            app:layout_constraintLeft_toLeftOf="@+id/s_b_constraint"
+            app:layout_constraintBottom_toBottomOf="@+id/s_b_constraint"
+            android:paddingBottom="20sp"
+            android:paddingTop="20sp"
+            >
+
+
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/no_add_barber_queue"
@@ -61,12 +72,12 @@
                 app:rippleColor="#33AAAAAA"
                 app:strokeColor="@color/backgroundItems"
                 app:strokeWidth="2dp"
-                android:layout_weight="1.35"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.3"></View>
+                app:layout_constraintTop_toTopOf="@+id/buttons_layout"
+                app:layout_constraintRight_toLeftOf="@+id/yes_add_barber_queue"
+                app:layout_constraintLeft_toLeftOf="@+id/buttons_layout"
+                app:layout_constraintBottom_toBottomOf="@+id/buttons_layout"
+                app:layout_constraintWidth_percent="0.4"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/yes_add_barber_queue"
@@ -78,10 +89,36 @@
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/buttonCAPTextSize"
                 app:backgroundTint="@color/backgroundItems"
-                android:layout_weight="1.35"/>
+                app:layout_constraintTop_toTopOf="@+id/buttons_layout"
+                app:layout_constraintRight_toRightOf="@+id/buttons_layout"
+                app:layout_constraintLeft_toRightOf="@+id/no_add_barber_queue"
+                app:layout_constraintBottom_toBottomOf="@+id/buttons_layout"
+                app:layout_constraintWidth_percent="0.4"
+
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="4">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:weightSum="3"
+            android:layout_margin="10dp">
+
         </LinearLayout>
 
 
     </LinearLayout>
+    -->
 
 </androidx.cardview.widget.CardView>

@@ -23,6 +23,7 @@
     <dimen name="tableHeadingTextSie">10sp</dimen>
     <dimen name="dialogHeadingTextSize">16sp</dimen>
     <dimen name="dialogTextSize">25sp</dimen>
+    <dimen name="waitinglistItemSize">18sp</dimen>
 
 
 </resources>

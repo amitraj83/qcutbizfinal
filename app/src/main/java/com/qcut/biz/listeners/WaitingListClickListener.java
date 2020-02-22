@@ -85,14 +85,14 @@ public class WaitingListClickListener implements View.OnClickListener {
             custNameTVServiceDone.setText(queueItemName);
             serviceDoneDialog.show();
             serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 5,
-                    Resources.getSystem().getDisplayMetrics());
-            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
-                    Resources.getSystem().getDisplayMetrics());
-
-            serviceDoneDialog.getWindow().setLayout(width, height);
+//            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 5,
+//                    Resources.getSystem().getDisplayMetrics());
+//            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
+//                    Resources.getSystem().getDisplayMetrics());
+//
+//            serviceDoneDialog.getWindow().setLayout(width, height);
         } else if (queueItemStatus.equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
             //TODO not need to get barbers if we disable button when barber status is on break or close
             DBUtils.getBarber(database, userid, tag, new OnSuccessListener<Barber>() {
@@ -102,14 +102,14 @@ public class WaitingListClickListener implements View.OnClickListener {
                         custNameTVServiceStart.setText(selectedCustomer.getName());
                         serviceStartDialog.show();
                         serviceStartDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 4,
-                                Resources.getSystem().getDisplayMetrics());
-                        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
-                                Resources.getSystem().getDisplayMetrics());
-
-                        serviceStartDialog.getWindow().setLayout(width, height);
+//                        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                                ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 4,
+//                                Resources.getSystem().getDisplayMetrics());
+//                        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                                ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
+//                                Resources.getSystem().getDisplayMetrics());
+//
+//                        serviceStartDialog.getWindow().setLayout(width, height);
                     } else {
                         Toast.makeText(mContext, "Cannot start services. May be barber is on break or his queue is stopped.", Toast.LENGTH_SHORT).show();
                     }

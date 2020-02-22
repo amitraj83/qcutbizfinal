@@ -34,7 +34,7 @@
             android:text="@string/sandra_adams"
             android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:textSize="@dimen/waitinglistItemSize" />
 
         <TextView
             android:id="@+id/for_who"
@@ -47,7 +47,7 @@
             android:text="@string/sandra_adams"
             android:fontFamily="@font/montserrat_light"
             android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:textSize="@dimen/waitinglistItemSize"
             android:gravity="center"/>
 
         <TextView
@@ -62,7 +62,7 @@
             android:paddingBottom="20dp"
             android:text="@string/in_chair"
             android:fontFamily="@font/montserrat_light"
-            android:textSize="18sp"
+            android:textSize="@dimen/waitinglistItemSize"
             android:gravity="right"/>
     </LinearLayout>
 

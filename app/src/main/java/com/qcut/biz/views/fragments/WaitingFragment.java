@@ -145,12 +145,12 @@ public class WaitingFragment extends Fragment implements WaitingView {
         this.barberNewStatus = newStatus;
         barberStatusChangeDialog.show();
         barberStatusChangeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-
-        barberStatusChangeDialog.getWindow().setLayout(width, height);
+//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
+//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
+//
+//        barberStatusChangeDialog.getWindow().setLayout(width, height);
 
         ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
         ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_text)).setText(dialogText);
@@ -178,11 +178,11 @@ public class WaitingFragment extends Fragment implements WaitingView {
         ddSpinner.setAdapter(customAdapter);
 
         barberSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 4, getResources().getDisplayMetrics());
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-        barberSelectionDialog.getWindow().setLayout(width, height);
+//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 4, getResources().getDisplayMetrics());
+//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+//                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
+//        barberSelectionDialog.getWindow().setLayout(width, height);
         //TODO create buttons and set listener only once
 
         ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

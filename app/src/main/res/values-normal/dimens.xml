@@ -3,5 +3,6 @@
     <dimen name="tableHeadingTextSie">16sp</dimen>
     <dimen name="dialogHeadingTextSize">20sp</dimen>
     <dimen name="dialogTextSize">18sp</dimen>
+    <dimen name="waitinglistItemSize">18sp</dimen>
 
 </resources>

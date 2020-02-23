@@ -41,11 +41,8 @@ public class Customer {
 
     //old
     private long timeAdded;
-    private long timeToWait;
     private boolean anyBarber;
     private String customerId;
-    private long timeFirstAddedInQueue;
-    private long timeServiceStarted;
 
     @Exclude
     public boolean isDone() {
@@ -73,14 +70,11 @@ public class Customer {
         HashMap<String, Object> result = new HashMap<>();
         result.put("key", key);
         result.put("timeAdded", timeAdded);
-        result.put("timeToWait", timeToWait);
         result.put("anyBarber", anyBarber);
         result.put("customerId", customerId);
         result.put("name", name);
         result.put("placeInQueue", placeInQueue);
         result.put("status", status);
-        result.put("timeFirstAddedInQueue", timeFirstAddedInQueue);
-        result.put("timeServiceStarted", timeServiceStarted);
 
         return result;
     }

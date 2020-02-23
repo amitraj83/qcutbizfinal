@@ -5,10 +5,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,15 +18,14 @@ import com.qcut.biz.listeners.BarbersChangeListener;
 import com.qcut.biz.listeners.WaitingListClickListener;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
-import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.ShopDetails;
+import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.MappingUtils;
-import com.qcut.biz.util.TimerService;
 import com.qcut.biz.views.WaitingListView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -91,66 +86,19 @@ public class WaitingListPresenter {
         final String selectedBarberKey = view.getSelectedBarberKey();
         final String customerName = view.getEnteredCustomerName();
         if (StringUtils.isNotBlank(customerName)) {
-            DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
-                @Override
-                public void onSuccess(Map<String, Barber> barbersMap) {
-                    Customer.CustomerBuilder customerBuilder = Customer.builder();
-                    String customerId = UUID.randomUUID().toString();
-                    customerBuilder.anyBarber(selectedBarberKey.equalsIgnoreCase(Constants.ANY))
-                            .name(customerName).customerId(customerId);
-                    if (selectedBarberKey.equalsIgnoreCase(Constants.ANY)) {
-                        for (Barber barber : barbersMap.values()) {
-                            if (BarberStatus.OPEN.name().equalsIgnoreCase(barber.getQueueStatus())) {
-                                final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barber.getKey());
-                                pushCustomerToDB(customerBuilder, queueRef, barber);
-                            }
-                        }
-                    } else {
-                        Barber bq = null;
-                        for (Barber barber : barbersMap.values()) {
-                            if (barber.getKey().equalsIgnoreCase(selectedBarberKey)) {
-                                bq = barber;
-                            }
-                        }
-                        final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, selectedBarberKey);
-                        customerBuilder.preferredBarberKey(selectedBarberKey).actualBarberId(selectedBarberKey);
-                        pushCustomerToDB(customerBuilder, queueRef, bq);
-                    }
-                }
-            });
-
+            final Customer.CustomerBuilder customerBuilder = Customer.builder();
+            //TODO remove customerID if not used
+            String customerId = UUID.randomUUID().toString();
+            final boolean anyBarber = selectedBarberKey.equalsIgnoreCase(Constants.ANY);
+            customerBuilder.anyBarber(anyBarber).name(customerName).customerId(customerId);
+            if (!anyBarber) {
+                customerBuilder.preferredBarberKey(selectedBarberKey);
+            }
+            BarberSelectionUtils.assignBarber(database, userid, customerBuilder, view);
         } else {
             view.showMessage("Cannot add customer. No name provided");
         }
     }
-
-    private void pushCustomerToDB(final Customer.CustomerBuilder customerBuilder, final DatabaseReference queueRef, final Barber barber) {
-        LogUtils.info("WaitingListPresenter: pushCustomerToDB");
-        DBUtils.getBarberQueue(database, userid, barber.getKey(), new OnSuccessListener<BarberQueue>() {
-            @Override
-            public void onSuccess(BarberQueue barberQueue) {
-                Task<Void> voidTask = DBUtils.pushCustomerToDB(customerBuilder, queueRef, barberQueue);
-                voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        LogUtils.info("Customer added to queue");
-                        TimerService.updateWaitingTimes(database, userid);
-                        view.showMessage(" added to queue");
-                        view.startDoorBell();
-
-                    }
-                });
-                voidTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        LogUtils.error("Customer added tsk failed:", e);
-                    }
-                });
-            }
-        });
-
-    }
-
 
     public void setBarberList(List<Barber> barberList) {
         view.setBarberList(new BarberSelectionArrayAdapter(context, barberList));
@@ -240,7 +188,7 @@ public class WaitingListPresenter {
 
         @Override
         public void onCancelled(@NonNull DatabaseError databaseError) {
-
+            LogUtils.error("databaseError: {}", databaseError.getMessage());
         }
     }
 }

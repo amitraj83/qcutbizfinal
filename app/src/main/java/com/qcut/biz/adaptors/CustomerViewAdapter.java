@@ -55,10 +55,10 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
         Customer customer = this.dataSet.get(position);
         holder.custName.setText(customer.getName());
-        if (customer.getTimeToWait() == 0) {
+        if (customer.getExpectedWaitingTime() == 0) {
             holder.waitingTime.setText("Ready");
         } else {
-            holder.waitingTime.setText(TimeUtil.getDisplayWaitingTime(customer.getTimeToWait()));
+            holder.waitingTime.setText(TimeUtil.getDisplayWaitingTime(customer.getExpectedWaitingTime()));
         }
         Drawable waitingDrawable = this.mContext.getResources().getDrawable(R.drawable.ic_action_waiting);
         holder.waitingTime.setCompoundDrawablesWithIntrinsicBounds(null, null, waitingDrawable, null);

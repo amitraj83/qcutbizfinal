@@ -2,6 +2,7 @@ package com.qcut.biz.tasks;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.common.util.CollectionUtils;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -16,6 +17,8 @@ import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.MappingUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,12 +57,23 @@ public class FetchBarbersQueuesTask implements Continuation<Map<String, Barber>,
 
     public List<BarberQueue> buildBarberQueue(DataSnapshot dataSnapshot, Map<String, Barber> barberMap) {
         Iterator<DataSnapshot> qSnapIterator = dataSnapshot.getChildren().iterator();
+        List<String> availableBarbers = new ArrayList<>();
+        for (Barber b : barberMap.values()) {
+            if (b.isOpen() || b.isOnBreak()) {
+                availableBarbers.add(b.getKey());
+            }
+        }
         List<BarberQueue> barbersQueues = new ArrayList<>();
         while (qSnapIterator.hasNext()) {
             final DataSnapshot queueSnapshot = qSnapIterator.next();
             final BarberQueue barberQueue = MappingUtils.mapToBarberQueue(queueSnapshot);
             barberQueue.setBarber(barberMap.get(barberQueue.getBarberKey()));
             barbersQueues.add(barberQueue);
+            availableBarbers.remove(barberQueue.getBarberKey());
+        }
+        for (String barberKey : availableBarbers) {
+            //empty queue for other available barbers for which no customer exists
+            barbersQueues.add(BarberQueue.builder().barber(barberMap.get(barberKey)).barberKey(barberKey).build());
         }
         return barbersQueues;
     }

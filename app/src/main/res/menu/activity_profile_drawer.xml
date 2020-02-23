@@ -8,7 +8,8 @@
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_person_black_24dp"
             android:fontFamily="@font/montserrat_medium"
-            android:title="Profile" />
+            android:title="Profile"
+            />
 
         <item
             android:id="@+id/addBarber"

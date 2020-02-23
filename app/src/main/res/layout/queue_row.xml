@@ -39,7 +39,7 @@
         <TextView
             android:id="@+id/for_who"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight=".8"
             android:layout_height="wrap_content"
             android:paddingLeft="10dp"
             android:paddingTop="20dp"
@@ -64,6 +64,20 @@
             android:fontFamily="@font/montserrat_light"
             android:textSize="@dimen/waitinglistItemSize"
             android:gravity="right"/>
+
+        <TextView
+            android:id="@+id/customer_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:text="&#8942;"
+            android:layout_weight=".2"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:gravity="center"
+            android:layout_marginRight="10dp"/>
+
     </LinearLayout>
 
 

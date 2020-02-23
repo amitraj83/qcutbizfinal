@@ -29,6 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.qcut.biz.R;
 import com.qcut.biz.adaptors.BarberSelectionArrayAdapter;
 import com.qcut.biz.adaptors.WaitingListRecyclerViewAdapter;
+import com.qcut.biz.listeners.CustomerOptionsListener;
 import com.qcut.biz.listeners.ItemTouchHelperCallback;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.presenters.fragments.WaitingListPresenter;
@@ -114,6 +115,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
         ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter, adapter));
         helper.attachToRecyclerView(dynamicListView);
 
+
         addCustomerView = factory.inflate(R.layout.add_customer_dialog, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setView(addCustomerView);
@@ -146,6 +148,13 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
 
             }
         });
+
+//        View queue_row = factory.inflate(R.layout.queue_row, null);
+//        TextView customerOptions = queue_row.findViewById(R.id.customer_options);
+//        customerOptions.setOnClickListener(new CustomerOptionsListener(mContext));
+
+//        presenter.addCustomerOptionsListere();
+
         return root;
     }
 
@@ -153,12 +162,6 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     public void showAddCustomerDialog() {
         addCustomerDialog.show();
         addCustomerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
-//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-//
-//        addCustomerDialog.getWindow().setLayout(width, height);
     }
 
     public String getEnteredCustomerName() {

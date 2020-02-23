@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.qcut.biz.R;
+import com.qcut.biz.listeners.CustomerOptionsListener;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
 
@@ -24,13 +25,14 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
     private View.OnClickListener waitingListClickListener;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView custName, custStatus, forWho;
+        public TextView custName, custStatus, forWho, options;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             this.custName = itemView.findViewById(R.id.cust_name);
             this.custStatus = itemView.findViewById(R.id.cust_status);
             this.forWho = itemView.findViewById(R.id.for_who);
+            this.options = itemView.findViewById(R.id.customer_options);
         }
     }
 
@@ -79,6 +81,9 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
             holder.custStatus.setText("In Chair");
             holder.custStatus.setTag(CustomerStatus.PROGRESS);
         }
+
+        holder.options.setOnClickListener(new CustomerOptionsListener(mContext, holder));
+
     }
 
     @Override

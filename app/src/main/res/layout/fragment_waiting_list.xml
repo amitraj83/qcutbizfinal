@@ -105,7 +105,7 @@
                 app:layout_constraintRight_toLeftOf="@+id/header_barber"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintWidth_percent="0.45"
+                app:layout_constraintWidth_percent="0.33"
                 />
 
             <TextView
@@ -123,7 +123,7 @@
                 app:layout_constraintRight_toLeftOf="@+id/header_waiting_time"
                 app:layout_constraintLeft_toRightOf="@id/header_customer"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintWidth_percent="0.2"
+                app:layout_constraintWidth_percent="0.24"
                 />
 
             <TextView
@@ -139,10 +139,28 @@
                 android:gravity="right"
                 android:background="@color/colorPrimaryDark"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/option_header"
                 app:layout_constraintLeft_toRightOf="@id/header_barber"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintWidth_percent="0.35"
+                app:layout_constraintWidth_percent="0.33"
+                />
+            <TextView
+                android:id="@+id/option_header"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:drawablePadding="5dp"
+                android:text=""
+                android:fontFamily="@font/montserrat_regular"
+                android:textSize="@dimen/tableHeadingTextSie"
+                app:autoSizeTextType="uniform"
+                android:textColor="@color/white"
+                android:gravity="right"
+                android:background="@color/colorPrimaryDark"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/header_waiting_time"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintWidth_percent="0.33"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

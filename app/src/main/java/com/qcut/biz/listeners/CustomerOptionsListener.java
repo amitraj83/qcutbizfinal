@@ -72,7 +72,7 @@ public class CustomerOptionsListener implements View.OnClickListener {
 
 
         final PopupWindow popup = new PopupWindow(popupWindowView,
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                (int)(context.getResources().getDimension(R.dimen.popupwindow_size)/ context.getResources().getDisplayMetrics().density),
                 RelativeLayout.LayoutParams.WRAP_CONTENT, true);
         popup.showAsDropDown(holder.itemView.findViewById(R.id.customer_options));
         View removeCustomer = popupWindowView.findViewById(R.id.remove_customer_row);

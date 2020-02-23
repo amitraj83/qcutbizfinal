@@ -4,5 +4,5 @@
     <dimen name="dialogHeadingTextSize">20sp</dimen>
     <dimen name="dialogTextSize">18sp</dimen>
     <dimen name="waitinglistItemSize">18sp</dimen>
-
+    <dimen name="popupwindow_size">800dp</dimen>
 </resources>

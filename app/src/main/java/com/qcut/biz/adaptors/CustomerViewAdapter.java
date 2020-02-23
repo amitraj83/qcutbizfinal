@@ -65,22 +65,24 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
         DBUtils.getBarber(database, userid, customer.getActualBarberId(), new OnSuccessListener<Barber>() {
             @Override
             public void onSuccess(Barber barber) {
-                StorageReference child = storageReference.child(barber.getImagePath());
-                child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        if (task.isSuccessful()) {
-                            RequestOptions myOptions = new RequestOptions()
-                                    .override(125, 125);
-                            Glide.with(mContext)
-                                    .asBitmap()
-                                    .apply(myOptions)
-                                    .load(task.getResult())
-                                    .into(holder.custBarber);
+                if (barber != null) {
+                    StorageReference child = storageReference.child(barber.getImagePath());
+                    child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                RequestOptions myOptions = new RequestOptions()
+                                        .override(125, 125);
+                                Glide.with(mContext)
+                                        .asBitmap()
+                                        .apply(myOptions)
+                                        .load(task.getResult())
+                                        .into(holder.custBarber);
 
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     }

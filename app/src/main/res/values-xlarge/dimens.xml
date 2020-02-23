@@ -5,4 +5,5 @@
     <dimen name="dialogTextSize">28sp</dimen>
     <dimen name="waitinglistItemSize">24sp</dimen>
     <dimen name="popupwindow_size">600dp</dimen>
+    <dimen name="cust_view_waiting_list_font_size">26sp</dimen>
 </resources>

@@ -23,6 +23,8 @@
     <dimen name="tableHeadingTextSie">10sp</dimen>
     <dimen name="dialogHeadingTextSize">16sp</dimen>
     <dimen name="dialogTextSize">25sp</dimen>
-
+    <dimen name="waitinglistItemSize">18sp</dimen>
+    <dimen name="popupwindow_size">800dp</dimen>
+    <dimen name="cust_view_waiting_list_font_size">18sp</dimen>
 
 </resources>

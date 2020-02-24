@@ -4,7 +4,7 @@ public interface Constants {
 
     String ANY = "Any";
     String STOPPED = "STOPPED";
-    String STOP_QUEUE = "Stop Q";
+    String STOP_QUEUE = "Log Off";
     String ON_BREAK = "On Break";
     String BREAK = "Break";
     String NONE = "NONE";

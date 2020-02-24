@@ -161,13 +161,14 @@ public class WaitingPresenter {
                         //barber tab not exists
                         remainingBarbers.add(b);
                     }
-                    if (remainingBarbers.size() > 0) {
-                        view.showBarberSelectionDialog(remainingBarbers);
-                    } else {
-                        view.showMessage("No barber to add.");
-                        LogUtils.info("No barber to add.");
-                    }
                 }
+                if (remainingBarbers.size() > 0) {
+                    view.showBarberSelectionDialog(remainingBarbers);
+                } else {
+                    view.showMessage("No barber to add.");
+                    LogUtils.info("No barber to add.");
+                }
+
 
             }
         });

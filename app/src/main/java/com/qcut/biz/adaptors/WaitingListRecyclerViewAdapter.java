@@ -10,9 +10,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.R;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
+import com.qcut.biz.presenters.CustomerOptionPresenter;
+import com.qcut.biz.views.CustomerOptionsView;
 
 import java.util.List;
 
@@ -22,23 +25,35 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
     private List<Customer> dataSet;
     private Context mContext;
     private View.OnClickListener waitingListClickListener;
+    CustomerOptionsView customerOptionsView;
+    String barberKey;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView custName, custStatus, forWho;
+        public TextView custName, custStatus, forWho, options;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             this.custName = itemView.findViewById(R.id.cust_name);
             this.custStatus = itemView.findViewById(R.id.cust_status);
             this.forWho = itemView.findViewById(R.id.for_who);
+            this.options = itemView.findViewById(R.id.customer_options);
+            this.options.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    customerOptionsView.show(WaitingListRecyclerViewAdapter.MyViewHolder.this);
+                }
+            });
         }
     }
 
     public WaitingListRecyclerViewAdapter(List<Customer> dataSet, Context mContext,
-                                          View.OnClickListener waitingListClickListener) {
+                                          View.OnClickListener waitingListClickListener,
+                                          FirebaseDatabase database, String userid, String barberKey) {
         this.dataSet = dataSet;
         this.mContext = mContext;
         this.waitingListClickListener = waitingListClickListener;
+        this.customerOptionsView = new CustomerOptionsView(mContext, new CustomerOptionPresenter(database, userid, barberKey));
+        this.barberKey = barberKey;
     }
 
     public void setDataSet(List<Customer> dataSet) {
@@ -79,6 +94,12 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
             holder.custStatus.setText("In Chair");
             holder.custStatus.setTag(CustomerStatus.PROGRESS);
         }
+
+
+    }
+
+    public void showPopupWindow() {
+
     }
 
     @Override

@@ -167,7 +167,7 @@ public class WaitingListPresenter {
 
     public WaitingListRecyclerViewAdapter createWaitingListViewAdaptor() {
         WaitingListClickListener clickListener = new WaitingListClickListener(context, barberKey, database, userid);
-        return new WaitingListRecyclerViewAdapter(new ArrayList<Customer>(), context, clickListener);
+        return new WaitingListRecyclerViewAdapter(new ArrayList<Customer>(), context, clickListener, database, userid, barberKey);
     }
 
     public FirebaseDatabase getDatabase() {

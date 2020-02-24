@@ -24,8 +24,8 @@ import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
+import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.DBUtils;
-import com.qcut.biz.util.TimerService;
 import com.qcut.biz.util.ViewUtils;
 
 import java.util.Date;
@@ -135,7 +135,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-//                            DBUtils.reAllocateCustomers(database, userid);
+                            BarberSelectionUtils.reAllocateCustomers(database, userid);
                         }
                     });
                 }
@@ -159,7 +159,6 @@ public class WaitingListClickListener implements View.OnClickListener {
             public void onClick(View v) {
                 setCustomerInProgress();
                 serviceStartDialog.dismiss();
-//                DBUtils.reAllocateCustomers(database, userid);
             }
         });
         noButton.setOnClickListener(new View.OnClickListener() {
@@ -189,10 +188,16 @@ public class WaitingListClickListener implements View.OnClickListener {
                     Map<String, Object> map = new HashMap<>();
                     c.setStatus(CustomerStatus.PROGRESS.name());
                     c.setTimeAdded(-1);
-                    c.setTimeToWait(0);
+                    c.setExpectedWaitingTime(0);
                     c.setServiceStartTime(new Date().getTime());
                     c.setPlaceInQueue(-1);
-                    DBUtils.getDbRefCustomer(database, userid, tag, selectedCustomer.getKey()).setValue(c);
+                    final Task<Void> voidTask = DBUtils.getDbRefCustomer(database, userid, tag, selectedCustomer.getKey()).setValue(c);
+                    voidTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            BarberSelectionUtils.reAllocateCustomers(database, userid);
+                        }
+                    });
                 } else {
                     Toast.makeText(mContext, "Cannot start services. A customer is already in progress.", Toast.LENGTH_LONG).show();
                 }

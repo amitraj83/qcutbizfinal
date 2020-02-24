@@ -94,9 +94,9 @@ public class CustomerViewPresenter {
     private static class CustomerArrivalTimeComparator implements Comparator<Customer> {
         @Override
         public int compare(Customer o1, Customer o2) {
-            if (o1.getTimeFirstAddedInQueue() > o2.getTimeFirstAddedInQueue()) {
+            if (o1.getArrivalTime() > o2.getArrivalTime()) {
                 return 1;
-            } else if (o1.getTimeFirstAddedInQueue() == o2.getTimeFirstAddedInQueue()) {
+            } else if (o1.getArrivalTime() == o2.getArrivalTime()) {
                 return 0;
             } else {
                 return -1;

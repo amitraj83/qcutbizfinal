@@ -41,7 +41,7 @@ public class BarberQueueChangeListener implements ChildEventListener {
             @Override
             public void onSuccess(List<BarberQueue> barberQueues) {
                 String barberKey = queueSnapshot.getKey();
-                BarberQueue queue = DBUtils.findKeyObjectFromChildren(barberQueues, barberKey);
+                BarberQueue queue = DBUtils.findBarberQueueByKey(barberQueues, barberKey);
                 if (queue != null && queue.getCustomers().size() > 0) {
                     //if this barber already has customer in queue then don't add new customers
                     return;

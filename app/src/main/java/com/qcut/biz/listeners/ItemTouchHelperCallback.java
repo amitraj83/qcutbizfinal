@@ -105,7 +105,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
                             .findViewHolderForAdapterPosition(i)).custStatus.getTag().toString();
                     if (status.equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
                         timeToUpdate.put(sourceTag + "/timeAdded", i);
-                        timeToUpdate.put(sourceTag + "/expectedWaitingTime", customers.get(count++).getTimeToWait());
+                        timeToUpdate.put(sourceTag + "/expectedWaitingTime", customers.get(count++).getExpectedWaitingTime());
                     }
                 }
                 DBUtils.getDbRefBarberQueue(database, userid, barberKey).updateChildren(timeToUpdate);

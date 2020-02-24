@@ -104,7 +104,7 @@ public class TimerService extends Service {
                         if (i == 0) {
                             //first customer int the queue
                             if (isSomeOneInProgress) {
-                                long timeToWait = customers.get(i).getTimeToWait();
+                                long timeToWait = customers.get(i).getExpectedWaitingTime();
                                 if (timeToWait > 0) {
                                     timeToWait = Math.min(avgTimeToCut, timeToWait);
                                     long newTimeToWait = timeToWait - 1;

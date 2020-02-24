@@ -1,18 +1,13 @@
 package com.qcut.biz.util;
 
-import android.net.Uri;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.storage.StorageReference;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
-import com.qcut.biz.models.CustomerStatus;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.tasks.FetchBarbersQueuesTask;
 import com.qcut.biz.tasks.FetchBarbersTask;
@@ -22,8 +17,6 @@ import com.qcut.biz.tasks.FindBarberQueueTask;
 import com.qcut.biz.tasks.FindBarberTask;
 import com.qcut.biz.tasks.FindCustomerTask;
 
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -119,50 +112,16 @@ public class DBUtils {
         return queueId.substring(0, queueId.length() - 8);
     }
 
-    public static Task<Void> pushCustomerToDB(Customer.CustomerBuilder customerBuilder, DatabaseReference queueRef, BarberQueue queue) {
-        int count = 0;
-        Long timeServiceStarted = null;
-        if (queue != null) {
-            for (Customer customer : queue.getCustomers()) {
-                if (customer.getStatus().equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
-                    count++;
-                }
-                if (customer.getStatus().equalsIgnoreCase(CustomerStatus.PROGRESS.name())) {
-                    timeServiceStarted = customer.getTimeServiceStarted();
-                }
-            }
-        }
-//TODO get avgTimeToCut from db
-//        DataSnapshot avgTimeToCutData = dataSnapshot.child("avgTimeToCut");
-//
-//        if (!avgTimeToCutData.exists()) {
-//            Toast.makeText(mContext, "Failed - Avg. Cut time not set. Set this in Shop Details. ", Toast.LENGTH_SHORT).show();
-//            return null;
-//        }
-
-        long avgTimeToCut = 900;//in sec
-
-        long timeToWait = avgTimeToCut;
-        //timeServiceStarted
-        if (count == 0 && timeServiceStarted != null) {
-            long timePreviousServiceStarted = Long.valueOf(timeServiceStarted.toString());
-            long minutesPassedSinceStarted = ((new Date().getTime() - timePreviousServiceStarted) / 1000) / 60;
-            timeToWait = Math.max(0, avgTimeToCut - minutesPassedSinceStarted);
-        } else {
-            timeToWait = avgTimeToCut * count;
-        }
+    public static Task<Void> saveCustomer(FirebaseDatabase database, String userid, Customer customer, String barberKey) {
+        DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barberKey);
         String key = queueRef.push().getKey();
-        customerBuilder.key(key).placeInQueue(count).timeToWait(timeToWait).status(CustomerStatus.QUEUE.name())
-                .timeAdded(new Date().getTime()).timeFirstAddedInQueue(new Date().getTime());
-        final Customer customer = customerBuilder.build();
-        LogUtils.info("DbUtils: pushCustomerToDB adding customer:{0}", customer);
+        customer.setKey(key);
+        LogUtils.info("DbUtils: saveCustomer adding customer:{0}", customer);
         return queueRef.child(key).setValue(customer);
     }
 
-    public static BarberQueue findKeyObjectFromChildren(List<BarberQueue> queues, String searchKey) {
-        Iterator<BarberQueue> queuesIterator = queues.iterator();
-        while (queuesIterator.hasNext()) {
-            BarberQueue queue = queuesIterator.next();
+    public static BarberQueue findBarberQueueByKey(List<BarberQueue> queues, String searchKey) {
+        for (BarberQueue queue : queues) {
             if (queue.getBarberKey().equals(searchKey)) {
                 return queue;
             }

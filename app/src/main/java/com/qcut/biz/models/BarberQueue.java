@@ -19,6 +19,7 @@ import lombok.ToString;
 public class BarberQueue {
     public static final String BARBER_WAITING_QUEUES = "barberWaitingQueues";
     private String barberKey;
+    @Builder.Default
     private List<Customer> customers = Collections.emptyList();
     private Barber barber;
 }

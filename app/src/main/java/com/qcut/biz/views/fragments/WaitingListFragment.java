@@ -111,47 +111,38 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
         dynamicListView.setAdapter(adapter);
         ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter, adapter));
         helper.attachToRecyclerView(dynamicListView);
+        if (addCustomerDialog == null) {
+            addCustomerView = factory.inflate(R.layout.add_customer_dialog, null);
+            addCustomerDialog = new AlertDialog.Builder(mContext).setView(addCustomerView).create();
+            yesButton = addCustomerView.findViewById(R.id.add_customer_dialog_yes);
+            noButton = addCustomerView.findViewById(R.id.add_customer_dialog_no);
+            customerNameInput = addCustomerView.findViewById(R.id.new_customer_name);
+            ddSpinner = addCustomerView.findViewById(R.id.spinner_barber_selection);
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addCustomerDialog.dismiss();
+                }
+            });
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onCustomerAddYesClick();
+                }
+            });
+            ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    selectedBarberKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
+                    LogUtils.info("onBarberSelected: {0}", selectedBarberKey);
+                }
 
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
 
-        addCustomerView = factory.inflate(R.layout.add_customer_dialog, null);
-        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setView(addCustomerView);
-        addCustomerDialog = builder.create();
-        yesButton = addCustomerView.findViewById(R.id.add_customer_dialog_yes);
-        noButton = addCustomerView.findViewById(R.id.add_customer_dialog_no);
-        customerNameInput = addCustomerView.findViewById(R.id.new_customer_name);
-        ddSpinner = addCustomerView.findViewById(R.id.spinner_barber_selection);
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addCustomerDialog.dismiss();
-            }
-        });
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onCustomerAddYesClick();
-            }
-        });
-        ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedBarberKey = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
-                LogUtils.info("onBarberSelected: {0}", selectedBarberKey);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-//        View queue_row = factory.inflate(R.layout.queue_row, null);
-//        TextView customerOptions = queue_row.findViewById(R.id.customer_options);
-//        customerOptions.setOnClickListener(new CustomerOptionsListener(mContext));
-
-//        presenter.addCustomerOptionsListere();
-
+                }
+            });
+        }
         return root;
     }
 

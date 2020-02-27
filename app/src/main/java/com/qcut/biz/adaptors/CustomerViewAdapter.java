@@ -63,12 +63,12 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
             Drawable tlProgress = this.mContext.getResources().getDrawable(R.drawable.ic_action_progress);
             holder.waitingTime.setBackground(this.mContext.getResources().getDrawable(R.drawable.rounded_text_view_grey));
             holder.waitingTime.setText("In Chair");
-            holder.mTimelineView.setMarker(tlProgress);
+//            holder.mTimelineView.setMarker(tlProgress);
         } else if (customer.getExpectedWaitingTime() == 0) {
             holder.waitingTime.setText("Ready");
             holder.waitingTime.setBackground(this.mContext.getResources().getDrawable(R.drawable.rounded_text_view_green));
             Drawable tlReady = this.mContext.getResources().getDrawable(R.drawable.green_dot);
-            holder.mTimelineView.setMarker(tlReady);
+//            holder.mTimelineView.setMarker(tlReady);
             final Animation animation = new AlphaAnimation(1, 0);
             animation.setDuration(1000);
             animation.setInterpolator(new LinearInterpolator());
@@ -76,7 +76,7 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
             animation.setRepeatMode(Animation.REVERSE);
             animation.cancel();
             animation.reset();
-            holder.mTimelineView.startAnimation(animation);
+//            holder.mTimelineView.startAnimation(animation);
         } else {
             holder.waitingTime.setBackground(this.mContext.getResources().getDrawable(R.drawable.rounded_text_view));
             holder.waitingTime.setText(TimeUtil.getDisplayWaitingTime(customer.getExpectedWaitingTime()));
@@ -120,15 +120,15 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
 
     public class TimeLineViewHolder extends RecyclerView.ViewHolder {
 
-        public TimelineView mTimelineView;
+//        public TimelineView mTimelineView;
         public TextView custName;
         TextView waitingTime;
         public ImageView custBarber;
 
         public TimeLineViewHolder(View itemView, int viewType) {
             super(itemView);
-            mTimelineView = (TimelineView) itemView.findViewById(R.id.timeline);
-            mTimelineView.initLine(viewType);
+//            mTimelineView = (TimelineView) itemView.findViewById(R.id.timeline);
+//            mTimelineView.initLine(viewType);
             this.custName = itemView.findViewById(R.id.cust_view_name);
             this.custBarber = itemView.findViewById(R.id.cus_view_barber);
             this.waitingTime = itemView.findViewById(R.id.cust_view_waiting_time);

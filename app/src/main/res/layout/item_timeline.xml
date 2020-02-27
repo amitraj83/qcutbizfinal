@@ -1,74 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:layout_height="@dimen/cust_view_height"
+    >
 
 
-    <com.github.vipulasri.timelineview.TimelineView
+   <!-- <com.github.vipulasri.timelineview.TimelineView
         android:id="@+id/timeline"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         app:endLineColor="@color/colorAccent"
         app:lineStyle="dash"
-        app:lineWidth="3dp"
+        app:lineWidth="@dimen/timeline_line_width"
         app:marker="@drawable/blue_dot"
-        app:markerSize="40dp"
-        app:startLineColor="@color/colorAccent" />
+        app:markerSize="@dimen/timeline_marker_size"
+        android:background="@android:color/holo_orange_dark"
+        app:startLineColor="@color/colorAccent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/cust_view_name"
+        app:layout_constraintWidth_percent="0.05"
+        />-->
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/upper_part"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_margin="10dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingLeft="15dp"
-            android:weightSum="3">
-
-            <TextView
-                android:id="@+id/cust_view_name"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="@font/montserrat_regular"
-                android:gravity="center_vertical|start"
-                android:paddingLeft="15dp"
-                android:textSize="36dp"
-                tools:text="24 JAN" />
+        <TextView
+            android:id="@+id/cust_view_name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:gravity="center_vertical|start"
+            android:paddingLeft="5dp"
+            android:textSize="@dimen/waitinglistItemSize"
+            tools:text="Loading..."
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/cus_view_barber"
+            app:layout_constraintWidth_percent="0.4"
+            />
 
             <ImageView
                 android:id="@+id/cus_view_barber"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1" />
+                android:layout_margin="5dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/cust_view_name"
+                app:layout_constraintRight_toLeftOf="@+id/cust_view_waiting_time"
+                app:layout_constraintWidth_percent="0.2"
+                />
 
             <TextView
                 android:id="@+id/cust_view_waiting_time"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
-                android:layout_weight="1"
                 android:background="@drawable/rounded_text_view"
                 android:fontFamily="@font/montserrat_regular"
                 android:gravity="center"
                 android:textColor="@android:color/white"
-                android:textSize="32dp" />
+                android:textSize="@dimen/waitinglistItemSize"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/cus_view_barber"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintWidth_percent="0.35"
+                />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        </LinearLayout>
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="3dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/upper_part"
+        app:layout_constraintVertical_bias="0.5"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
-    </LinearLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,19 +39,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:id="@+id/new_barber_name"/>
-<!--
-        <Button
-            android:id="@+id/UploadBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:text="Upload"
-            android:textStyle="bold"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@color/colorPrimaryDark"
-            android:layout_gravity="center"
-            />
--->
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/UploadBtn"
             style="@style/Widget.AppCompat.Button.Borderless"

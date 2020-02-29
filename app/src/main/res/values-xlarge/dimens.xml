@@ -11,4 +11,5 @@
     <dimen name="cust_view_height">90dp</dimen>
     <dimen name="timeline_line_width">3dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">40dp</dimen>
+    <dimen name="panelHeading2TextSize">30dp</dimen>
 </resources>

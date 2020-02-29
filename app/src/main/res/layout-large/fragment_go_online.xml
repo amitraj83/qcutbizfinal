@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:weightSum="20"
+        android:layout_margin="20dp">
+
+        <TextView
+            android:id="@+id/edit_profile"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="@string/edit_profile"
+            android:textSize="@dimen/panelHeading2TextSize"
+            android:textColor="@android:color/black"
+            android:layout_weight="2"/>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="2">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/expensive"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/normalTextSize"
+            android:layout_weight="1"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"></View>
+        <Spinner
+            android:id="@+id/expensive_spinner_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+        <ListView
+            android:id="@+id/listViewOnline"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_service"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:text="@string/add_service"
+            android:textColor="@color/backgroundItems"
+            android:textSize="15sp"
+            android:layout_gravity="center"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp" />
+
+
+    </LinearLayout>
+    </ScrollView>
+    <Button
+        android:id="@+id/bottom_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/bottomBtnColor"
+        android:fontFamily="@font/montserrat_medium"
+        android:paddingBottom="0dp"
+        android:text="@string/save_profile"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:layout_weight="1"/>
+
+</LinearLayout>
+

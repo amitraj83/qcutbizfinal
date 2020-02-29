@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".views.activities.StartActivity"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:background="@drawable/start_image"
+        android:orientation="vertical"
+        android:alpha="1"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:text="QCut"
+            android:textSize="60dp"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:textColor="#FAFFFFFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="@string/spend_time_wisely"
+            android:textColor="#FAFFFFFF"
+            android:textSize="20dp"
+            android:fontFamily="@font/montserrat_bold"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:layout_margin="40dp"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/sign_up"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/buttonHeight"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/round_button_blue"
+            android:text="@string/sign_up"
+            android:gravity="center"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_light"
+            android:textColor="#FAFFFFFF"
+            android:textSize="@dimen/panelHeading2TextSize"
+            android:radius="10dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="30dp"/>
+        <Button
+            android:id="@+id/sign_up_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/buttonHeight"
+            android:background="@drawable/round_button_blue"
+            android:text="@string/sign_in"
+            android:gravity="center"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_light"
+            android:textColor="#FAFFFFFF"
+            android:textSize="@dimen/panelHeading2TextSize"/>
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

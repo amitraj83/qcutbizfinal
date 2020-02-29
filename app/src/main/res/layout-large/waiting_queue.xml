@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addTab"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Add Barber"
+            android:textColor="@color/backgroundItems"
+            android:textSize="@dimen/waitinglistItemSize"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_margin="2dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tab_index_test"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tab_index_test"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Break"
+            android:textColor="@color/backgroundItems"
+            android:textSize="@dimen/waitinglistItemSize"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_margin="2dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/addTab"
+            app:layout_constraintRight_toLeftOf="@id/stop_queue"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/stop_queue"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Log Off"
+            android:textColor="@color/backgroundItems"
+            android:textSize="@dimen/waitinglistItemSize"
+            app:backgroundTint="@android:color/white"
+            app:rippleColor="#33AAAAAA"
+            app:strokeColor="@color/backgroundItems"
+            app:strokeWidth="2dp"
+            android:layout_margin="2dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/tab_index_test"
+            app:layout_constraintRight_toRightOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/tab_layout"
+        android:layout_weight="1"/>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:background="?attr/colorPrimary"
+        app:tabSelectedTextColor="@android:color/black"
+        android:elevation="6dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:tabBackground="@drawable/selector"
+        />
+
+
+
+</LinearLayout>

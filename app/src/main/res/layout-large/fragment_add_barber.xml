@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:layout_margin="10dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="Add Barber"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:textSize="@dimen/panelHeading2TextSize"
+        android:textColor="@android:color/black"
+        android:layout_weight="1.1">
+    </TextView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.9"
+        android:orientation="horizontal"
+        android:weightSum="6">
+
+        <ImageView
+            android:id="@+id/barber_photo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_add_barber_photo_black_24dp"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:id="@+id/new_barber_name"/>
+<!--
+        <Button
+            android:id="@+id/UploadBtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:text="Upload"
+            android:textStyle="bold"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_gravity="center"
+            />
+-->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/UploadBtn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/montserrat_light"
+            android:text="@string/add"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/buttonCAPTextSize"
+            app:backgroundTint="@color/backgroundItems"
+            android:layout_weight="2"/>
+
+
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/list_barbers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        android:layout_marginTop="30dp"
+        />
+
+
+
+
+
+</LinearLayout>

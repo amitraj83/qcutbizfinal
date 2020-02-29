@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="Opening Hours"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:textSize="@dimen/panelHeading2TextSize"
+        android:textColor="@android:color/black"
+        android:layout_weight="0.5">
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:background="@android:color/white"
+        android:layout_height="0dp"
+        android:weightSum="9"
+        android:layout_weight="8.5"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/monday"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:fontFamily="@font/montserrat_light"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/monday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/monday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/tuesday"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/tuesday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/tuesday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/wednesday"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/wednesday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/wednesday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/thursday"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/thurday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/thurday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/friday"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/friday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/friday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/saturday"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/saturday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/saturday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_weight="1">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="@string/sunday"
+                android:fontFamily="@font/montserrat_light"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/panelHeading2TextSize"
+                android:layout_weight="1"
+                android:gravity="center_vertical"/>
+            <Spinner
+                android:id="@+id/sunday_spinner_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/sunday_spinner_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/save_opening_hours"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/bottomBtnColor"
+        android:fontFamily="@font/montserrat_medium"
+        android:text="@string/save_general"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:layout_weight="1"/>
+
+</LinearLayout>

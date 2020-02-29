@@ -21,6 +21,7 @@
         android:background="@android:color/white"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_profile"
-        app:menu="@menu/activity_profile_drawer" />
+        app:menu="@menu/activity_profile_drawer"
+        />
 
 </androidx.drawerlayout.widget.DrawerLayout>

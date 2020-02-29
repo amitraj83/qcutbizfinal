@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="tableHeadingTextSie">16sp</dimen>
     <dimen name="dialogHeadingTextSize">20sp</dimen>
     <dimen name="dialogTextSize">18sp</dimen>
@@ -10,5 +10,5 @@
     <dimen name="timeline_marker_size">22dp</dimen>
     <dimen name="cust_view_height">60dp</dimen>
     <dimen name="timeline_line_width">1.5dp</dimen>
-
+    <dimen name="design_navigation_icon_size" tools:override="true">20dp</dimen>
 </resources>

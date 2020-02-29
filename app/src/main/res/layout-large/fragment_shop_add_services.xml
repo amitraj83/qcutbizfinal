@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:background="@android:color/white"
+        android:layout_height="0dp"
+        android:weightSum="9"
+        android:layout_weight="9"
+        android:orientation="vertical"
+        android:layout_margin="20dp">
+
+        <include
+            layout="@layout/fragment_services"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            >
+
+        </include>
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/add_service"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/bottomBtnColor"
+        android:fontFamily="@font/montserrat_medium"
+        android:text="@string/add_service"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:layout_weight="1"/>
+
+</LinearLayout>

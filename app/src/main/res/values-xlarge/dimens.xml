@@ -4,7 +4,7 @@
     <dimen name="dialogHeadingTextSize">32sp</dimen>
     <dimen name="dialogTextSize">28sp</dimen>
     <dimen name="waitinglistItemSize">27sp</dimen>
-    <dimen name="popupwindow_size">600dp</dimen>
+    <dimen name="popupwindow_size">120dp</dimen>
     <dimen name="cust_view_waiting_list_font_size">26sp</dimen>
 
     <dimen name="timeline_marker_size">40dp</dimen>

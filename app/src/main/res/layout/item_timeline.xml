@@ -6,30 +6,11 @@
     android:layout_height="@dimen/cust_view_height"
     >
 
-
-   <!-- <com.github.vipulasri.timelineview.TimelineView
-        android:id="@+id/timeline"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        app:endLineColor="@color/colorAccent"
-        app:lineStyle="dash"
-        app:lineWidth="@dimen/timeline_line_width"
-        app:marker="@drawable/blue_dot"
-        app:markerSize="@dimen/timeline_marker_size"
-        android:background="@android:color/holo_orange_dark"
-        app:startLineColor="@color/colorAccent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/cust_view_name"
-        app:layout_constraintWidth_percent="0.05"
-        />-->
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/upper_part"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp">
+        android:layout_marginLeft="0dp">
 
         <TextView
             android:id="@+id/cust_view_name"
@@ -37,44 +18,60 @@
             android:layout_height="match_parent"
             android:fontFamily="@font/montserrat_regular"
             android:gravity="center_vertical|start"
-            android:paddingLeft="5dp"
+
             android:textSize="@dimen/waitinglistItemSize"
             tools:text="Loading..."
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/cus_view_barber"
-            app:layout_constraintWidth_percent="0.4"
+            app:layout_constraintRight_toLeftOf="@+id/card_view_1"
+            app:layout_constraintWidth_percent="0.35"
             />
 
-            <ImageView
-                android:id="@+id/cus_view_barber"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/cust_view_name"
-                app:layout_constraintRight_toLeftOf="@+id/cust_view_waiting_time"
-                app:layout_constraintWidth_percent="0.2"
-                />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view_1"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            app:cardCornerRadius="22dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/cust_view_name"
+            app:layout_constraintRight_toLeftOf="@+id/cust_view_waiting_time"
+            app:layout_constraintWidth_percent="0.2"
+            app:cardBackgroundColor="@android:color/darker_gray"
+            >
+            <androidx.cardview.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardCornerRadius="20dp">
 
-            <TextView
-                android:id="@+id/cust_view_waiting_time"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/rounded_text_view"
-                android:fontFamily="@font/montserrat_regular"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/waitinglistItemSize"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@id/cus_view_barber"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintWidth_percent="0.35"
-                />
+                <ImageView
+                    android:id="@+id/cus_view_barber"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    />
+            </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
+
+
+        <TextView
+            android:id="@+id/cust_view_waiting_time"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/rounded_text_view"
+            android:fontFamily="@font/montserrat_regular"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/waitinglistItemSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/card_view_1"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintWidth_percent="0.3"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -82,10 +79,10 @@
     <View
         android:id="@+id/divider"
         android:layout_width="0dp"
-        android:layout_height="3dp"
+        android:layout_height="2dp"
         android:background="@android:color/darker_gray"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

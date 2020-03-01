@@ -28,7 +28,7 @@ public class CustomerOptionsView {
 
 
         popupWindow = new PopupWindow(popupWindowView,
-                (int)(context.getResources().getDimension(R.dimen.popupwindow_size)/ context.getResources().getDisplayMetrics().density),
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT, true);
         removeCustomer = popupWindowView.findViewById(R.id.remove_customer_row);
         shuffleCustomer = popupWindowView.findViewById(R.id.shuffle_customer_row);

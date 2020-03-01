@@ -81,7 +81,6 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
     }
 
     public void onAddCustomerClick() {
-        LogUtils.info("onAddCustomerClick");
         DBUtils.getShopDetails(database, userid, new OnSuccessListener<ShopDetails>() {
             @Override
             public void onSuccess(ShopDetails shopDetails) {
@@ -95,9 +94,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
     }
 
     public void onCustomerAddYesClick() {
-        LogUtils.info("onCustomerAddYesClick");
         view.hideAddCustomerDialog();
-        view.setYesButtonEnable(false);
         final String selectedBarberKey = view.getSelectedBarberKey();
         final String customerName = view.getEnteredCustomerName();
         if (StringUtils.isNotBlank(customerName)) {
@@ -113,6 +110,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
         } else {
             view.showMessage("Cannot add customer. No name provided");
         }
+        view.clearEnteredCustomerName();
     }
 
     public String getBarberKey() {

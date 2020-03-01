@@ -58,7 +58,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     private View root;
 
     public WaitingListFragment(String tag) {
-        LogUtils.info("New WaitingListFragment created");
+        LogUtils.info("WaitingListFragment created");
         this.tag = tag;
     }
 
@@ -151,7 +151,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
 
     @Override
     public void hideAddCustomerDialog() {
-        addCustomerDialog.hide();
+        addCustomerDialog.dismiss();
     }
 
     @Override
@@ -188,6 +188,11 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
             root.findViewById(R.id.next_customer_card).setVisibility(View.VISIBLE);
             root.findViewById(R.id.barber_on_break_message).setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void clearEnteredCustomerName() {
+        customerNameInput.setText("");
     }
 
     @Override

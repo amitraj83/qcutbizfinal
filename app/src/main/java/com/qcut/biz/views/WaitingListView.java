@@ -28,4 +28,6 @@ public interface WaitingListView {
     void updateAndRefreshQueue(List<Customer> customers);
 
     void updateBarberStatus(boolean onBreak);
+
+    void clearEnteredCustomerName();
 }

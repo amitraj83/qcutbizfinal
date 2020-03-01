@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,11 +13,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.BarbersChangeEvent;
+import com.qcut.biz.listeners.BarberQueueChangeListener;
+import com.qcut.biz.listeners.BarberStatusChangeListener;
+import com.qcut.biz.listeners.BarbersChangeListener;
+import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.ShopStatus;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.views.MainView;
 import com.qcut.biz.views.activities.StartActivity;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -36,6 +46,13 @@ public class MainPresenter {
         database = FirebaseDatabase.getInstance();
         userid = preferences.getString("userid", null);
         setStatusListner();
+        DBUtils.getDbRefBarbers(database, userid).addValueEventListener(new BarbersChangeListener());
+        LogUtils.info("addBarbersChangeListener: MainPresenter");
+        DBUtils.getDbRefBarberQueues(database, userid).addChildEventListener
+                (new BarberQueueChangeListener(database, userid));
+        DBUtils.getDbRefBarbers(database, userid)
+                .addChildEventListener(new BarberStatusChangeListener());
+
     }
 
     public void onStatusClick() {

@@ -83,7 +83,7 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
         } else {
             holder.forWho.setText("You");
         }
-        if (customer.getStatus().equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
+        if (customer.isInQueue()) {
             Drawable waitingDrawable = this.mContext.getResources().getDrawable(R.drawable.ic_action_waiting);
             holder.custStatus.setCompoundDrawablesWithIntrinsicBounds(null, null, waitingDrawable, null);
             holder.custStatus.setText(String.valueOf(customer.getExpectedWaitingTime()));
@@ -94,12 +94,6 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
             holder.custStatus.setText("In Chair");
             holder.custStatus.setTag(CustomerStatus.PROGRESS);
         }
-
-
-    }
-
-    public void showPopupWindow() {
-
     }
 
     @Override

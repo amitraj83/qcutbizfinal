@@ -11,11 +11,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.qcut.biz.listeners.BarberQueueChangeListener;
-import com.qcut.biz.listeners.BarberQueueStatusChangeListener;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.BarberQueueChangeEvent;
+import com.qcut.biz.events.BarberStatusChangeEvent;
+import com.qcut.biz.events.QueueTabSelectedEvent;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.BarberStatus;
@@ -31,14 +34,16 @@ import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class WaitingPresenter {
+public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusChangeEventHandler, BarberQueueChangeEvent.BarberQueueChangeEventHandler {
 
     private String userid;
     private WaitingView view;
     private SharedPreferences preferences;
+
     private Context context;
     private FirebaseDatabase database;
     private StorageReference storageReference;
+    private Map<String, BarberQueue> queueMap = new HashMap<>();
 
     public WaitingPresenter(WaitingView view, Context context) {
         this.view = view;
@@ -48,16 +53,16 @@ public class WaitingPresenter {
         database = FirebaseDatabase.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
         userid = preferences.getString("userid", null);
+        EventBus.instance().registerHandler(BarberQueueChangeEvent.TYPE, this);
+        EventBus.instance().registerHandler(BarberStatusChangeEvent.TYPE, this);
     }
 
     public void initializeTab() {
-        DBUtils.getDbRefBarbers(database, userid)
-                .addChildEventListener(new BarberQueueStatusChangeListener(database, userid, view));
-        DBUtils.getDbRefBarberQueues(database, userid).addChildEventListener(new BarberQueueChangeListener(database, userid));
         DBUtils.getBarbersQueues(database, userid, new OnSuccessListener<List<BarberQueue>>() {
             @Override
             public void onSuccess(List<BarberQueue> barberQueues) {
                 for (BarberQueue bq : barberQueues) {
+                    queueMap.put(bq.getBarberKey(), bq);
                     if (!view.isTabExists(bq.getBarberKey())) {
                         //barber queue not exists
                         view.addBarberQueueTab(bq.getBarber());
@@ -168,13 +173,11 @@ public class WaitingPresenter {
                     view.showMessage("No barber to add.");
                     LogUtils.info("No barber to add.");
                 }
-
-
             }
         });
     }
 
-    public void onBarberQueueTabSelected(String selectedBarberKey) {
+    public void onBarberQueueTabSelected(final String selectedBarberKey) {
         DBUtils.getBarber(database, userid, selectedBarberKey, new OnSuccessListener<Barber>() {
             @Override
             public void onSuccess(Barber barber) {
@@ -189,6 +192,7 @@ public class WaitingPresenter {
                 } else {
                     view.updateButtonToStopQ();
                 }
+                EventBus.instance().fireEvent(new QueueTabSelectedEvent(queueMap.get(selectedBarberKey)));
             }
         });
     }
@@ -219,5 +223,24 @@ public class WaitingPresenter {
         Map<String, Object> map = new HashMap<>();
         map.put(Barber.QUEUE_STATUS, BarberStatus.OPEN.name());
         DBUtils.getDbRefBarber(database, userid, selectedKey).updateChildren(map);
+    }
+
+    @Override
+    public void onBarberStatusChange(BarberStatusChangeEvent event) {
+        Barber barber = event.getBarber();
+        if (barber.isOpen()) {
+            LogUtils.info("queueStatus: {0}", barber.getQueueStatus());
+            if (!view.isTabExists(barber.getKey())) {
+                view.addBarberQueueTab(barber);
+                final DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barber.getKey());
+                queueRef.push().setValue(BarberQueue.builder().build());
+            }
+        }
+    }
+
+    @Override
+    public void onBarberQueueChange(BarberQueueChangeEvent event) {
+        final BarberQueue queue = event.getChangedBarberQueue();
+        queueMap.put(queue.getBarberKey(), queue);
     }
 }

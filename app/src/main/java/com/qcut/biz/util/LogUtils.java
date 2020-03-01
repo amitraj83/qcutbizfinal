@@ -12,6 +12,9 @@ public class LogUtils {
         Log.i(MY_ACTIVITY, formatMessage(msgPattern, params));
     }
 
+    public static void debug(String msgPattern, Object... params) {
+//        Log.d(MY_ACTIVITY, formatMessage(msgPattern, params));
+    }
 
     public static void error(String msgPattern, Object... params) {
         Log.e(MY_ACTIVITY, formatMessage(msgPattern, params));

@@ -43,7 +43,7 @@ public class FetchBarbersQueuesTask implements Continuation<Map<String, Barber>,
             public void onDataChange(DataSnapshot dataSnapshot) {
                 LogUtils.info("Queues loaded");
                 List<BarberQueue> barbersQueues = buildBarberQueue(dataSnapshot, barberMap);
-                LogUtils.info("FetchBarbersQueuesTask: {0}", barbersQueues);
+                LogUtils.debug("FetchBarbersQueuesTask: {0}", barbersQueues);
                 tcs.setResult(barbersQueues);
             }
 

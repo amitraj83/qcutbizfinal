@@ -38,7 +38,5 @@ public interface WaitingView {
 
     String getStopButtonText();
 
-    String getTakeBreakButtonText();
-
     String getSelectedBarberKey();
 }

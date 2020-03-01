@@ -3,18 +3,15 @@ package com.qcut.biz.presenters.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.adaptors.BarberSelectionArrayAdapter;
 import com.qcut.biz.adaptors.WaitingListRecyclerViewAdapter;
-import com.qcut.biz.listeners.BarbersChangeListener;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.BarberQueueChangeEvent;
+import com.qcut.biz.events.BarbersChangeEvent;
+import com.qcut.biz.events.QueueTabSelectedEvent;
 import com.qcut.biz.listeners.WaitingListClickListener;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
@@ -25,19 +22,21 @@ import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.util.MappingUtils;
 import com.qcut.biz.views.WaitingListView;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class WaitingListPresenter {
+public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEventHandler,
+        BarberQueueChangeEvent.BarberQueueChangeEventHandler, QueueTabSelectedEvent.QueueTabSelectedEventHandler {
 
     private String userid;
     private WaitingListView view;
@@ -45,11 +44,6 @@ public class WaitingListPresenter {
     private String barberKey;
     private Context context;
     private FirebaseDatabase database;
-    private ValueEventListener barbersChangeListener;
-    private DatabaseReference dbRefBarbers;
-    private DatabaseReference dbRefBarberQueue;
-    private ValueEventListener barberQueueChangeListener;
-    int lc = 0;
 
     public WaitingListPresenter(WaitingListView view, Context context, String barberKey) {
         this.view = view;
@@ -59,10 +53,31 @@ public class WaitingListPresenter {
         FirebaseApp.initializeApp(context);
         database = FirebaseDatabase.getInstance();
         userid = preferences.getString("userid", null);
-        dbRefBarbers = DBUtils.getDbRefBarbers(database, userid);
-        barbersChangeListener = new BarbersChangeListener(this);
-        dbRefBarberQueue = DBUtils.getDbRefBarberQueue(database, userid, barberKey);
-        barberQueueChangeListener = new BarberQueuesListener(view);
+        registerHandlers();
+        //fetch values first time
+        DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
+            @Override
+            public void onSuccess(Map<String, Barber> barbersMap) {
+                updateBarbersSelectionList(barbersMap.values());
+            }
+        });
+    }
+
+    private void registerHandlers() {
+        EventBus.instance().registerHandler(BarbersChangeEvent.TYPE, this);
+        EventBus.instance().registerHandler(BarberQueueChangeEvent.TYPE, this);
+        EventBus.instance().registerHandler(QueueTabSelectedEvent.TYPE, this);
+
+    }
+
+    public void onDestroy() {
+        unregisterHandlers();
+    }
+
+    private void unregisterHandlers() {
+        EventBus.instance().unregisterHandler(BarbersChangeEvent.TYPE, this);
+        EventBus.instance().unregisterHandler(BarberQueueChangeEvent.TYPE, this);
+        EventBus.instance().unregisterHandler(QueueTabSelectedEvent.TYPE, this);
     }
 
     public void onAddCustomerClick() {
@@ -100,10 +115,6 @@ public class WaitingListPresenter {
         }
     }
 
-    public void setBarberList(List<Barber> barberList) {
-        view.setBarberList(new BarberSelectionArrayAdapter(context, barberList));
-    }
-
     public String getBarberKey() {
         return barberKey;
     }
@@ -130,65 +141,70 @@ public class WaitingListPresenter {
         view.showMessage(msg);
     }
 
-    public void addBarbersChangeListener() {
-        LogUtils.info("{1} addBarbersChangeListener: {0}", barberKey);
-        dbRefBarbers.addValueEventListener(barbersChangeListener);
+    @Override
+    public void onBarbersChange(BarbersChangeEvent event) {
+        updateBarbersSelectionList(event.getBarbers());
     }
 
-    public void addQueueOnChangeListener() {
-        LogUtils.info("addQueueOnChangeListener: {0}", barberKey);
-        dbRefBarberQueue.addValueEventListener(barberQueueChangeListener);
-    }
+    public void updateBarbersSelectionList(Collection<Barber> barbers) {
+        List<Barber> barberList = new ArrayList<>();
+        barberList.add(Barber.builder().key(Constants.ANY).name(Constants.ANY).imagePath("").build());
 
-    public void removeQueueOnChangeListener() {
-        LogUtils.info("removeQueueOnChangeListener: {0}", barberKey);
-        dbRefBarberQueue.removeEventListener(barberQueueChangeListener);
-    }
+        for (Barber barber : barbers) {
+            if (!barber.isStopped()) {
+                barberList.add(barber);
+            }
 
-    public void removeBarbersChangeListener() {
-        LogUtils.info("{1} removeBarbersChangeListener: {0}", barberKey);
-        dbRefBarbers.removeEventListener(barbersChangeListener);
-    }
-
-    public static class BarberQueuesListener implements ValueEventListener {
-        private WaitingListView view;
-
-        public BarberQueuesListener(WaitingListView view) {
-            this.view = view;
+            if (barber.getKey().equalsIgnoreCase(barberKey)) {
+                updateBarberStatus(barber.isOnBreak());
+            }
         }
+        view.setBarberList(new BarberSelectionArrayAdapter(context, barberList));
+    }
 
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            final List<Customer> models = new ArrayList<>();
-            final BarberQueue barberQueue = MappingUtils.mapToBarberQueue(dataSnapshot);
-            boolean isSomeOneInQueue = false;
-            for (Customer customer : barberQueue.getCustomers()) {
-                if (!customer.isDone() && !customer.isRemoved()) {
-                    if (customer.isInQueue()) {
-                        isSomeOneInQueue = true;
-                    }
-                    models.add(customer);
+    @Override
+    public void onBarberQueueChange(BarberQueueChangeEvent event) {
+        // customer is added/removed/updated
+        final BarberQueue barberQueue = event.getChangedBarberQueue();
+        if (!barberQueue.getBarberKey().equalsIgnoreCase(barberKey)) {
+            return;
+        }
+        LogUtils.info("WaitingListPresenter onBarberQueueChange");
+        populateCustomers(barberQueue);
+    }
+
+    public void populateCustomers(BarberQueue barberQueue) {
+        final List<Customer> models = new ArrayList<>();
+        boolean isSomeOneInQueue = false;
+        for (Customer customer : barberQueue.getCustomers()) {
+            if (!customer.isDone() && !customer.isRemoved()) {
+                if (customer.isInQueue()) {
+                    isSomeOneInQueue = true;
+                }
+                models.add(customer);
+            }
+        }
+        if (isSomeOneInQueue && models.size() > 0) {
+            Collections.sort(models, new CustomerComparator());
+            for (Customer model : models) {
+                if (model.isInQueue()) {
+                    //just set name of first queued customer
+                    view.updateNextCustomerView(model.getName(), model.getKey());
+                    break;
                 }
             }
-            if (isSomeOneInQueue && models.size() > 0) {
-                Collections.sort(models, new CustomerComparator());
-                for (Customer model : models) {
-                    if (model.isInQueue()) {
-                        //just set name of first queued customer
-                        view.updateNextCustomerView(model.getName(), model.getKey());
-                        break;
-                    }
-                }
-            } else {
-                view.updateNextCustomerView("No customer.", "NONE");
-            }
-            LogUtils.info("Refreshing queue view");
-            view.updateAndRefreshQueue(models);
+        } else {
+            view.updateNextCustomerView("No customer.", "NONE");
         }
+        view.updateAndRefreshQueue(models);
+    }
 
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            LogUtils.error("databaseError: {}", databaseError.getMessage());
+    @Override
+    public void onQueueTabSelected(QueueTabSelectedEvent event) {
+        if (!event.getBarberQueue().getBarberKey().equalsIgnoreCase(barberKey)) {
+            return;
         }
+        LogUtils.info("WaitingListPresenter onQueueTabSelected");
+        populateCustomers(event.getBarberQueue());
     }
 }

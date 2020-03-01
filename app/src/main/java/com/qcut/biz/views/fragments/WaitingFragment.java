@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,6 @@ import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.presenters.fragments.WaitingPresenter;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.LogUtils;
-import com.qcut.biz.util.ViewUtils;
 import com.qcut.biz.views.WaitingView;
 
 import java.util.List;
@@ -51,6 +49,8 @@ public class WaitingFragment extends Fragment implements WaitingView {
     private Spinner ddSpinner;
     private String selectedBarberKeyFromBarberDialog;
     private BarberStatus barberNewStatus;
+    private ViewPager viewPager;
+    private PagerAdapter adapter;
 
     @Override
     public void onAttach(Context context) {
@@ -62,33 +62,40 @@ public class WaitingFragment extends Fragment implements WaitingView {
                              ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.waiting_queue, container, false);
         tabLayout = root.findViewById(R.id.tab_layout);
+        viewPager = root.findViewById(R.id.pager);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        presenter = new WaitingPresenter(this, getContext());
-        View addBarber = root.findViewById(R.id.addTab);
-        takeBreakButton = root.findViewById(R.id.tab_index_test);
-        stopQButton = root.findViewById(R.id.stop_queue);
+        if (presenter == null) {
+            presenter = new WaitingPresenter(this, getContext());
+            View addBarber = root.findViewById(R.id.addTab);
+            takeBreakButton = root.findViewById(R.id.tab_index_test);
+            stopQButton = root.findViewById(R.id.stop_queue);
 
-        stopQButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onStopButtonClick();
-            }
-        });
+            stopQButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onStopButtonClick();
+                }
+            });
 
-        takeBreakButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onTakeBreakButtonClick();
-            }
-        });
+            takeBreakButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onTakeBreakButtonClick();
+                }
+            });
 
-        presenter.initializeTab();
-        addBarber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onAddBarberQueueTabClick();
-            }
-        });
+            presenter.initializeTab();
+            addBarber.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onAddBarberQueueTabClick();
+                }
+            });
+            //TODO check if thats correct, do we need to create always new pager adaptor
+            adapter = new PagerAdapter(getActivity().getSupportFragmentManager(), tabLayout);
+            viewPager.setAdapter(adapter);
+            viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        }
         if (barberStatusChangeDialog == null) {
             final LayoutInflater factory = LayoutInflater.from(mContext);
             final View takeBreakView = factory.inflate(R.layout.take_break_dialog, null);
@@ -129,6 +136,16 @@ public class WaitingFragment extends Fragment implements WaitingView {
 
                 }
             });
+            ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, long l) {
+                    selectedBarberKeyFromBarberDialog = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
             noButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -145,13 +162,6 @@ public class WaitingFragment extends Fragment implements WaitingView {
         this.barberNewStatus = newStatus;
         barberStatusChangeDialog.show();
         barberStatusChangeDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 3, getResources().getDisplayMetrics());
-//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-//
-//        barberStatusChangeDialog.getWindow().setLayout(width, height);
-
         ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_dialog_title)).setText(dialogTitle);
         ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_text)).setText(dialogText);
         ((TextView) barberStatusChangeDialog.findViewById(R.id.take_break_confirm_text)).setText(confirmText);
@@ -178,23 +188,6 @@ public class WaitingFragment extends Fragment implements WaitingView {
         ddSpinner.setAdapter(customAdapter);
 
         barberSelectionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                ViewUtils.getDisplayHeight(getActivity().getWindowManager()) / 4, getResources().getDisplayMetrics());
-//        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                ViewUtils.getDisplayWidth(getActivity().getWindowManager()) / 2, getResources().getDisplayMetrics());
-//        barberSelectionDialog.getWindow().setLayout(width, height);
-        //TODO create buttons and set listener only once
-
-        ddSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, long l) {
-                selectedBarberKeyFromBarberDialog = ddSpinner.getAdapter().getDropDownView(i, null, null).getTag().toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
     }
 
     @Override
@@ -205,11 +198,6 @@ public class WaitingFragment extends Fragment implements WaitingView {
     @Override
     public String getStopButtonText() {
         return stopQButton.getText().toString();
-    }
-
-    @Override
-    public String getTakeBreakButtonText() {
-        return takeBreakButton.getText().toString();
     }
 
     @Override
@@ -228,19 +216,14 @@ public class WaitingFragment extends Fragment implements WaitingView {
         tab.setCustomView(customView);
         tab.setTag(barber.getKey());
         tabLayout.addTab(tab.setText("Loading...").setIcon(R.drawable.photo_barber));
-
-        final ViewPager viewPager = root.findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter(getActivity().getSupportFragmentManager(), tabLayout.getTabCount(), tabLayout);
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        adapter.notifyDataSetChanged();
         viewPager.setCurrentItem(adapter.getCount() - 1);
-
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                ((TextView) tab.getCustomView().findViewById(R.id.tab_name)).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
                 presenter.onBarberQueueTabSelected(tab.getTag().toString());
+                ((TextView) tab.getCustomView().findViewById(R.id.tab_name)).setTextColor(getResources().getColor(R.color.colorPrimaryDark));
             }
 
             @Override
@@ -251,7 +234,6 @@ public class WaitingFragment extends Fragment implements WaitingView {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
-
         ((TextView) customView.findViewById(R.id.tab_name)).setText(barber.getName());
         presenter.updateBarberStatus(barber.getKey());
         presenter.getDownloadUri(barber.getImagePath(), new OnSuccessListener<Uri>() {

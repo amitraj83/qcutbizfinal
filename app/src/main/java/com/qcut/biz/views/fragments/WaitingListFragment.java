@@ -36,14 +36,12 @@ import com.qcut.biz.views.WaitingListView;
 
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class WaitingListFragment extends Fragment implements WaitingListView {
 
     private FloatingActionButton addCustomer;
     private SharedPreferences sp;
-    private WaitingListRecyclerViewAdapter adapter = null;
-    private RecyclerView dynamicListView = null;
+    private WaitingListRecyclerViewAdapter adapter;
+    private RecyclerView dynamicListView;
     private TextView nextCustomerTV;
     private String tag;
     private Context mContext;
@@ -60,6 +58,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     private View root;
 
     public WaitingListFragment(String tag) {
+        LogUtils.info("New WaitingListFragment created");
         this.tag = tag;
     }
 
@@ -70,47 +69,41 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
         if (presenter == null) {
             presenter = new WaitingListPresenter(this, mContext, tag);
         }
-        presenter.addQueueOnChangeListener();
-        presenter.addBarbersChangeListener();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        presenter.removeQueueOnChangeListener();
-        presenter.removeBarbersChangeListener();
+    }
+
+    public void destroy() {
+        presenter.onDestroy();
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_waiting_list, container, false);
         this.rootView = root;
-        sp = mContext.getSharedPreferences("login", MODE_PRIVATE);
-        nextCustomerTV = root.findViewById(R.id.next_customer);
-        factory = LayoutInflater.from(mContext);
+        if (nextCustomerTV == null) {
+            nextCustomerTV = root.findViewById(R.id.next_customer);
+            factory = LayoutInflater.from(mContext);
+            addCustomer = root.findViewById(R.id.add_customer_fab);
 
-
-//TODO remove textview
-//        TextView viewById = root.findViewById(R.id.textView);
-//        viewById.setText(tag);
-
-        addCustomer = root.findViewById(R.id.add_customer_fab);
-
-        addCustomer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onAddCustomerClick();
-            }
-        });
-
-        dynamicListView = root.findViewById(R.id.today_queue);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
-        dynamicListView.setLayoutManager(mLayoutManager);
-        dynamicListView.setItemAnimator(new DefaultItemAnimator());
-        adapter = presenter.createWaitingListViewAdaptor();
-        dynamicListView.setAdapter(adapter);
-        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter, adapter));
-        helper.attachToRecyclerView(dynamicListView);
+            addCustomer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onAddCustomerClick();
+                }
+            });
+            dynamicListView = root.findViewById(R.id.today_queue);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(mContext.getApplicationContext());
+            dynamicListView.setLayoutManager(mLayoutManager);
+            dynamicListView.setItemAnimator(new DefaultItemAnimator());
+            adapter = presenter.createWaitingListViewAdaptor();
+            dynamicListView.setAdapter(adapter);
+            ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter, adapter));
+            helper.attachToRecyclerView(dynamicListView);
+        }
         if (addCustomerDialog == null) {
             addCustomerView = factory.inflate(R.layout.add_customer_dialog, null);
             addCustomerDialog = new AlertDialog.Builder(mContext).setView(addCustomerView).create();

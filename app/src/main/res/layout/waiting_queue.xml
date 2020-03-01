@@ -83,15 +83,17 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_below="@+id/toolbar"
         android:background="?attr/colorPrimary"
-        app:tabSelectedTextColor="@android:color/black"
         android:elevation="6dp"
         android:minHeight="?attr/actionBarSize"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:tabBackground="@drawable/selector"
-        />
+        app:tabRippleColor="@color/colorPrimaryDark"
+        app:tabMaxWidth="0dp"
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        app:tabIndicatorColor="@color/colorPrimaryDark"/>
 
 
 

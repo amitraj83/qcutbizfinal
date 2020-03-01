@@ -11,13 +11,13 @@
         android:id="@+id/remove_customer_row"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:layout_margin="20dp">
         <ImageView
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/ic_remove_customer_24dp"
             android:id="@+id/remove_customer_img"
             android:paddingLeft="10dp"
@@ -46,13 +46,13 @@
         android:id="@+id/shuffle_customer_row"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:layout_margin="20dp">
         <ImageView
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/ic_shuffle_black_24dp"
             android:id="@+id/move_any_img"
             android:paddingLeft="10dp"

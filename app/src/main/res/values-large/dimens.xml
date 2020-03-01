@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="tableHeadingTextSie">10sp</dimen>
     <dimen name="dialogHeadingTextSize">22sp</dimen>
     <dimen name="dialogTextSize">22sp</dimen>
     <dimen name="waitinglistItemSize">18sp</dimen>
-    <dimen name="popupwindow_size">800dp</dimen>
+    <dimen name="popupwindow_size">100dp</dimen>
     <dimen name="cust_view_waiting_list_font_size">18sp</dimen>
 
+    <dimen name="timeline_marker_size">25dp</dimen>
+    <dimen name="cust_view_height">60dp</dimen>
+    <dimen name="timeline_line_width">2dp</dimen>
+    <dimen name="design_navigation_icon_size" tools:override="true">30dp</dimen>
+    <dimen name="panelHeading2TextSize">30dp</dimen>
 </resources>

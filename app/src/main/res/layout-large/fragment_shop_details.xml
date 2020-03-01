@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="Shop Details"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        android:textSize="@dimen/panelHeading2TextSize"
+        android:textColor="@android:color/black"
+        android:layout_weight="0.5">
+    </TextView>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="0dp"
+    android:weightSum="10"
+    android:layout_weight="8.6"
+    android:orientation="vertical"
+    android:layout_marginTop="0dp"
+    android:layout_marginBottom="0dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginLeft="20dp"
+    >
+
+
+    <EditText
+        android:id="@+id/shop_details_email"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/email"
+        android:layout_weight="1"
+        android:editable="false"/>
+
+    <EditText
+        android:id="@+id/shop_details_password"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/password"
+        android:layout_weight="1"
+        android:inputType="textPassword"/>
+
+    <EditText
+        android:id="@+id/shop_details_contact_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/your_name"
+        android:layout_weight="1"/>
+    <EditText
+        android:id="@+id/shop_details_shop_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_name"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/shop_details_address_1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_address_line_1"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/shop_details_address_2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/shop_address_line_2"
+        android:layout_weight="1"/>
+
+    <EditText
+        android:id="@+id/shop_details_gmap_link"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="@string/gmap_link"
+        android:layout_weight="1"/>
+    <EditText
+        android:id="@+id/shop_details_avg_time_to_cut"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/backgroundItems"
+        android:hint="Avg. time to cut"
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="1">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/city"
+            android:textColor="@android:color/black"
+            android:textSize="18dp"
+            android:fontFamily="@font/montserrat_light"
+            android:layout_weight="1"
+            android:gravity="center_vertical"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"></View>
+        <Spinner
+            android:id="@+id/shop_details_city"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        android:layout_weight="1">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/country"
+            android:textColor="@android:color/black"
+            android:textSize="18dp"
+            android:fontFamily="@font/montserrat_light"
+            android:layout_weight="1"
+            android:gravity="center_vertical"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"></View>
+        <Spinner
+            android:id="@+id/shop_details_country"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            />
+
+    </LinearLayout>
+</LinearLayout>
+    <Button
+        android:id="@+id/shop_details_save"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/bottomBtnColor"
+        android:fontFamily="@font/montserrat_medium"
+        android:text="@string/save_general"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="17sp"
+        android:layout_weight="0.9"/>
+
+</LinearLayout>

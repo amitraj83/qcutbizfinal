@@ -83,7 +83,7 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="130dp"
         android:layout_below="@+id/toolbar"
         android:background="?attr/colorPrimary"
         android:elevation="6dp"

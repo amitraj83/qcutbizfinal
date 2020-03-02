@@ -2,12 +2,9 @@ package com.qcut.biz.listeners;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,14 +16,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.R;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.BarberStatus;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
-import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.DBUtils;
-import com.qcut.biz.util.ViewUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -85,14 +82,6 @@ public class WaitingListClickListener implements View.OnClickListener {
             custNameTVServiceDone.setText(queueItemName);
             serviceDoneDialog.show();
             serviceDoneDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                    ViewUtils.getDisplayHeight(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 5,
-//                    Resources.getSystem().getDisplayMetrics());
-//            int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//                    ViewUtils.getDisplayWidth(((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE))) / 2,
-//                    Resources.getSystem().getDisplayMetrics());
-//
-//            serviceDoneDialog.getWindow().setLayout(width, height);
         } else if (queueItemStatus.equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
             //TODO not need to get barbers if we disable button when barber status is on break or close
             DBUtils.getBarber(database, userid, tag, new OnSuccessListener<Barber>() {
@@ -127,7 +116,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                     voidTask.addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            BarberSelectionUtils.reAllocateCustomers(database, userid);
+                            EventBus.instance().fireEvent(new RelocationRequestEvent());
                         }
                     });
                 }
@@ -187,7 +176,7 @@ public class WaitingListClickListener implements View.OnClickListener {
                     voidTask.addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            BarberSelectionUtils.reAllocateCustomers(database, userid);
+                            EventBus.instance().fireEvent(new RelocationRequestEvent());
                         }
                     });
                 } else {

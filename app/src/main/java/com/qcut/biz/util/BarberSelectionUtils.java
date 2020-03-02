@@ -6,9 +6,12 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
@@ -54,10 +57,15 @@ public class BarberSelectionUtils {
                 final BarberQueue queue = DBUtils.findBarberQueueByKey(barberQueues, barberKey);
                 final Pair<Integer, Long> waitingInfo = calculateNewCustomerWaitingInfo(queue);
                 final long now = new Date().getTime();
-                Customer newCustomer = customerBuilder.actualBarberId(barberKey).arrivalTime(now)
+                final Customer newCustomer = customerBuilder.actualBarberId(barberKey).arrivalTime(now)
                         .expectedWaitingTime(waitingInfo.getRight()).placeInQueue(waitingInfo.getLeft())
                         .timeAdded(now).status(CustomerStatus.QUEUE.name()).build();
-                DBUtils.saveCustomer(database, userid, newCustomer, barberKey);
+                DBUtils.saveCustomer(database, userid, newCustomer, barberKey).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        EventBus.instance().fireEvent(new RelocationRequestEvent());
+                    }
+                });
             }
         });
     }
@@ -67,28 +75,28 @@ public class BarberSelectionUtils {
         DBUtils.getBarbersQueues(database, userId, new OnSuccessListener<List<BarberQueue>>() {
             @Override
             public void onSuccess(final List<BarberQueue> barberQueues) {
-                DBUtils.getDbRefBarberQueues(database, userId).runTransaction(new Transaction.Handler() {
-                    //TODO if single transaction can have multiple dbref commit
+                final DatabaseReference dbRefBarberQueues = DBUtils.getDbRefBarberQueues(database, userId);
+                dbRefBarberQueues.runTransaction(new Transaction.Handler() {
+
                     @NonNull
                     @Override
                     public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
                         List<BarberSorted> barberSortedList = sortedListOfBarbersForReAllocation(barberQueues, avgServiceTime);
-                        Set<Customer> allCustomers = removeAndGetAllCustomerToBeAddedLater(database, userId, barberQueues);
-                        assignCustomersToBarbers(database, userId, barberSortedList, allCustomers, avgServiceTime);
+                        Set<Customer> allCustomers = removeAndGetAllCustomerToBeAddedLater(database, userId, barberQueues, mutableData);
+                        assignCustomersToBarbers(dbRefBarberQueues, barberSortedList, allCustomers, avgServiceTime, mutableData);
                         return Transaction.success(mutableData);
                     }
 
                     @Override
                     public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
                         if (databaseError != null) {
-                            LogUtils.error("databaseError: {}", databaseError.getMessage());
+                            LogUtils.error("databaseError: {0}", databaseError.getMessage());
                         }
                         TimerService.updateWaitingTimes(database, userId);
                     }
                 });
             }
         });
-
     }
 
     private static Pair<Integer, Long> calculateNewCustomerWaitingInfo(BarberQueue queue) {
@@ -151,8 +159,8 @@ public class BarberSelectionUtils {
     }
 
 
-    private static void assignCustomersToBarbers(final FirebaseDatabase database, final String userid,
-                                                 List<BarberSorted> barberSortedList, Set<Customer> allCustomers, long avgServiceTime) {
+    private static void assignCustomersToBarbers(DatabaseReference dbRefBarberQueues, List<BarberSorted> barberSortedList, Set<Customer> allCustomers,
+                                                 long avgServiceTime, MutableData mutableData) {
         int placeInQueue = 1;
         for (Customer customer : allCustomers) {
             String barberKey;
@@ -162,7 +170,8 @@ public class BarberSelectionUtils {
                 barberKey = customer.getPreferredBarberKey();
             }
             customer.setTimeAdded(placeInQueue++);
-            DBUtils.saveCustomer(database, userid, customer, barberKey);
+            customer.setKey(dbRefBarberQueues.child(barberKey).push().getKey());
+            DBUtils.saveCustomer(customer, mutableData.child(barberKey));
 
             for (BarberSorted barberSorted : barberSortedList) {
                 if (barberSorted.getKey().equalsIgnoreCase(barberKey)) {
@@ -174,19 +183,25 @@ public class BarberSelectionUtils {
         }
     }
 
-    private static Set<Customer> removeAndGetAllCustomerToBeAddedLater(FirebaseDatabase database, String userid, @NonNull List<BarberQueue> queues) {
+    private static Set<Customer> removeAndGetAllCustomerToBeAddedLater(FirebaseDatabase database, String userid, @NonNull List<BarberQueue> queues, MutableData mutableData) {
         Set<Customer> allCustomers = new TreeSet<>(new CustComparatorBasedOnArrivalTime());
         for (BarberQueue queue : queues) {
             for (Customer customer : queue.getCustomers()) {
                 if (customer.isInQueue()) {
                     allCustomers.add(customer);
-                    DBUtils.getDbRefCustomer(database, userid, queue.getBarberKey(), customer.getKey()).removeValue();
+                    removeCustomer(mutableData, queue.getBarberKey(), customer.getKey());
+//                    DBUtils.getDbRefCustomer(database, userid, queue.getBarberKey(), customer.getKey()).removeValue();
                     //clear key
+                    removeCustomer(mutableData, queue.getBarberKey(), customer.getKey());
                     customer.setKey(null);
                 }
             }
         }
         return allCustomers;
+    }
+
+    private static void removeCustomer(MutableData mutableData, String barberKey, String customerKey) {
+        mutableData.child(barberKey).child(customerKey).setValue(null);
     }
 
     /**

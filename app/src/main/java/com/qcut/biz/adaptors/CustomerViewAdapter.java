@@ -87,7 +87,7 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
             public void onSuccess(Barber barber) {
                 if (barber != null) {
                     StorageReference child = storageReference.child(barber.getImagePath());
-                    child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    /*child.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                         @Override
                         public void onComplete(@NonNull Task<Uri> task) {
                             if (task.isSuccessful()) {
@@ -101,7 +101,7 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
 
                             }
                         }
-                    });
+                    });*/
                 }
             }
         });
@@ -123,14 +123,14 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
 //        public TimelineView mTimelineView;
         public TextView custName;
         TextView waitingTime;
-        public ImageView custBarber;
+//        public ImageView custBarber;
 
         public TimeLineViewHolder(View itemView, int viewType) {
             super(itemView);
 //            mTimelineView = (TimelineView) itemView.findViewById(R.id.timeline);
 //            mTimelineView.initLine(viewType);
             this.custName = itemView.findViewById(R.id.cust_view_name);
-            this.custBarber = itemView.findViewById(R.id.cus_view_barber);
+//            this.custBarber = itemView.findViewById(R.id.cus_view_barber);
             this.waitingTime = itemView.findViewById(R.id.cust_view_waiting_time);
         }
     }

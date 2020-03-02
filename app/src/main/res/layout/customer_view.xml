@@ -25,21 +25,20 @@
                 android:id="@+id/cust_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/montserrat_regular"
                 android:gravity="center_vertical"
                 android:text="Customer"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/dialogTextSize"
+                android:textSize="@dimen/customer_view_header_size"
                 card_view:layout_constraintBottom_toBottomOf="parent"
                 card_view:layout_constraintLeft_toLeftOf="parent"
-                card_view:layout_constraintRight_toLeftOf="@id/cust_barber"
+                card_view:layout_constraintRight_toLeftOf="@id/cust_waiting_time"
                 card_view:layout_constraintTop_toTopOf="parent"
-                card_view:layout_constraintWidth_percent="0.4" />
+                card_view:layout_constraintWidth_percent="0.5" />
 
-            <TextView
+            <!--<TextView
                 android:id="@+id/cust_barber"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -54,7 +53,7 @@
                 card_view:layout_constraintLeft_toRightOf="@id/cust_name"
                 card_view:layout_constraintRight_toLeftOf="@id/cust_waiting_time"
                 card_view:layout_constraintTop_toTopOf="parent"
-                card_view:layout_constraintWidth_percent="0.2" />
+                card_view:layout_constraintWidth_percent="0.2" />-->
 
             <TextView
                 android:id="@+id/cust_waiting_time"
@@ -65,14 +64,14 @@
                 android:layout_marginBottom="10dp"
                 android:fontFamily="@font/montserrat_regular"
                 android:gravity="end|center_vertical"
-                android:text="Waiting Time"
+                android:text="Time"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/dialogTextSize"
+                android:textSize="@dimen/customer_view_header_size"
                 card_view:layout_constraintBottom_toBottomOf="parent"
-                card_view:layout_constraintLeft_toRightOf="@id/cust_barber"
+                card_view:layout_constraintLeft_toRightOf="@id/cust_name"
                 card_view:layout_constraintRight_toRightOf="parent"
                 card_view:layout_constraintTop_toTopOf="parent"
-                card_view:layout_constraintWidth_percent="0.35" />
+                card_view:layout_constraintWidth_percent="0.4" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

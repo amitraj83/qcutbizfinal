@@ -8,8 +8,12 @@
     <dimen name="cust_view_waiting_list_font_size">18sp</dimen>
 
     <dimen name="timeline_marker_size">25dp</dimen>
-    <dimen name="cust_view_height">60dp</dimen>
+    <dimen name="cust_view_height">100dp</dimen>
     <dimen name="timeline_line_width">2dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">30dp</dimen>
     <dimen name="panelHeading2TextSize">30dp</dimen>
+
+    <dimen name="customer_view_item_size">40sp</dimen>
+    <dimen name="customer_view_header_size">50sp</dimen>
+
 </resources>

@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
@@ -118,6 +119,11 @@ public class DBUtils {
         customer.setKey(key);
         LogUtils.info("DbUtils: saveCustomer adding customer:{0}", customer);
         return queueRef.child(key).setValue(customer);
+    }
+
+    public static void saveCustomer(Customer customer, MutableData queueMutableData) {
+        queueMutableData.child(customer.getKey()).setValue(customer);
+        LogUtils.info("DbUtils: saveCustomer adding customer:{0}", customer);
     }
 
     public static BarberQueue findBarberQueueByKey(List<BarberQueue> queues, String searchKey) {

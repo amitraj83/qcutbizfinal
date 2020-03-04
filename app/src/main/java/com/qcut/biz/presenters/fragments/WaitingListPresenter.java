@@ -99,10 +99,8 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
         final String customerName = view.getEnteredCustomerName();
         if (StringUtils.isNotBlank(customerName)) {
             final Customer.CustomerBuilder customerBuilder = Customer.builder();
-            //TODO remove customerID if not used
-            String customerId = UUID.randomUUID().toString();
             final boolean anyBarber = selectedBarberKey.equalsIgnoreCase(Constants.ANY);
-            customerBuilder.anyBarber(anyBarber).name(customerName).customerId(customerId);
+            customerBuilder.anyBarber(anyBarber).name(customerName);
             if (!anyBarber) {
                 customerBuilder.preferredBarberKey(selectedBarberKey);
             }

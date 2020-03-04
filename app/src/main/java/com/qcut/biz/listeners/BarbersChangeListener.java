@@ -8,8 +8,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.eventbus.EventBus;
 import com.qcut.biz.events.BarbersChangeEvent;
 import com.qcut.biz.models.Barber;
-import com.qcut.biz.presenters.fragments.WaitingListPresenter;
-import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.MappingUtils;
 

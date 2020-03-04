@@ -42,7 +42,6 @@ public class Customer {
     //old
     private long timeAdded;
     private boolean anyBarber;
-    private String customerId;
 
     @Exclude
     public boolean isDone() {
@@ -63,20 +62,4 @@ public class Customer {
     public boolean isRemoved() {
         return StringUtils.isNotBlank(status) && CustomerStatus.REMOVED.name().equalsIgnoreCase(status);
     }
-
-
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("key", key);
-        result.put("timeAdded", timeAdded);
-        result.put("anyBarber", anyBarber);
-        result.put("customerId", customerId);
-        result.put("name", name);
-        result.put("placeInQueue", placeInQueue);
-        result.put("status", status);
-
-        return result;
-    }
-
 }

@@ -27,14 +27,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TimerService extends Service {
+
     private static Timer timer = new Timer();
     private Context ctx;
-
     private FirebaseDatabase database = null;
     private String userid;
     private SharedPreferences sp;
-//    int avgTimeToCut = 15;
-
 
     public IBinder onBind(Intent arg0) {
         return null;

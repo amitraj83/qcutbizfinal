@@ -134,4 +134,9 @@ public class DBUtils {
         }
         return null;
     }
+
+    public static Task<Void> saveShopDetails(FirebaseDatabase database, String userid, ShopDetails shopDetails) {
+        final DatabaseReference dbRef = getDbRefShopDetails(database, userid);
+        return dbRef.setValue(shopDetails);
+    }
 }

@@ -33,7 +33,8 @@ public class ShopDetails {
     private String address;
     private String addressLine1;
     private String addressLine2;
-    private String avgTimeToCut;
+    private long avgTimeToCut;
+    private String gmapLink;
     private String city;
     private String country;
     private String status;

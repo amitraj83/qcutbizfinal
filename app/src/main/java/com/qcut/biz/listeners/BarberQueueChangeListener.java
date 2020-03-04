@@ -6,23 +6,13 @@ import androidx.annotation.Nullable;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.eventbus.ChangeType;
 import com.qcut.biz.eventbus.EventBus;
 import com.qcut.biz.events.BarberQueueChangeEvent;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.util.MappingUtils;
 
-public class BarberQueueChangeListener implements ChildEventListener, ValueEventListener {
-
-    private FirebaseDatabase database;
-    private String userid;
-
-    public BarberQueueChangeListener(FirebaseDatabase database, String userid) {
-        this.database = database;
-        this.userid = userid;
-    }
+public class BarberQueueChangeListener implements ChildEventListener {
 
     @Override
     public void onChildAdded(@NonNull final DataSnapshot queueSnapshot, @Nullable String previouseKey) {
@@ -52,11 +42,6 @@ public class BarberQueueChangeListener implements ChildEventListener, ValueEvent
     @Override
     public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-    }
-
-    @Override
-    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-        fireBarberQueueChangeEvent(dataSnapshot, ChangeType.CHILD_UPDATED);
     }
 
     @Override

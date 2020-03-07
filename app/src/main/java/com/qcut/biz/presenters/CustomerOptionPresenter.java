@@ -1,22 +1,12 @@
 package com.qcut.biz.presenters;
 
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
-import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
-import com.qcut.biz.util.MappingUtils;
-
-import java.util.Iterator;
 
 public class CustomerOptionPresenter {
 
@@ -31,12 +21,17 @@ public class CustomerOptionPresenter {
     }
 
     public void onAssignToAnyClick(final String customerKey) {
-
         DBUtils.getCustomer(database, userid, barberKey, customerKey, new OnSuccessListener<Customer>() {
             @Override
             public void onSuccess(Customer customer) {
                 customer.setAnyBarber(true);
-                DBUtils.getDbRefBarberQueue(database, userid, barberKey).child(customerKey).setValue(customer);
+                DBUtils.getDbRefBarberQueue(database, userid, barberKey).child(customerKey).setValue(customer)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                EventBus.instance().fireEvent(new RelocationRequestEvent());
+                            }
+                        });
             }
         });
     }
@@ -46,7 +41,13 @@ public class CustomerOptionPresenter {
             @Override
             public void onSuccess(Customer customer) {
                 customer.setStatus(CustomerStatus.REMOVED.name());
-                DBUtils.getDbRefBarberQueue(database, userid, barberKey).child(customerKey).setValue(customer);
+                DBUtils.getDbRefBarberQueue(database, userid, barberKey).child(customerKey)
+                        .setValue(customer).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        EventBus.instance().fireEvent(new RelocationRequestEvent());
+                    }
+                });
             }
         });
     }

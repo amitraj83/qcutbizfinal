@@ -9,7 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.adaptors.BarberSelectionArrayAdapter;
 import com.qcut.biz.adaptors.WaitingListRecyclerViewAdapter;
 import com.qcut.biz.eventbus.EventBus;
-import com.qcut.biz.events.BarberQueueChangeEvent;
+import com.qcut.biz.events.BarberQueuesChangeEvent;
 import com.qcut.biz.events.BarbersChangeEvent;
 import com.qcut.biz.events.QueueTabSelectedEvent;
 import com.qcut.biz.listeners.WaitingListClickListener;
@@ -29,14 +29,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEventHandler,
-        BarberQueueChangeEvent.BarberQueueChangeEventHandler, QueueTabSelectedEvent.QueueTabSelectedEventHandler {
+        BarberQueuesChangeEvent.BarberQueuesChangeEventHandler, QueueTabSelectedEvent.QueueTabSelectedEventHandler {
 
     private String userid;
     private WaitingListView view;
@@ -44,6 +44,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
     private String barberKey;
     private Context context;
     private FirebaseDatabase database;
+    private Map<String, Barber> barbersMap = new HashMap<>();
 
     public WaitingListPresenter(WaitingListView view, Context context, String barberKey) {
         this.view = view;
@@ -65,7 +66,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
 
     private void registerHandlers() {
         EventBus.instance().registerHandler(BarbersChangeEvent.TYPE, this);
-        EventBus.instance().registerHandler(BarberQueueChangeEvent.TYPE, this);
+        EventBus.instance().registerHandler(BarberQueuesChangeEvent.TYPE, this);
         EventBus.instance().registerHandler(QueueTabSelectedEvent.TYPE, this);
 
     }
@@ -76,7 +77,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
 
     private void unregisterHandlers() {
         EventBus.instance().unregisterHandler(BarbersChangeEvent.TYPE, this);
-        EventBus.instance().unregisterHandler(BarberQueueChangeEvent.TYPE, this);
+        EventBus.instance().unregisterHandler(BarberQueuesChangeEvent.TYPE, this);
         EventBus.instance().unregisterHandler(QueueTabSelectedEvent.TYPE, this);
     }
 
@@ -104,7 +105,18 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
             if (!anyBarber) {
                 customerBuilder.preferredBarberKey(selectedBarberKey);
             }
-            BarberSelectionUtils.assignBarber(database, userid, customerBuilder, view);
+            if (barbersMap.isEmpty()) {
+                DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
+                    @Override
+                    public void onSuccess(Map<String, Barber> barbersMap) {
+                        WaitingListPresenter.this.barbersMap = barbersMap;
+                        BarberSelectionUtils.assignBarber(database, userid, customerBuilder, barbersMap);
+                    }
+                });
+            } else {
+                BarberSelectionUtils.assignBarber(database, userid, customerBuilder, barbersMap);
+            }
+
         } else {
             view.showMessage("Cannot add customer. No name provided");
         }
@@ -139,6 +151,10 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
 
     @Override
     public void onBarbersChange(BarbersChangeEvent event) {
+        barbersMap.clear();
+        for (Barber barber : event.getBarbers()) {
+            barbersMap.put(barber.getKey(), barber);
+        }
         updateBarbersSelectionList(event.getBarbers());
     }
 
@@ -159,14 +175,22 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
     }
 
     @Override
-    public void onBarberQueueChange(BarberQueueChangeEvent event) {
+    public void onBarberQueuesChange(BarberQueuesChangeEvent event) {
         // customer is added/removed/updated
-        final BarberQueue barberQueue = event.getChangedBarberQueue();
-        if (!barberQueue.getBarberKey().equalsIgnoreCase(barberKey)) {
-            return;
+        final List<BarberQueue> queues = event.getBarberQueues();
+        boolean queueUpdated = false;
+        for (BarberQueue queue : queues) {
+            if (queue.getBarberKey().equalsIgnoreCase(barberKey)) {
+                queueUpdated = true;
+                populateCustomers(queue);
+                break;
+            }
         }
-        LogUtils.info("WaitingListPresenter onBarberQueueChange");
-        populateCustomers(barberQueue);
+        if (!queueUpdated) {
+            //it mean barber may be logged out and now there is no customer in queue
+            //so there is no queue instance left, so update list with empty model
+            populateCustomers(BarberQueue.builder().barberKey(barberKey).build());
+        }
     }
 
     public void populateCustomers(BarberQueue barberQueue) {
@@ -200,7 +224,6 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
         if (!event.getBarberQueue().getBarberKey().equalsIgnoreCase(barberKey)) {
             return;
         }
-        LogUtils.info("WaitingListPresenter onQueueTabSelected");
         populateCustomers(event.getBarberQueue());
     }
 }

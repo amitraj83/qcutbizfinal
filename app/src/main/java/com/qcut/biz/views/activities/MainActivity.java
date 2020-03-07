@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavController navController;
     private ImageView blinkingDot;
     private TextView statusView;
-    private String userid;
-    private FirebaseDatabase database = null;
     private Animation animation;
     private MainPresenter mainPresenter;
 
@@ -46,42 +44,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        statusView = findViewById(R.id.status_change);
+        if (mainPresenter == null) {
+            statusView = findViewById(R.id.status_change);
+            mainPresenter = new MainPresenter(this, this);
 
-        mainPresenter = new MainPresenter(this, this);
+            startService(new Intent(getBaseContext(), TimerService.class));
 
-        startService(new Intent(getBaseContext(), TimerService.class));
+            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            getSupportActionBar().setCustomView(R.layout.action_bar);
 
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.action_bar);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+            blinkingDot = findViewById(R.id.blinking_dot);
 
-        blinkingDot = findViewById(R.id.blinking_dot);
+            animation = new AlphaAnimation(1, 0);
+            animation.setDuration(1000);
+            animation.setInterpolator(new LinearInterpolator());
+            animation.setRepeatCount(Animation.INFINITE);
+            animation.setRepeatMode(Animation.REVERSE);
+            animation.cancel();
+            animation.reset();
+            blinkingDot.setAnimation(animation);
 
-        animation = new AlphaAnimation(1, 0);
-        animation.setDuration(1000);
-        animation.setInterpolator(new LinearInterpolator());
-        animation.setRepeatCount(Animation.INFINITE);
-        animation.setRepeatMode(Animation.REVERSE);
-        animation.cancel();
-        animation.reset();
-        blinkingDot.setAnimation(animation);
+            statusView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mainPresenter.onStatusClick();
+                }
+            });
 
-        statusView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainPresenter.onStatusClick();
-            }
-        });
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
+            navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        }
     }
 
     @Override

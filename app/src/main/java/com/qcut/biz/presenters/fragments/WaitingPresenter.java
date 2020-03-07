@@ -15,16 +15,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.qcut.biz.eventbus.ChangeType;
 import com.qcut.biz.eventbus.EventBus;
-import com.qcut.biz.events.BarberQueueChangeEvent;
+import com.qcut.biz.events.BarberQueuesChangeEvent;
 import com.qcut.biz.events.BarberStatusChangeEvent;
-import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.events.QueueTabSelectedEvent;
+import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.BarberStatus;
-import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
@@ -38,7 +36,7 @@ import java.util.Map;
 import static android.content.Context.MODE_PRIVATE;
 
 public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusChangeEventHandler,
-        BarberQueueChangeEvent.BarberQueueChangeEventHandler, RelocationRequestEvent.RelocationRequestEventHandler {
+        BarberQueuesChangeEvent.BarberQueuesChangeEventHandler {
 
     private String userid;
     private WaitingView view;
@@ -57,9 +55,8 @@ public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusCha
         database = FirebaseDatabase.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
         userid = preferences.getString("userid", null);
-        EventBus.instance().registerHandler(BarberQueueChangeEvent.TYPE, this);
+        EventBus.instance().registerHandler(BarberQueuesChangeEvent.TYPE, this);
         EventBus.instance().registerHandler(BarberStatusChangeEvent.TYPE, this);
-        EventBus.instance().registerHandler(RelocationRequestEvent.TYPE, this);
     }
 
     public void initializeTab() {
@@ -119,10 +116,18 @@ public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusCha
         });
     }
 
-    public void onBarberStatusChangeYesClick(BarberStatus status) {
+    public void onBarberStatusChangeYesClick(final BarberStatus status) {
         Map<String, Object> map = new HashMap<>();
         map.put(Barber.QUEUE_STATUS, status.name());
-        DBUtils.getDbRefBarber(database, userid, view.getSelectedTabId()).updateChildren(map);
+        DBUtils.getDbRefBarber(database, userid, view.getSelectedTabId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                if (status == BarberStatus.OPEN || status == BarberStatus.STOP) {
+                    //reallocate customers if barber is closing or opening queue
+                    EventBus.instance().fireEvent(new RelocationRequestEvent());
+                }
+            }
+        });
         view.hideDialog();
         if (status == BarberStatus.BREAK) {
             view.setButtonToBarberOnBreak();
@@ -249,14 +254,11 @@ public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusCha
     }
 
     @Override
-    public void onBarberQueueChange(BarberQueueChangeEvent event) {
-        final BarberQueue queue = event.getChangedBarberQueue();
-        queueMap.put(queue.getBarberKey(), queue);
-    }
-
-    @Override
-    public void onRelocationRequested(RelocationRequestEvent event) {
-        LogUtils.info("WaitingPresenter: onRelocationRequested");
-        BarberSelectionUtils.reAllocateCustomers(database, userid);
+    public void onBarberQueuesChange(BarberQueuesChangeEvent event) {
+        queueMap.clear();
+        final List<BarberQueue> queues = event.getBarberQueues();
+        for (BarberQueue queue : queues) {
+            queueMap.put(queue.getBarberKey(), queue);
+        }
     }
 }

@@ -113,17 +113,12 @@ public class DBUtils {
         return queueId.substring(0, queueId.length() - 8);
     }
 
-    public static Task<Void> saveCustomer(FirebaseDatabase database, String userid, Customer customer, String barberKey) {
-        DatabaseReference queueRef = DBUtils.getDbRefBarberQueue(database, userid, barberKey);
-        String key = queueRef.push().getKey();
-        customer.setKey(key);
-        LogUtils.info("DbUtils: saveCustomer adding customer:{0}", customer);
-        return queueRef.child(key).setValue(customer);
-    }
-
     public static void saveCustomer(Customer customer, MutableData queueMutableData) {
         queueMutableData.child(customer.getKey()).setValue(customer);
-        LogUtils.info("DbUtils: saveCustomer adding customer:{0}", customer);
+    }
+
+    public static void saveCustomerWaitingTime(MutableData customerMutableData, long waitingTime) {
+        customerMutableData.child(Customer.EXPECTED_WAITING_TIME).setValue(waitingTime);
     }
 
     public static BarberQueue findBarberQueueByKey(List<BarberQueue> queues, String searchKey) {

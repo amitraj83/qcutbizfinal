@@ -24,6 +24,7 @@ public class Barber {
     private String name;
     private String imagePath;
     private String queueStatus;
+    private long avgTimeToCut;
 
     @Exclude
     public boolean isStopped() {

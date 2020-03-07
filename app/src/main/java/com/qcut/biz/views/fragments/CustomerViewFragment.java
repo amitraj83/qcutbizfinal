@@ -1,10 +1,12 @@
 package com.qcut.biz.views.fragments;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -47,5 +49,16 @@ public class CustomerViewFragment extends Fragment implements CustomerView {
     @Override
     public void setCustomerViewAdaptor(CustomerViewAdapter adapter) {
         customerViewLV.setAdapter(adapter);
+    }
+
+    @Override
+    public void showMessage(String msg) {
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void startDoorBell() {
+        MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), R.raw.door_bell);
+        mediaPlayer.start();
     }
 }

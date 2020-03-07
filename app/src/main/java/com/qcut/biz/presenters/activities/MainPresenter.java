@@ -12,24 +12,35 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.qcut.biz.R;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.BarbersChangeEvent;
+import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.listeners.BarberQueueChangeListener;
 import com.qcut.biz.listeners.BarberStatusChangeListener;
 import com.qcut.biz.listeners.BarbersChangeListener;
+import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.ShopStatus;
+import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.views.MainView;
 import com.qcut.biz.views.activities.StartActivity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static android.content.Context.MODE_PRIVATE;
 
-public class MainPresenter {
+public class MainPresenter implements BarbersChangeEvent.BarbersChangeEventHandler,
+        RelocationRequestEvent.RelocationRequestEventHandler {
 
     private final String userid;
     private MainView view;
     private SharedPreferences preferences;
     private Context context;
     private FirebaseDatabase database;
+    private Map<String, Barber> barberMap = new HashMap<>();
+
 
     public MainPresenter(MainView mainView, Context context) {
         this.view = mainView;
@@ -41,9 +52,10 @@ public class MainPresenter {
         setStatusListner();
         DBUtils.getDbRefBarbers(database, userid).addValueEventListener(new BarbersChangeListener());
         LogUtils.info("addBarbersChangeListener: MainPresenter");
-        DBUtils.getDbRefBarberQueues(database, userid).addChildEventListener(new BarberQueueChangeListener());
+        DBUtils.getDbRefBarberQueues(database, userid).addValueEventListener(new BarberQueueChangeListener());
         DBUtils.getDbRefBarbers(database, userid).addChildEventListener(new BarberStatusChangeListener());
-
+        EventBus.instance().registerHandler(RelocationRequestEvent.TYPE, this);
+        EventBus.instance().registerHandler(BarbersChangeEvent.TYPE, this);
     }
 
     public void onStatusClick() {
@@ -71,7 +83,6 @@ public class MainPresenter {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                LogUtils.info("BarberStatus changed to: ");
                 if (dataSnapshot.exists()) {
                     String status = dataSnapshot.getValue(String.class);
                     if (ShopStatus.valueOf(status) == ShopStatus.ONLINE) {
@@ -119,5 +130,18 @@ public class MainPresenter {
             view.navigateToId(R.id.frag_customer_view);
         }
         view.closeDrawer();
+    }
+
+    @Override
+    public void onBarbersChange(BarbersChangeEvent event) {
+        barberMap.clear();
+        for (Barber barber : event.getBarbers()) {
+            barberMap.put(barber.getKey(), barber);
+        }
+    }
+
+    @Override
+    public void onRelocationRequested(RelocationRequestEvent event) {
+        BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
     }
 }

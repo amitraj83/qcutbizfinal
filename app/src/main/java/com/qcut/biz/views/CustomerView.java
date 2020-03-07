@@ -11,4 +11,8 @@ import java.util.List;
 public interface CustomerView {
 
     void setCustomerViewAdaptor(CustomerViewAdapter adapter);
+
+    void showMessage(String s);
+
+    void startDoorBell();
 }

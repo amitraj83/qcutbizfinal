@@ -46,25 +46,27 @@ public class AddBarberFragment extends Fragment implements AddBarberView {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_add_barber, container, false);
-        presenter = new AddBarberPresenter(this, getContext());
-        barberUploadImageView = root.findViewById(R.id.barber_photo);
-        barberUploadButton = root.findViewById(R.id.UploadBtn);
-        newBarberName = root.findViewById(R.id.new_barber_name);
-        listBarbers = root.findViewById(R.id.list_barbers);
+        if (presenter == null) {
+            presenter = new AddBarberPresenter(this, getContext());
+            barberUploadImageView = root.findViewById(R.id.barber_photo);
+            barberUploadButton = root.findViewById(R.id.UploadBtn);
+            newBarberName = root.findViewById(R.id.new_barber_name);
+            listBarbers = root.findViewById(R.id.list_barbers);
 
-        barberUploadImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onUploadImageClick();
-            }
-        });
+            barberUploadImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onUploadImageClick();
+                }
+            });
 
-        barberUploadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onUploadButtonClick(filePath);
-            }
-        });
+            barberUploadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.onUploadButtonClick(filePath);
+                }
+            });
+        }
         presenter.populateBarbers();
         return root;
     }

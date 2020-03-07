@@ -22,6 +22,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.qcut.biz.models.Barber;
+import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.views.AddBarberView;
@@ -43,6 +44,7 @@ public class AddBarberPresenter {
     private Context context;
     private FirebaseDatabase database;
     private StorageReference storageReference;
+    private ShopDetails shopDetails;
 
     public AddBarberPresenter(AddBarberView view, Context context) {
         this.view = view;
@@ -52,6 +54,12 @@ public class AddBarberPresenter {
         database = FirebaseDatabase.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
         userid = preferences.getString("userid", null);
+        DBUtils.getShopDetails(database, userid, new OnSuccessListener<ShopDetails>() {
+            @Override
+            public void onSuccess(ShopDetails shopDetails) {
+                AddBarberPresenter.this.shopDetails = shopDetails;
+            }
+        });
     }
 
 
@@ -85,7 +93,9 @@ public class AddBarberPresenter {
                                 //create barber
                                 String key = barbersRef.push().getKey();
                                 barbersRef.child(key).setValue(Barber.builder().key(key).name(name)
-                                        .imagePath(taskSnapshot.getMetadata().getPath()).build());
+                                        .imagePath(taskSnapshot.getMetadata().getPath())
+                                        //copy avgTimeToCut from shopDetails
+                                        .avgTimeToCut(getAvgTimeToCut()).build());
                                 LogUtils.info("Image uploaded successfully.");
                             }
                             view.showMessage("Uploaded");
@@ -110,6 +120,13 @@ public class AddBarberPresenter {
                         }
                     });
         }
+    }
+
+    public long getAvgTimeToCut() {
+        if (shopDetails == null || shopDetails.getAvgTimeToCut() == 0) {
+            return 15;
+        }
+        return shopDetails.getAvgTimeToCut();
     }
 
     public void populateBarbers() {

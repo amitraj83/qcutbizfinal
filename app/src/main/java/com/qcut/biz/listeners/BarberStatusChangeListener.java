@@ -23,7 +23,6 @@ public class BarberStatusChangeListener implements ChildEventListener {
         if (!dataSnapshot.exists()) {
             return;
         }
-        LogUtils.debug("dataSnapshot: {0}", dataSnapshot.getValue());
         EventBus.instance().fireEvent(new BarberStatusChangeEvent(dataSnapshot.getValue(Barber.class)));
 
     }

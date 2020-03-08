@@ -18,6 +18,8 @@ import lombok.ToString;
 @IgnoreExtraProperties
 public class ServiceAvailable {
 
+    public static final String SERVICES_AVAILABLE = "servicesAvailable";
+    private String key;
     private String serviceName;
     private String servicePrice;
 }

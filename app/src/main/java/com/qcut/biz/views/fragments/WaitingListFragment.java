@@ -58,7 +58,6 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     private View root;
 
     public WaitingListFragment(String tag) {
-        LogUtils.info("WaitingListFragment created");
         this.tag = tag;
     }
 

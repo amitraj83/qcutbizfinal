@@ -20,6 +20,7 @@ import lombok.ToString;
 public class Barber {
     public static final String BARBERS = "barbers";
     public static final String QUEUE_STATUS = "queueStatus";
+    public static final int DEFAULT_AVG_TIME_TO_CUT = 15;
     private String key;
     private String name;
     private String imagePath;

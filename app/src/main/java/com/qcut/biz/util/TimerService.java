@@ -82,14 +82,13 @@ public class TimerService extends Service {
                         barberMap.put(barberQueue.getBarberKey(), barberQueue.getBarber());
                     }
                     BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
-//                    updateWaitingTimes(database, userid);
                 }
             });
 
         }
     };
 
-    public static void updateWaitingTimes(final FirebaseDatabase database, final String userid) {
+    public static void updateWaitingTimes(final FirebaseDatabase database, final String userid, final Map<String, Barber> barberMap) {
         final DatabaseReference dbRefBarberQueues = DBUtils.getDbRefBarberQueues(database, userid);
         dbRefBarberQueues.runTransaction(new Transaction.Handler() {
 
@@ -108,7 +107,8 @@ public class TimerService extends Service {
                         }
                     }
                     Collections.sort(customers, new CustomerComparator());
-                    long avgTimeToCut = 15;//TODO barber.getAvgTimeToCut() == 0 ? 15 : barber.getAvgTimeToCut();
+                    final long avgServiceTime = barberMap.get(barberQueue.getBarberKey()).getAvgTimeToCut();
+                    long avgTimeToCut = avgServiceTime == 0 ? Barber.DEFAULT_AVG_TIME_TO_CUT : avgServiceTime;//if avgServiceTime not defined in barber than use default
                     long prevCustomerTime = 0;
                     for (int i = 0; i < customers.size(); i++) {
                         final MutableData customerMutableData = mutableData.child(barberQueue.getBarberKey()).child(customers.get(i).getKey());

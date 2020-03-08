@@ -14,38 +14,12 @@ import com.qcut.biz.util.MappingUtils;
 
 public class BarberQueueChangeListener implements ValueEventListener {
 
-    public void onChildAdded(@NonNull final DataSnapshot queueSnapshot, @Nullable String previouseKey) {
-        fireBarberQueueChangeEvent(queueSnapshot, ChangeType.CHILD_ADDED);
-    }
-
-    public void fireBarberQueueChangeEvent(@NonNull DataSnapshot queueSnapshot, ChangeType changeType) {
-        if (!queueSnapshot.exists()) {
-            return;
-        }
-        LogUtils.info("BarberQueueChangeListener: {0}", changeType);
-//        final BarberQueuesChangeEvent queueChangeEvent = new BarberQueuesChangeEvent
-//                (MappingUtils.mapToBarberQueue(queueSnapshot), changeType);
-//        EventBus.instance().fireEvent(queueChangeEvent);
-    }
-
-    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-        fireBarberQueueChangeEvent(dataSnapshot, ChangeType.CHILD_UPDATED);
-    }
-
-    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-        fireBarberQueueChangeEvent(dataSnapshot, ChangeType.CHILD_REMOVED);
-    }
-
-    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-    }
-
     @Override
     public void onDataChange(@NonNull DataSnapshot queuesSnapshot) {
         if (!queuesSnapshot.exists()) {
             return;
         }
-        LogUtils.info("BarberQueueChangeListener: {0}", queuesSnapshot);
+        LogUtils.info("BarberQueueChangeListener..");
         final BarberQueuesChangeEvent queueChangeEvent = new BarberQueuesChangeEvent(MappingUtils
                 .mapToBarberQueues(queuesSnapshot));
         EventBus.instance().fireEvent(queueChangeEvent);
@@ -53,6 +27,6 @@ public class BarberQueueChangeListener implements ValueEventListener {
 
     @Override
     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+        LogUtils.error("BarberQueueChangeListener:databaseError {0}", databaseError);
     }
 }

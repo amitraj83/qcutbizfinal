@@ -13,19 +13,23 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -70,7 +74,18 @@ public class TimerService extends Service {
     private final Handler toastHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            updateWaitingTimes(database, userid);
+            DBUtils.getBarbersQueues(database, userid, new OnSuccessListener<List<BarberQueue>>() {
+                @Override
+                public void onSuccess(List<BarberQueue> barberQueues) {
+                    Map<String, Barber> barberMap = new HashMap<>();
+                    for (BarberQueue barberQueue : barberQueues) {
+                        barberMap.put(barberQueue.getBarberKey(), barberQueue.getBarber());
+                    }
+                    BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
+//                    updateWaitingTimes(database, userid);
+                }
+            });
+
         }
     };
 

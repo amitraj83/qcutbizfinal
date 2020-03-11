@@ -23,7 +23,6 @@ public class FindBarberTask implements Continuation<Map<String, Barber>, Task<Ba
 
         final TaskCompletionSource<Barber> tcs = new TaskCompletionSource<>();
         tcs.setResult(task.getResult().get(barberKey));
-        LogUtils.info("FindBarberTask: barberKey:{0}", barberKey);
         return tcs.getTask();
     }
 }

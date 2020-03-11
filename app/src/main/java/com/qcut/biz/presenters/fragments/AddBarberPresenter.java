@@ -124,7 +124,7 @@ public class AddBarberPresenter {
 
     public long getAvgTimeToCut() {
         if (shopDetails == null || shopDetails.getAvgTimeToCut() == 0) {
-            return 15;
+            return Barber.DEFAULT_AVG_TIME_TO_CUT;
         }
         return shopDetails.getAvgTimeToCut();
     }

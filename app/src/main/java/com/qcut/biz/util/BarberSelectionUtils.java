@@ -89,8 +89,6 @@ public class BarberSelectionUtils {
 
     public static void reAllocateCustomers(final FirebaseDatabase database, final String userId,
                                            final Map<String, Barber> barberMap) {
-        final long avgServiceTime = 15;// Long.valueOf(dataSnapshot.getValue().toString()) * 60 * 1000;
-
         final DatabaseReference dbRefBarberQueues = DBUtils.getDbRefBarberQueues(database, userId);
         dbRefBarberQueues.runTransaction(new Transaction.Handler() {
 
@@ -100,11 +98,9 @@ public class BarberSelectionUtils {
                 final List<BarberQueue> barberQueues = MappingUtils.buildBarberQueue(mutableData, barberMap);
                 //this queue include available and un available barbers, because barber may have customer
                 // but he is logged out, so we need to distribute those customer among other barbers
-                LogUtils.info("reAllocateCustomers: {0}", barberQueues);
-
-                List<BarberSorted> barberSortedList = sortedListOfBarbersForReAllocation(barberQueues, avgServiceTime);
+                List<BarberSorted> barberSortedList = sortedListOfBarbersForReAllocation(barberQueues);
                 Set<Customer> allCustomers = removeAndGetAllCustomerToBeAddedLater(database, userId, barberQueues, mutableData);
-                assignCustomersToBarbers(dbRefBarberQueues, barberSortedList, allCustomers, avgServiceTime, mutableData);
+                assignCustomersToBarbers(dbRefBarberQueues, barberSortedList, allCustomers, mutableData);
                 return Transaction.success(mutableData);
             }
 
@@ -115,7 +111,7 @@ public class BarberSelectionUtils {
                     return;
                 }
                 //customers are reallocated successfully, now update expected waiting times
-                TimerService.updateWaitingTimes(database, userId);
+                TimerService.updateWaitingTimes(database, userId, barberMap);
             }
         });
     }
@@ -125,7 +121,8 @@ public class BarberSelectionUtils {
         if (queue == null) {
             return Pair.of(0, waitingTime);
         }
-        long avgServiceTime = 15;//TODO consider avServiceTime from db
+        long avgServiceTime = queue.getBarber().getAvgTimeToCut() == 0 ? Barber.DEFAULT_AVG_TIME_TO_CUT
+                : queue.getBarber().getAvgTimeToCut();//if avgTimeToCut not defined in barber than use default
         int lastCustPlaceInQueue = 0;
         for (Customer customer : queue.getCustomers()) {
             if (customer.isInQueue()) {
@@ -140,6 +137,7 @@ public class BarberSelectionUtils {
 
     private static long calculateRemainingMinsToComplete(Customer customer, long avgServiceTime) {
         long minutesPassedSinceStarted = ((new Date().getTime() - customer.getServiceStartTime()) / 1000) / 60;
+        avgServiceTime = avgServiceTime == 0 ? Barber.DEFAULT_AVG_TIME_TO_CUT : avgServiceTime;//if avgTimeToCut not defined in barber than use default
         long minsRemaining = avgServiceTime - minutesPassedSinceStarted;
 
         if (minsRemaining < 0) {
@@ -163,7 +161,7 @@ public class BarberSelectionUtils {
     }
 
 
-    private static List<BarberSorted> sortedListOfBarbersForReAllocation(List<BarberQueue> queues, long avgServiceTime) {
+    private static List<BarberSorted> sortedListOfBarbersForReAllocation(List<BarberQueue> queues) {
         List<BarberSorted> barberSortedList = new ArrayList<>();
         for (BarberQueue queue : queues) {
             if (queue.getBarber().isStopped()) {
@@ -173,10 +171,13 @@ public class BarberSelectionUtils {
             long remainingMinsToComplete = -1;
             for (Customer customer : queue.getCustomers()) {
                 if (customer.isInProgress()) {
-                    remainingMinsToComplete = calculateRemainingMinsToComplete(customer, avgServiceTime);
+                    remainingMinsToComplete = calculateRemainingMinsToComplete(customer, queue.getBarber().getAvgTimeToCut());
                 }
             }
-            barberSortedList.add(BarberSorted.builder().key(queue.getBarberKey()).timeToGetAvailable(remainingMinsToComplete).build());
+            long avgServiceTime = queue.getBarber().getAvgTimeToCut() == 0 ? Barber.DEFAULT_AVG_TIME_TO_CUT
+                    : queue.getBarber().getAvgTimeToCut();//if avgTimeToCut not defined in barber than use default
+            barberSortedList.add(BarberSorted.builder().key(queue.getBarberKey())
+                    .avgServiceTime(avgServiceTime).timeToGetAvailable(remainingMinsToComplete).build());
         }
         Collections.sort(barberSortedList, new BarberComparator());
         return barberSortedList;
@@ -184,8 +185,7 @@ public class BarberSelectionUtils {
 
 
     private static void assignCustomersToBarbers(DatabaseReference dbRefBarberQueues, List<BarberSorted> barberSortedList,
-                                                 Set<Customer> allCustomers, long avgServiceTime,
-                                                 MutableData mutableData) {
+                                                 Set<Customer> allCustomers, MutableData mutableData) {
         int placeInQueue = 1;
         for (Customer customer : allCustomers) {
             String barberKey;
@@ -201,7 +201,7 @@ public class BarberSelectionUtils {
             for (BarberSorted barberSorted : barberSortedList) {
                 if (barberSorted.getKey().equalsIgnoreCase(barberKey)) {
                     long timeToGetAvailable = barberSorted.getTimeToGetAvailable();
-                    barberSorted.setTimeToGetAvailable(timeToGetAvailable + avgServiceTime);
+                    barberSorted.setTimeToGetAvailable(timeToGetAvailable + barberSorted.getAvgServiceTime());
                 }
             }
             Collections.sort(barberSortedList, new BarberComparator());
@@ -243,7 +243,9 @@ public class BarberSelectionUtils {
             if (totalCustomers > 0) {
                 waitingTimeOfLastCustomer = queue.getCustomers().get(totalCustomers - 1).getExpectedWaitingTime();
             }
-            barberSortedList.add(BarberSorted.builder().key(queue.getBarberKey())
+            long avgServiceTime = queue.getBarber().getAvgTimeToCut() == 0 ? Barber.DEFAULT_AVG_TIME_TO_CUT
+                    : queue.getBarber().getAvgTimeToCut();//if avgTimeToCut not defined in barber than use default
+            barberSortedList.add(BarberSorted.builder().key(queue.getBarberKey()).avgServiceTime(avgServiceTime)
                     .timeToGetAvailable(waitingTimeOfLastCustomer).build());
         }
 
@@ -271,6 +273,7 @@ public class BarberSelectionUtils {
     private static class BarberSorted {
         private String key;
         private long timeToGetAvailable;
+        private long avgServiceTime;
     }
 
     private static class BarberComparator implements Comparator<BarberSorted> {

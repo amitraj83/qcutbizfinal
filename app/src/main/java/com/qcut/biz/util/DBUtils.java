@@ -9,10 +9,12 @@ import com.google.firebase.database.MutableData;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
+import com.qcut.biz.models.ServiceAvailable;
 import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.tasks.FetchBarbersQueuesTask;
 import com.qcut.biz.tasks.FetchBarbersTask;
 import com.qcut.biz.tasks.FetchShopDetailsTask;
+import com.qcut.biz.tasks.FetchShopServicesTask;
 import com.qcut.biz.tasks.FetchShopsDetailsTask;
 import com.qcut.biz.tasks.FindBarberQueueTask;
 import com.qcut.biz.tasks.FindBarberTask;
@@ -63,6 +65,9 @@ public class DBUtils {
         return database.getReference().child(ShopDetails.SHOP_DETAILS);
     }
 
+    public static DatabaseReference getDbRefShopsServices(FirebaseDatabase database, String userid) {
+        return database.getReference().child(ServiceAvailable.SERVICES_AVAILABLE).child(userid);
+    }
 
     public static void getShopDetails(FirebaseDatabase database, String userid, OnSuccessListener<ShopDetails> onSuccessListener) {
         Tasks.<Void>forResult(null).continueWithTask(new FetchShopDetailsTask(database, userid))
@@ -105,6 +110,12 @@ public class DBUtils {
                 .addOnSuccessListener(onSuccessListener);
     }
 
+
+    public static void getShopServices(FirebaseDatabase database, String userid, OnSuccessListener<List<ServiceAvailable>> onSuccessListener) {
+        Tasks.<Void>forResult(null).continueWithTask(new FetchShopServicesTask(database, userid))
+                .addOnSuccessListener(onSuccessListener);
+    }
+
     public static String buildShopIdForToday(String userid) {
         return String.format("%s_%s", userid, TimeUtil.getTodayDDMMYYYY());
     }
@@ -134,4 +145,5 @@ public class DBUtils {
         final DatabaseReference dbRef = getDbRefShopDetails(database, userid);
         return dbRef.setValue(shopDetails);
     }
+
 }

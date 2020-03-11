@@ -5,6 +5,7 @@ import com.google.firebase.database.MutableData;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
+import com.qcut.biz.models.ServiceAvailable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,11 +82,7 @@ public class MappingUtils {
      */
     public static List<BarberQueue> buildBarberQueue(MutableData queuesData, Map<String, Barber> barberMap) {
         Iterator<MutableData> qSnapIterator = queuesData.getChildren().iterator();
-        List<Barber> availableBarbers = new ArrayList<>();
-        LogUtils.info("buildBarberQueue: {0}", barberMap);
-        for (Barber b : barberMap.values()) {
-            availableBarbers.add(b);
-        }
+        List<Barber> availableBarbers = new ArrayList<>(barberMap.values());
         List<BarberQueue> barbersQueues = new ArrayList<>();
         while (qSnapIterator.hasNext()) {
             final MutableData queueSnapshot = qSnapIterator.next();
@@ -112,5 +109,11 @@ public class MappingUtils {
                 iterator.remove();
             }
         }
+    }
+
+    public static ServiceAvailable mapToServiceAvailable(DataSnapshot serviceAvailableSnapshot) {
+        final ServiceAvailable serviceAvailable = serviceAvailableSnapshot.getValue(ServiceAvailable.class);
+        serviceAvailable.setKey(serviceAvailableSnapshot.getKey());
+        return serviceAvailable;
     }
 }

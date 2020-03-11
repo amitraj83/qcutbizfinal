@@ -22,7 +22,7 @@ public class BarbersChangeListener implements ValueEventListener {
         if (!barbersSnapshot.exists()) {
             return;
         }
-        LogUtils.info("BarbersChangeListener:onDataChange");
+        LogUtils.info("BarbersChangeListener..");
         final Iterator<DataSnapshot> iterator = barbersSnapshot.getChildren().iterator();
         List<Barber> barberList = new ArrayList<>();
         while (iterator.hasNext()) {

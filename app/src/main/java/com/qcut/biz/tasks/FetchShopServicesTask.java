@@ -9,48 +9,45 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.qcut.biz.models.Barber;
-import com.qcut.biz.models.ShopDetails;
-import com.qcut.biz.models.ShopStatus;
+import com.qcut.biz.models.ServiceAvailable;
 import com.qcut.biz.util.DBUtils;
 import com.qcut.biz.util.LogUtils;
+import com.qcut.biz.util.MappingUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-public class FetchShopsDetailsTask implements Continuation<Void, Task<List<ShopDetails>>> {
+public class FetchShopServicesTask implements Continuation<Void, Task<List<ServiceAvailable>>> {
 
     private FirebaseDatabase database;
+    private String userid;
 
-    public FetchShopsDetailsTask(FirebaseDatabase database) {
+    public FetchShopServicesTask(FirebaseDatabase database, String userid) {
         this.database = database;
+        this.userid = userid;
     }
 
     @Override
-    public Task<List<ShopDetails>> then(@NonNull Task<Void> task) throws Exception {
-        final TaskCompletionSource<List<ShopDetails>> tcs = new TaskCompletionSource<>();
+    public Task<List<ServiceAvailable>> then(@NonNull Task<Void> task) throws Exception {
+        final TaskCompletionSource<List<ServiceAvailable>> tcs = new TaskCompletionSource<>();
 
-        DBUtils.getDbRefShopsDetails(database).addListenerForSingleValueEvent(new ValueEventListener() {
+        DBUtils.getDbRefShopsServices(database, userid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                LogUtils.info("ShopsDetails loaded");
+                LogUtils.info("ServicesAvailable loaded");
                 Iterator<DataSnapshot> childrenIterator = dataSnapshot.getChildren().iterator();
-                List<ShopDetails> shopsDetails = new ArrayList<>();
+                List<ServiceAvailable> servicesAvailable = new ArrayList<>();
                 while (childrenIterator.hasNext()) {
                     final DataSnapshot next = childrenIterator.next();
-                    ShopDetails shopDetails = next.getValue(ShopDetails.class);
-                    shopDetails.setKey(next.getKey());
-                    shopsDetails.add(shopDetails);
+                    servicesAvailable.add(MappingUtils.mapToServiceAvailable(next));
                 }
-                tcs.setResult(shopsDetails);
+                tcs.setResult(servicesAvailable);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError dbError) {
-                LogUtils.error("Error loading shopDetails:{0}", dbError.getMessage());
+                LogUtils.error("Error loading ServicesAvailable:{0}", dbError.getMessage());
             }
         });
         return tcs.getTask();

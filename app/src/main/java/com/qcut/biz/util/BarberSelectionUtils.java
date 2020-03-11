@@ -195,7 +195,7 @@ public class BarberSelectionUtils {
                 barberKey = customer.getPreferredBarberKey();
             }
             customer.setTimeAdded(placeInQueue++);
-            customer.setKey(dbRefBarberQueues.child(barberKey).push().getKey());
+//            customer.setKey(dbRefBarberQueues.child(barberKey).push().getKey());
             DBUtils.saveCustomer(customer, mutableData.child(barberKey));
 
             for (BarberSorted barberSorted : barberSortedList) {
@@ -216,7 +216,7 @@ public class BarberSelectionUtils {
                     allCustomers.add(customer);
                     removeCustomer(mutableData, queue.getBarberKey(), customer.getKey());
                     //clear key
-                    customer.setKey(null);
+//                    customer.setKey(null);
                 }
             }
         }

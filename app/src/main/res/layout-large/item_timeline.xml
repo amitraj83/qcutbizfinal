@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             android:fontFamily="@font/montserrat_bold"
             android:gravity="center_vertical|start"
-
+            android:textAllCaps="true"
             android:textSize="@dimen/customer_view_item_size"
             tools:text="Loading..."
             app:layout_constraintTop_toTopOf="parent"
@@ -68,6 +68,7 @@
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/customer_view_item_size"
+                android:textAllCaps="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/cust_view_name"

@@ -64,6 +64,9 @@ public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusCha
             @Override
             public void onSuccess(List<BarberQueue> barberQueues) {
                 for (BarberQueue bq : barberQueues) {
+                    if (bq.getBarber().isStopped()) {
+                        continue;
+                    }
                     queueMap.put(bq.getBarberKey(), bq);
                     if (!view.isTabExists(bq.getBarberKey())) {
                         //barber queue not exists
@@ -202,7 +205,13 @@ public class WaitingPresenter implements BarberStatusChangeEvent.BarberStatusCha
                 } else {
                     view.updateButtonToStopQ();
                 }
-                EventBus.instance().fireEvent(new QueueTabSelectedEvent(queueMap.get(selectedBarberKey)));
+                BarberQueue queue = queueMap.get(barber.getKey());
+                if (queue == null) {
+                    //it means there is no customer, that is the reason queue is not created yet
+                    queue = BarberQueue.builder().barber(barber).barberKey(barber.getKey()).build();
+                    queueMap.put(queue.getBarberKey(), queue);
+                }
+                EventBus.instance().fireEvent(new QueueTabSelectedEvent(queue));
             }
         });
     }

@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,13 +21,16 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.qcut.biz.eventbus.EventBus;
 import com.qcut.biz.events.RelocationRequestEvent;
+import com.qcut.biz.listeners.ConfigParamsChangeListener;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
+import com.qcut.biz.models.ConfigParams;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +39,13 @@ import java.util.TimerTask;
 
 public class TimerService extends Service {
 
-    private static Timer timer = new Timer();
+    private static Timer timer;
     private Context ctx;
     private FirebaseDatabase database = null;
     private String userid;
     private SharedPreferences sp;
+    private ConfigParams configParams;
+    private static final int SIXTY_SECONDS = 60 * 1000;
 
     public IBinder onBind(Intent arg0) {
         return null;
@@ -53,12 +57,29 @@ public class TimerService extends Service {
         database = FirebaseDatabase.getInstance();
         sp = ctx.getSharedPreferences("login", MODE_PRIVATE);
         userid = sp.getString("userid", null);
-
-        startService();
+        if (configParams == null) {
+            DBUtils.getDbRefConfigParams(database, userid).addValueEventListener(new ConfigParamsChangeListener() {
+                @Override
+                protected void onDataChange(ConfigParams configParams) {
+                    TimerService.this.configParams = configParams;
+                }
+            });
+        }
+        resetTimer(SIXTY_SECONDS);
     }
 
-    private void startService() {
-        timer.scheduleAtFixedRate(new mainTask(), 0, 60 * 1000);
+    private void resetTimer(long delay) {
+        stopService();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new mainTask(), delay, SIXTY_SECONDS);
+    }
+
+    private void stopService() {
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+            timer = null;
+        }
     }
 
     private class mainTask extends TimerTask {
@@ -69,6 +90,7 @@ public class TimerService extends Service {
 
     public void onDestroy() {
         super.onDestroy();
+        stopService();
         Toast.makeText(this, "Service Stopped ...", Toast.LENGTH_SHORT).show();
     }
 
@@ -76,9 +98,29 @@ public class TimerService extends Service {
     private final Handler toastHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            if (configParams != null && isRecentlyTriggered()) {
+                //if recently triggered then don't run and reset timer
+                LogUtils.info("Reallocation recently ran at {0} reseting timer.",
+                        new Date(configParams.getLastReallocationTime()));
+                long milliSecSinceLastReallocation = System.currentTimeMillis() - configParams.getLastReallocationTime();
+                long remainigTimeForNextRun = milliSecSinceLastReallocation >= SIXTY_SECONDS ?
+                        SIXTY_SECONDS : SIXTY_SECONDS - milliSecSinceLastReallocation;
+                resetTimer(remainigTimeForNextRun);
+                return;
+            }
             EventBus.instance().fireEvent(new RelocationRequestEvent());
+            Map<String, Object> properties = new HashMap<>();
+            final long now = System.currentTimeMillis();
+            properties.put(ConfigParams.LAST_REALLOCATION_TIME, now);
+            DBUtils.getDbRefConfigParams(database, userid).updateChildren(properties);
+            LogUtils.info("Last reallocation time updated: {0}", new Date(now));
         }
     };
+
+    private boolean isRecentlyTriggered() {
+        //if less than 59sec
+        return System.currentTimeMillis() - configParams.getLastReallocationTime() < 59000;
+    }
 
     public static void updateWaitingTimes(final FirebaseDatabase database, final String userid, final Map<String, Barber> barberMap) {
         final DatabaseReference dbRefBarberQueues = DBUtils.getDbRefBarberQueues(database, userid);

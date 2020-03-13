@@ -207,6 +207,8 @@ public class WaitingFragment extends Fragment implements WaitingView {
 
     @Override
     public void addBarberQueueTab(Barber barber) {
+        LogUtils.info("addBarberQueueTab");
+
         if (isTabExists(barber.getKey())) {
             LogUtils.error("Tab already exists for: {0}, so no new tab will be added", barber.getKey());
             return;
@@ -218,6 +220,10 @@ public class WaitingFragment extends Fragment implements WaitingView {
         tabLayout.addTab(tab.setText("Loading...").setIcon(R.drawable.photo_barber));
         adapter.notifyDataSetChanged();
         viewPager.setCurrentItem(adapter.getCount() - 1);
+        if (tabLayout.getTabCount() == 1) {
+            //when only one tab onTabSelected does not called so we have to manually trigger tab initialization
+            presenter.onBarberQueueTabSelected(tab.getTag().toString());
+        }
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {

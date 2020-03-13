@@ -8,6 +8,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
+import com.qcut.biz.models.ConfigParams;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.ServiceAvailable;
 import com.qcut.biz.models.ShopDetails;
@@ -63,6 +64,10 @@ public class DBUtils {
 
     public static DatabaseReference getDbRefShopsDetails(FirebaseDatabase database) {
         return database.getReference().child(ShopDetails.SHOP_DETAILS);
+    }
+
+    public static DatabaseReference getDbRefConfigParams(FirebaseDatabase database, String userid) {
+        return database.getReference().child(ConfigParams.CONFIG_PARAMETERS).child(buildShopIdForToday(userid));
     }
 
     public static DatabaseReference getDbRefShopsServices(FirebaseDatabase database, String userid) {
@@ -145,5 +150,4 @@ public class DBUtils {
         final DatabaseReference dbRef = getDbRefShopDetails(database, userid);
         return dbRef.setValue(shopDetails);
     }
-
 }

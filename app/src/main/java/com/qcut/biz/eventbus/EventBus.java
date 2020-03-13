@@ -60,7 +60,7 @@ public class EventBus {
             try {
                 event.dispatch(handler);
             } catch (Exception ex) {
-                LogUtils.error("Error while dipatching event: {0}", event, ex);
+                LogUtils.error("Error while dipatching event: {0}", ex, event);
             }
         }
     }

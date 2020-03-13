@@ -41,7 +41,6 @@ public class MainPresenter implements BarbersChangeEvent.BarbersChangeEventHandl
     private FirebaseDatabase database;
     private Map<String, Barber> barberMap = new HashMap<>();
 
-
     public MainPresenter(MainView mainView, Context context) {
         this.view = mainView;
         this.context = context;

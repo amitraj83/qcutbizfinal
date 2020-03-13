@@ -76,6 +76,8 @@ public class CustomerViewAdapter extends RecyclerView.Adapter<CustomerViewAdapte
             animation.setRepeatMode(Animation.REVERSE);
             animation.cancel();
             animation.reset();
+            holder.waitingTime.startAnimation(animation);
+
 //            holder.mTimelineView.startAnimation(animation);
         } else {
             holder.waitingTime.setBackground(this.mContext.getResources().getDrawable(R.drawable.rounded_text_view));

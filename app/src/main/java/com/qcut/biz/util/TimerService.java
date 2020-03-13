@@ -20,6 +20,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.qcut.biz.eventbus.EventBus;
+import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
@@ -74,17 +76,7 @@ public class TimerService extends Service {
     private final Handler toastHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            DBUtils.getBarbersQueues(database, userid, new OnSuccessListener<List<BarberQueue>>() {
-                @Override
-                public void onSuccess(List<BarberQueue> barberQueues) {
-                    Map<String, Barber> barberMap = new HashMap<>();
-                    for (BarberQueue barberQueue : barberQueues) {
-                        barberMap.put(barberQueue.getBarberKey(), barberQueue.getBarber());
-                    }
-                    BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
-                }
-            });
-
+            EventBus.instance().fireEvent(new RelocationRequestEvent());
         }
     };
 
@@ -98,39 +90,34 @@ public class TimerService extends Service {
                 List<BarberQueue> barberQueues = MappingUtils.mapToBarberQueues(mutableData);
                 for (BarberQueue barberQueue : barberQueues) {
                     List<Customer> customers = new ArrayList<>();
-                    boolean isSomeOneInProgress = false;
+                    Customer inProgressCustomer = null;
                     for (Customer customer : barberQueue.getCustomers()) {
                         if (customer.isInQueue()) {
                             customers.add(customer);
                         } else if (customer.isInProgress()) {
-                            isSomeOneInProgress = true;
+                            inProgressCustomer = customer;
                         }
                     }
                     Collections.sort(customers, new CustomerComparator());
-                    final long avgServiceTime = barberMap.get(barberQueue.getBarberKey()).getAvgTimeToCut();
-                    long avgTimeToCut = avgServiceTime == 0 ? Barber.DEFAULT_AVG_TIME_TO_CUT : avgServiceTime;//if avgServiceTime not defined in barber than use default
+                    long barberAvgTimeToCut = barberMap.get(barberQueue.getBarberKey()).getAvgTimeToCut();
+                    long avgTimeToCut = barberAvgTimeToCut == 0 ? 15 : barberAvgTimeToCut;
                     long prevCustomerTime = 0;
                     for (int i = 0; i < customers.size(); i++) {
                         final MutableData customerMutableData = mutableData.child(barberQueue.getBarberKey()).child(customers.get(i).getKey());
                         long newTimeToWait = 0;
                         if (i == 0) {
                             //first customer in the queue
-                            if (isSomeOneInProgress) {
-                                long timeToWait = customers.get(i).getExpectedWaitingTime();
-                                if (timeToWait > 0) {
-                                    timeToWait = Math.min(avgTimeToCut, timeToWait);
-                                    newTimeToWait = timeToWait - 1;
-                                    prevCustomerTime = newTimeToWait;
-                                    DBUtils.saveCustomerWaitingTime(customerMutableData, newTimeToWait);
-
-                                }
+                            if (inProgressCustomer != null) {
+                                long serviceStartTime = inProgressCustomer.getServiceStartTime();
+                                long timeToWait = avgTimeToCut - ((System.currentTimeMillis() - serviceStartTime) / 60000);
+                                newTimeToWait = Math.max(0, timeToWait);
+                                //incase in progress customer is ther for more than avgTimeToCut
                             } else {
                                 //customer is waiting to be served, there is none on chair
                                 newTimeToWait = 0;
-                                prevCustomerTime = newTimeToWait;
-                                DBUtils.saveCustomerWaitingTime(customerMutableData, newTimeToWait);
-
                             }
+                            prevCustomerTime = newTimeToWait;
+                            DBUtils.saveCustomerWaitingTime(customerMutableData, newTimeToWait);
                         } else {
                             newTimeToWait = prevCustomerTime + avgTimeToCut;
                             prevCustomerTime = newTimeToWait;

@@ -14,6 +14,7 @@ import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.BarberQueue;
 import com.qcut.biz.models.Customer;
+import com.qcut.biz.models.CustomerComparator;
 import com.qcut.biz.models.CustomerStatus;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -208,7 +209,7 @@ public class BarberSelectionUtils {
     }
 
     private static Set<Customer> removeAndGetAllCustomerToBeAddedLater(FirebaseDatabase database, String userid, @NonNull List<BarberQueue> queues, MutableData mutableData) {
-        Set<Customer> allCustomers = new TreeSet<>(new CustComparatorBasedOnArrivalTime());
+        Set<Customer> allCustomers = new TreeSet<>(new CustomerComparator());
         for (BarberQueue queue : queues) {
             for (Customer customer : queue.getCustomers()) {
                 if (customer.isInQueue()) {
@@ -248,20 +249,6 @@ public class BarberSelectionUtils {
 
         Collections.sort(barberSortedList, new BarberComparator());
         return barberSortedList;
-    }
-
-    private static class CustComparatorBasedOnArrivalTime implements Comparator<Customer> {
-        @Override
-        public int compare(Customer o1, Customer o2) {
-            //sort based on arrival time ascending order
-            if (o1.getArrivalTime() > o2.getArrivalTime()) {
-                return 1;
-            } else if (o1.getArrivalTime() == o2.getArrivalTime()) {
-                return 0;
-            } else {
-                return -1;
-            }
-        }
     }
 
     @Getter

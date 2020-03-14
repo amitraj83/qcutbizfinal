@@ -1,34 +1,35 @@
 package com.qcut.biz.listeners;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.SuccessContinuation;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.FirebaseDatabase;
 import com.qcut.biz.adaptors.WaitingListRecyclerViewAdapter;
-import com.qcut.biz.models.BarberQueue;
+import com.qcut.biz.models.Barber;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerComparator;
-import com.qcut.biz.models.CustomerStatus;
 import com.qcut.biz.presenters.fragments.WaitingListPresenter;
 import com.qcut.biz.util.DBUtils;
+import com.qcut.biz.util.LogUtils;
+import com.qcut.biz.util.TimerService;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
-    private int dragFrom = -1;
-    private int dragTo = -1;
-    private WaitingListRecyclerViewAdapter adapter;
-    private WaitingListPresenter waitingListPresenter;
 
-    public ItemTouchHelperCallback(WaitingListPresenter waitingListPresenter, WaitingListRecyclerViewAdapter adapter) {
+    private WaitingListPresenter waitingListPresenter;
+    private Customer draggedCustomer;
+
+    public ItemTouchHelperCallback(WaitingListPresenter waitingListPresenter) {
         this.waitingListPresenter = waitingListPresenter;
-        this.adapter = adapter;
     }
 
     @Override
@@ -39,34 +40,59 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(@NonNull final RecyclerView recyclerView, @NonNull final RecyclerView.ViewHolder dragged,
                           @NonNull final RecyclerView.ViewHolder target) {
-        FirebaseDatabase database = waitingListPresenter.getDatabase();
-        String userid = waitingListPresenter.getUserId();
-        String barberKey = waitingListPresenter.getBarberKey();
-        DBUtils.getBarberQueue(database, userid, barberKey, new OnSuccessListener<BarberQueue>() {
-            @Override
-            public void onSuccess(BarberQueue barberQueue) {
-                //TODO use  orderByChild(Constants.Customer.STATUS).equalTo(BarberStatus.PROGRESS.name());
-                for (Customer customer : barberQueue.getCustomers()) {
-                    if (CustomerStatus.PROGRESS.name().equalsIgnoreCase(customer.getStatus())) {
-                        waitingListPresenter.showMessage("A customer in chair. Cannot drag or drop others.");
-                        return;
-                    }
-                }
-                final int position_dragged = dragged.getAdapterPosition();
-                final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder) recyclerView.findViewHolderForAdapterPosition(position_dragged))
-                        .custStatus.getTag().toString();
-                if (status.equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
-                    final int position_target = target.getAdapterPosition();
-                    Collections.swap(adapter.getDataSet(), position_dragged, position_target);
-                    if (dragFrom == -1) {
-                        dragFrom = position_dragged;
-                    }
-                    dragTo = position_target;
-                    adapter.notifyItemMoved(position_dragged, position_target);
-                }
+        draggedCustomer = null;
+        final List<Customer> customers = getDataSet(recyclerView.getAdapter());
+        for (Customer customer : customers) {
+            if (customer.isInProgress()) {
+                //in any customer is in progress drag is not allowed
+                waitingListPresenter.showMessage("A customer in chair. Cannot drag or drop others.");
+                return true;
             }
-        });
+        }
+
+        final int position_dragged = dragged.getAdapterPosition();
+        Customer draggedCustomer = getCustomerFromViewHolder(dragged);
+        if (draggedCustomer.isInQueue()) {
+            final int position_target = target.getAdapterPosition();
+            final RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            Collections.swap(customers, position_dragged, position_target);
+            //if not moved to first then, get arrival time of one customer ahead in queue
+            // note position starts with 0 and index also starts with 0
+            long beforeCustomerTime = position_target == 0 ? -1 : getCustomerTime(customers, position_target - 1);
+            long afterCustomerTime = position_target == customers.size() - 1 ? -1 : getCustomerTime(customers, position_target + 1);
+            if (beforeCustomerTime == -1 && afterCustomerTime != -1) {
+                beforeCustomerTime = afterCustomerTime - 10;
+            } else if (afterCustomerTime == -1 && beforeCustomerTime != -1) {
+                afterCustomerTime = beforeCustomerTime + 10;
+            }
+            //there is only one customer in queue no need to change anything
+            boolean dragNeeded = beforeCustomerTime != -1 && afterCustomerTime != -1;
+
+            final long arrivalTime = CustomerComparator.getCustomerTime(draggedCustomer);
+            //if customer is already in between than drag not required
+            dragNeeded = dragNeeded && (arrivalTime < beforeCustomerTime || arrivalTime > afterCustomerTime);
+            if (dragNeeded) {
+                long newDragTime = beforeCustomerTime + ((afterCustomerTime - beforeCustomerTime) / 2);
+                draggedCustomer.setDragAdjustedTime(newDragTime);
+                this.draggedCustomer = draggedCustomer;
+                adapter.notifyItemMoved(position_dragged, position_target);
+            } else {
+                LogUtils.info("Customer is already in correct position so drag time change not required");
+            }
+        }
         return true;
+    }
+
+    public long getCustomerTime(List<Customer> customers, int index) {
+        return CustomerComparator.getCustomerTime(customers.get(index));
+    }
+
+    public List<Customer> getDataSet(RecyclerView.Adapter adapter) {
+        return ((WaitingListRecyclerViewAdapter) adapter).getDataSet();
+    }
+
+    public Customer getCustomerFromViewHolder(@NonNull RecyclerView.ViewHolder dragged) {
+        return ((WaitingListRecyclerViewAdapter.MyViewHolder) dragged).getCustomer();
     }
 
     @Override
@@ -79,37 +105,37 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
         return true;
     }
 
+//    @Override
+//    public float getMoveThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+//        //TODO Consider overriding it
+//        return super.getMoveThreshold(viewHolder);
+//    }
+
     @Override
     public void clearView(final RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
+        if (draggedCustomer == null) {
+            //nothing was dragged
+            return;
+        }
         final FirebaseDatabase database = waitingListPresenter.getDatabase();
         final String userid = waitingListPresenter.getUserId();
         final String barberKey = waitingListPresenter.getBarberKey();
-        DBUtils.getBarberQueue(database, userid, barberKey, new OnSuccessListener<BarberQueue>() {
+        Map<String, Object> updateProperties = new HashMap<>();
+        updateProperties.put(draggedCustomer.getKey() + "/" + Customer.DRAG_ADJUSTED_TIME, draggedCustomer.getDragAdjustedTime());
+        DBUtils.getDbRefBarberQueue(database, userid, barberKey).updateChildren(updateProperties).onSuccessTask(new SuccessContinuation<Void, Object>() {
+            @NonNull
             @Override
-            public void onSuccess(BarberQueue barberQueue) {
-                List<Customer> customers = new ArrayList<>();
-                for (Customer customer : barberQueue.getCustomers()) {
-                    if (CustomerStatus.QUEUE.name().equalsIgnoreCase(customer.getStatus())) {
-                        customers.add(customer);
+            public Task<Object> then(@Nullable Void aVoid) throws Exception {
+                DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
+                    @Override
+                    public void onSuccess(Map<String, Barber> barbersMap) {
+                        TimerService.updateWaitingTimes(database, userid, barbersMap);
                     }
-                }
-                Collections.sort(customers, new CustomerComparator());
-                int count = 0;
-                int itemCount = recyclerView.getAdapter().getItemCount();
-                Map<String, Object> timeToUpdate = new HashMap<>();
-                for (int i = 0; i < itemCount; i++) {
-                    final String sourceTag = recyclerView.findViewHolderForAdapterPosition(i)
-                            .itemView.getTag().toString();
-                    final String status = ((WaitingListRecyclerViewAdapter.MyViewHolder) recyclerView
-                            .findViewHolderForAdapterPosition(i)).custStatus.getTag().toString();
-                    if (status.equalsIgnoreCase(CustomerStatus.QUEUE.name())) {
-                        timeToUpdate.put(sourceTag + "/timeAdded", i);
-                        timeToUpdate.put(sourceTag + "/expectedWaitingTime", customers.get(count++).getExpectedWaitingTime());
-                    }
-                }
-                DBUtils.getDbRefBarberQueue(database, userid, barberKey).updateChildren(timeToUpdate);
+                });
+                return null;
             }
         });
+
     }
 }

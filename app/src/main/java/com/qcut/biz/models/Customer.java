@@ -22,9 +22,11 @@ import lombok.Setter;
 @IgnoreExtraProperties
 public class Customer {
     public static final String EXPECTED_WAITING_TIME = "expectedWaitingTime";
+    public static final String DRAG_ADJUSTED_TIME = "dragAdjustedTime";
     private String key;
     private String name;
     private long arrivalTime;
+    private long dragAdjustedTime;
     private long expectedWaitingTime;
     private long serviceStartTime;
     private long actualProcessingTime;

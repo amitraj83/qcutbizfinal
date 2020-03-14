@@ -25,11 +25,11 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
     private List<Customer> dataSet;
     private Context mContext;
     private View.OnClickListener waitingListClickListener;
-    CustomerOptionsView customerOptionsView;
-    String barberKey;
+    private CustomerOptionsView customerOptionsView;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView custName, custStatus, forWho, options;
+        private TextView custName, custStatus, forWho, options;
+        private Customer customer;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -44,6 +44,10 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
                 }
             });
         }
+
+        public Customer getCustomer() {
+            return customer;
+        }
     }
 
     public WaitingListRecyclerViewAdapter(List<Customer> dataSet, Context mContext,
@@ -53,7 +57,6 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
         this.mContext = mContext;
         this.waitingListClickListener = waitingListClickListener;
         this.customerOptionsView = new CustomerOptionsView(mContext, new CustomerOptionPresenter(database, userid, barberKey));
-        this.barberKey = barberKey;
     }
 
     public void setDataSet(List<Customer> dataSet) {
@@ -78,6 +81,7 @@ public class WaitingListRecyclerViewAdapter extends RecyclerView.Adapter<Waiting
         Customer customer = this.dataSet.get(position);
         holder.itemView.setTag(customer.getKey());
         holder.custName.setText(customer.getName());
+        holder.customer = customer;
         if (customer.isAnyBarber()) {
             holder.forWho.setText("Any");
         } else {

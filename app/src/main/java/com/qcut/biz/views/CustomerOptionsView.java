@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +15,7 @@ import com.qcut.biz.presenters.CustomerOptionPresenter;
 public class CustomerOptionsView {
 
     Context context;
+    private CustomerOptionPresenter presenter;
     PopupWindow popupWindow;
     View removeCustomer;
     View shuffleCustomer;
@@ -21,11 +23,10 @@ public class CustomerOptionsView {
 
     public CustomerOptionsView (Context context, final CustomerOptionPresenter presenter) {
         this.context = context;
+        presenter.setView(this);
         LayoutInflater inflater = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View popupWindowView = inflater.inflate(R.layout.popup_window, null);
-
-
 
         popupWindow = new PopupWindow(popupWindowView,
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -46,13 +47,14 @@ public class CustomerOptionsView {
                 popupWindow.dismiss();
             }
         });
-
     }
-
 
     public void show(RecyclerView.ViewHolder holder) {
         selectedCustomerKey = holder.itemView.getTag().toString();
         popupWindow.showAsDropDown(holder.itemView.findViewById(R.id.customer_options));
+    }
 
+    public void showMessage(String msg) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 }

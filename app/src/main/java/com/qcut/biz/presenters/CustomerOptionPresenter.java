@@ -7,12 +7,14 @@ import com.qcut.biz.events.RelocationRequestEvent;
 import com.qcut.biz.models.Customer;
 import com.qcut.biz.models.CustomerStatus;
 import com.qcut.biz.util.DBUtils;
+import com.qcut.biz.views.CustomerOptionsView;
 
 public class CustomerOptionPresenter {
 
     FirebaseDatabase database;
     String userid;
     private String barberKey;
+    private CustomerOptionsView view;
 
     public CustomerOptionPresenter(FirebaseDatabase database, String userid, String barberKey) {
         this.database = database;
@@ -40,6 +42,10 @@ public class CustomerOptionPresenter {
         DBUtils.getCustomer(database, userid, barberKey, customerKey, new OnSuccessListener<Customer>() {
             @Override
             public void onSuccess(Customer customer) {
+                if (customer.isInProgress()) {
+                    view.showMessage("In progress customer can't be removed.");
+                    return;
+                }
                 customer.setStatus(CustomerStatus.REMOVED.name());
                 DBUtils.getDbRefBarberQueue(database, userid, barberKey).child(customerKey)
                         .setValue(customer).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -50,5 +56,9 @@ public class CustomerOptionPresenter {
                 });
             }
         });
+    }
+
+    public void setView(CustomerOptionsView view) {
+        this.view = view;
     }
 }

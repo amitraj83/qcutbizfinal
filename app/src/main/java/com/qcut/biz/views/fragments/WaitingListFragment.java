@@ -141,6 +141,8 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     @Override
     public void showAddCustomerDialog() {
         addCustomerDialog.show();
+        //select always "Any" by default
+        ddSpinner.setSelection(0);
         addCustomerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
     }
 

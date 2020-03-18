@@ -100,7 +100,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
             dynamicListView.setItemAnimator(new DefaultItemAnimator());
             adapter = presenter.createWaitingListViewAdaptor();
             dynamicListView.setAdapter(adapter);
-            ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter, adapter));
+            ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelperCallback(presenter));
             helper.attachToRecyclerView(dynamicListView);
         }
         if (addCustomerDialog == null) {

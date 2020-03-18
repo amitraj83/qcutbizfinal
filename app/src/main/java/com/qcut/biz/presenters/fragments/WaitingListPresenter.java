@@ -21,7 +21,6 @@ import com.qcut.biz.models.ShopDetails;
 import com.qcut.biz.util.BarberSelectionUtils;
 import com.qcut.biz.util.Constants;
 import com.qcut.biz.util.DBUtils;
-import com.qcut.biz.util.LogUtils;
 import com.qcut.biz.views.WaitingListView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -217,6 +216,10 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
             view.updateNextCustomerView("No customer.", "NONE");
         }
         view.updateAndRefreshQueue(models);
+    }
+
+    public Map<String, Barber> getBarbersMap() {
+        return barbersMap;
     }
 
     @Override

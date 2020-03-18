@@ -207,8 +207,6 @@ public class WaitingFragment extends Fragment implements WaitingView {
 
     @Override
     public void addBarberQueueTab(Barber barber) {
-        LogUtils.info("addBarberQueueTab");
-
         if (isTabExists(barber.getKey())) {
             LogUtils.error("Tab already exists for: {0}, so no new tab will be added", barber.getKey());
             return;
@@ -227,6 +225,10 @@ public class WaitingFragment extends Fragment implements WaitingView {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(final TabLayout.Tab tab) {
+//                if (WaitingFragment.this.isDetached()) {
+//                    //do not proceed if it is detached
+//                    return;
+//                }
                 viewPager.setCurrentItem(tab.getPosition());
                 presenter.onBarberQueueTabSelected(tab.getTag().toString());
                 ((TextView) tab.getCustomView().findViewById(R.id.tab_name)).setTextColor(getResources().getColor(R.color.colorPrimaryDark));

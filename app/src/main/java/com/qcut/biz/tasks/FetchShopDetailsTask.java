@@ -31,9 +31,11 @@ public class FetchShopDetailsTask implements Continuation<Void, Task<ShopDetails
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 LogUtils.info("ShopDetails loaded");
                 ShopDetails shopDetails = dataSnapshot.getValue(ShopDetails.class);
-                shopDetails.setKey(dataSnapshot.getKey());
-                LogUtils.info("FetchShopDetailsTask: {0}", shopDetails);
-                tcs.setResult(shopDetails);
+                if (shopDetails != null) {
+                    shopDetails.setKey(dataSnapshot.getKey());
+                    LogUtils.info("FetchShopDetailsTask: {0}", shopDetails);
+                    tcs.setResult(shopDetails);
+                }
             }
 
             @Override

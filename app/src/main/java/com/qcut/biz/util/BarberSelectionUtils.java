@@ -81,6 +81,7 @@ public class BarberSelectionUtils {
                         .expectedWaitingTime(waitingInfo.getRight()).placeInQueue(waitingInfo.getLeft())
                         .timeAdded(now).status(CustomerStatus.QUEUE.name())
                         .key(dbRefBarberQueues.child(barberKey).push().getKey()).build();
+                newCustomer.setAddedBy(newCustomer.getKey());
                 DBUtils.saveCustomer(newCustomer, queuesMutableData.child(barberKey));
             }
         });

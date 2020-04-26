@@ -35,6 +35,9 @@ public class Customer {
     private String preferredBarberKey;
     private int placeInQueue;
     private boolean absent;
+    private String channel = "DIRECT";
+    private String addedBy ;
+
 
     //history
     private long departureTime;

@@ -84,7 +84,7 @@ public class TimerService extends Service {
 
     private class mainTask extends TimerTask {
         public void run() {
-            toastHandler.sendEmptyMessage(0);
+            //toastHandler.sendEmptyMessage(0);
         }
     }
 

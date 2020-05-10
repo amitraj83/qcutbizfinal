@@ -30,7 +30,7 @@
             android:layout_marginTop="50dp"
             android:fontFamily="@font/montserrat_regular"
             android:textSize="22dp"
-            android:text="Make Business Better"/>
+            android:text="Digital Queue, Better Business"/>
 
 
     </LinearLayout>

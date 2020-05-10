@@ -30,7 +30,7 @@
             android:gravity="center"
             android:layout_marginTop="40dp"
             android:fontFamily="@font/montserrat_regular"
-            android:text="Make Business Better"/>
+            android:text="Digital Queue, Better Business"/>
 
     </LinearLayout>
 

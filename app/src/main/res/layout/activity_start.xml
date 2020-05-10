@@ -14,30 +14,23 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
-        android:background="@drawable/start_image"
+        android:background="@color/backgroundItems"
         android:orientation="vertical"
         android:alpha="1"
+        android:gravity="center"
         >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5"
-            android:gravity="center"
-            android:text="QCut"
-            android:textSize="60dp"
-            android:fontFamily="@font/montserrat_extrabold"
-            android:textColor="#FAFFFFFF"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/biz_logo_round"/>
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/spend_time_wisely"
-            android:textColor="#FAFFFFFF"
-            android:textSize="20dp"
-            android:fontFamily="@font/montserrat_bold"
-            />
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/montserrat_regular"
+            android:text="Make Business Better"/>
 
     </LinearLayout>
 

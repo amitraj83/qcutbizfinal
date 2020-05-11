@@ -57,24 +57,24 @@ public class MainPresenter implements BarbersChangeEvent.BarbersChangeEventHandl
         EventBus.instance().registerHandler(BarbersChangeEvent.TYPE, this);
     }
 
-    public void onStatusClick() {
-        final String OFFLINE = context.getString(R.string.status_offline);
-        if (userid == null) {
-            view.showMessage("Problem. Please logout and Login again. ");
-            LogUtils.error("UserId is null: {0}", userid);
-            return;
-        }
-        if (view.getCurrentStatus().equalsIgnoreCase(OFFLINE)) {
-            //go online
-            updateStatus(context.getString(R.string.status_online));
-            view.setShopStatusOnline();
-
-        } else {
-            //go offline
-            updateStatus(OFFLINE);
-            view.setShopStatusOffline();
-        }
-    }
+//    public void onStatusClick() {
+//        final String OFFLINE = context.getString(R.string.status_offline);
+//        if (userid == null) {
+//            view.showMessage("Problem. Please logout and Login again. ");
+//            LogUtils.error("UserId is null: {0}", userid);
+//            return;
+//        }
+//        if (view.getCurrentStatus().equalsIgnoreCase(OFFLINE)) {
+//            //go online
+//            updateStatus(context.getString(R.string.status_online));
+//            view.setShopStatusOnline();
+//
+//        } else {
+//            //go offline
+//            updateStatus(OFFLINE);
+//            view.setShopStatusOffline();
+//        }
+//    }
 
     public void setStatusListner() {
         DatabaseReference shopStatusRef = DBUtils.getDbRefShopStatus(database, userid);
@@ -134,8 +134,17 @@ public class MainPresenter implements BarbersChangeEvent.BarbersChangeEventHandl
     @Override
     public void onBarbersChange(BarbersChangeEvent event) {
         barberMap.clear();
+        boolean online = false;
         for (Barber barber : event.getBarbers()) {
+            if(!barber.isStopped()){
+                online = true;
+            }
             barberMap.put(barber.getKey(), barber);
+        }
+        if(online){
+            updateStatus(context.getString(R.string.status_online));
+        }else{
+            updateStatus(context.getString(R.string.status_offline));
         }
     }
 

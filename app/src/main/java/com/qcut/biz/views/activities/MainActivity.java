@@ -70,12 +70,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             animation.reset();
             blinkingDot.setAnimation(animation);
 
-            statusView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mainPresenter.onStatusClick();
-                }
-            });
+//            statusView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mainPresenter.onStatusClick();
+//                }
+//            });
 
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
             navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);

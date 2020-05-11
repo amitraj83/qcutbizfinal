@@ -38,6 +38,7 @@ public class ShopDetails {
     private String city;
     private String country;
     private String status;
+    private String timezone;
 
     @Exclude
     public boolean isOnline() {

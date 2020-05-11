@@ -13,6 +13,7 @@ import com.qcut.biz.views.ShopDetailsView;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -81,6 +82,7 @@ public class ShopDetailsPresenter {
         final ShopDetails.ShopDetailsBuilder builder = ShopDetails.builder();
         builder.email(view.getEmail()).name(view.getName()).password(view.getPassword())
                 .addressLine1(view.getAddressLine1()).status(shopDetails.getStatus())
+                .timezone(TimeZone.getDefault().getID())
                 .addressLine2(view.getAddressLine2()).shopName(view.getShopName()).gmapLink(view.getGmapLink())
                 .avgTimeToCut(view.getAvgTimeToCut()).city(view.getSelectedCity()).country(view.getSelectedCountry());
         if (shopDetails != null && StringUtils.isNotBlank(shopDetails.getKey())) {

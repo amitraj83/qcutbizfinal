@@ -17,6 +17,7 @@ import com.qcut.biz.views.activities.MainActivity;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -64,6 +65,7 @@ public class SignUpPresenter {
                     String key = dbRef.push().getKey();
                     ShopDetails shopDetails = ShopDetails.builder().key(key).email(email).password(view.getPassword())
                             .name(view.getShopContactName()).shopName(view.getShopName())
+                            .timezone(TimeZone.getDefault().getID())
                             .status(ShopStatus.OFFLINE.name()).build();
                     dbRef.child(key).setValue(shopDetails);
                     LogUtils.info("New ShopDetails are saved: {0}", shopDetails);

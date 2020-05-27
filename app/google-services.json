@@ -1,43 +1,86 @@
 {
   "project_info": {
-    "project_number": "965198029915",
-    "firebase_url": "https://qcutbiz.firebaseio.com",
-    "project_id": "qcutbiz",
-    "storage_bucket": "qcutbiz.appspot.com"
+    "project_number": "679003759994",
+    "firebase_url": "https://qcut-test.firebaseio.com",
+    "project_id": "qcut-test",
+    "storage_bucket": "qcut-test.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:965198029915:android:4f36e267c8020913c58b7e",
+        "mobilesdk_app_id": "1:679003759994:android:a335dc4fc01a68a26ee2c3",
         "android_client_info": {
-          "package_name": "com.qcut.biz"
+          "package_name": "com.qcut.barber"
         }
       },
       "oauth_client": [
         {
-          "client_id": "965198029915-p1fdosjn5kmln4pqrn0i0e0u3qubf8m7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.qcut.biz",
-            "certificate_hash": "9c09ecc00148f6cfde3ad8726416c3904249742a"
-          }
-        },
-        {
-          "client_id": "965198029915-ke8dr1k5hve5qi222fjgls67gg6l0pcj.apps.googleusercontent.com",
+          "client_id": "679003759994-jtv73sf0gros1mtrlc7fatkm21rg8esj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBesjWQsXzt-gWhx_uwCBtI0Idhy0ecOjQ"
+          "current_key": "AIzaSyAuj4-6MiqS04q9bb3vBjzzQs__szyneoU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "965198029915-ke8dr1k5hve5qi222fjgls67gg6l0pcj.apps.googleusercontent.com",
+              "client_id": "679003759994-jtv73sf0gros1mtrlc7fatkm21rg8esj.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "679003759994-a8p4nbsu9shuk1uae5642g08ehmbt0sm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qcut.ios.customer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679003759994:android:e974acd4c1d17f776ee2c3",
+        "android_client_info": {
+          "package_name": "com.qcut.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "679003759994-0a6rq83acmc8a3nnkcf9eivhuo66gqsv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.qcut.customer",
+            "certificate_hash": "9c09ecc00148f6cfde3ad8726416c3904249742a"
+          }
+        },
+        {
+          "client_id": "679003759994-jtv73sf0gros1mtrlc7fatkm21rg8esj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuj4-6MiqS04q9bb3vBjzzQs__szyneoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "679003759994-jtv73sf0gros1mtrlc7fatkm21rg8esj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "679003759994-a8p4nbsu9shuk1uae5642g08ehmbt0sm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.qcut.ios.customer"
+              }
             }
           ]
         }

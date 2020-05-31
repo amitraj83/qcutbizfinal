@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.qcut.barber.models.Barber;
 import com.qcut.barber.models.BarberQueue;
 import com.qcut.barber.models.ConfigParams;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DBUtils {
+
 
 
     public static DatabaseReference getDbRefShopStatus(FirebaseDatabase database, String userid) {

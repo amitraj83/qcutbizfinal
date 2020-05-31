@@ -48,6 +48,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/addTab"
             app:layout_constraintRight_toLeftOf="@id/stop_queue"
+            android:visibility="gone"
             />
 
         <com.google.android.material.button.MaterialButton

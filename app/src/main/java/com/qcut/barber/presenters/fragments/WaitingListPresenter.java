@@ -3,9 +3,15 @@ package com.qcut.barber.presenters.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.qcut.barber.adaptors.BarberSelectionArrayAdapter;
 import com.qcut.barber.adaptors.WaitingListRecyclerViewAdapter;
 import com.qcut.barber.eventbus.EventBus;
@@ -104,7 +110,44 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
             if (!anyBarber) {
                 customerBuilder.preferredBarberKey(selectedBarberKey);
             }
-            if (barbersMap.isEmpty()) {
+            /**
+             * var customerName = data.customerName;
+             *   console.log("customerName : "+customerName);
+             *   var customerKey = data.customerKey;
+             *   console.log("customerKey : "+customerKey);
+             *   var channel = data.channel;
+             *   console.log("channel : "+channel);
+             *   var shopKey = data.shopKey;
+             *   console.log("shopKey : "+shopKey);
+             *   var anyBarber = data.anyBarber;
+             *   console.log("Anybarber : "+anyBarber);
+             */
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("customerName", customerName);
+            data.put("customerKey", "");
+            data.put("channel", "DIRECT");
+            data.put("shopKey", userid);
+            data.put("anyBarber", anyBarber);
+
+            FirebaseFunctions.getInstance().getHttpsCallable("queueCustomer")
+                    .call(data)
+                    .continueWith(new Continuation<HttpsCallableResult, String>() {
+                        @Override
+                        public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
+                            // This continuation runs on either success or failure, but if the task
+                            // has failed then getResult() will throw an Exception which will be
+                            // propagated down.
+                            String result = (String) task.getResult().getData();
+                            if (result.equalsIgnoreCase("false")) {
+                                view.showMessage("Customer addition failed. Try again!");
+                            } else {
+                                view.showMessage("Success. Customer addition successful."+result);
+                            }
+                            return result;
+                        }
+                    });
+            /*if (barbersMap.isEmpty()) {
                 DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
                     @Override
                     public void onSuccess(Map<String, Barber> barbersMap) {
@@ -114,7 +157,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
                 });
             } else {
                 BarberSelectionUtils.assignBarber(database, userid, customerBuilder, barbersMap);
-            }
+            }*/
 
         } else {
             view.showMessage("Cannot add customer. No name provided");

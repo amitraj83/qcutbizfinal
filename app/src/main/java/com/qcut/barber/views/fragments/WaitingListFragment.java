@@ -31,6 +31,7 @@ import com.qcut.barber.adaptors.WaitingListRecyclerViewAdapter;
 import com.qcut.barber.listeners.ItemTouchHelperCallback;
 import com.qcut.barber.models.Customer;
 import com.qcut.barber.presenters.fragments.WaitingListPresenter;
+import com.qcut.barber.util.Constants;
 import com.qcut.barber.util.LogUtils;
 import com.qcut.barber.views.WaitingListView;
 
@@ -54,7 +55,7 @@ public class WaitingListFragment extends Fragment implements WaitingListView {
     private Button noButton;
     private EditText customerNameInput;
     private LayoutInflater factory;
-    private String selectedBarberKey;
+    private String selectedBarberKey = Constants.ANY;
     private View root;
 
     public WaitingListFragment(String tag) {

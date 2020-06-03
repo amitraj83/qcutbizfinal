@@ -18,9 +18,11 @@ import com.qcut.barber.events.RelocationRequestEvent;
 import com.qcut.barber.listeners.BarberQueueChangeListener;
 import com.qcut.barber.listeners.BarberStatusChangeListener;
 import com.qcut.barber.listeners.BarbersChangeListener;
+import com.qcut.barber.listeners.IResult;
 import com.qcut.barber.models.Barber;
 import com.qcut.barber.models.ShopStatus;
 import com.qcut.barber.util.BarberSelectionUtils;
+import com.qcut.barber.util.CloudFunctionsUtils;
 import com.qcut.barber.util.DBUtils;
 import com.qcut.barber.util.LogUtils;
 import com.qcut.barber.views.MainView;
@@ -136,20 +138,31 @@ public class MainPresenter implements BarbersChangeEvent.BarbersChangeEventHandl
         barberMap.clear();
         boolean online = false;
         for (Barber barber : event.getBarbers()) {
-            if(!barber.isStopped()){
+            if (!barber.isStopped()) {
                 online = true;
             }
             barberMap.put(barber.getKey(), barber);
         }
-        if(online){
+        if (online) {
             updateStatus(context.getString(R.string.status_online));
-        }else{
+        } else {
             updateStatus(context.getString(R.string.status_offline));
         }
     }
 
     @Override
     public void onRelocationRequested(RelocationRequestEvent event) {
-        BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
+//        BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
+        CloudFunctionsUtils.reallocate(userid, new IResult<String>() {
+            @Override
+            public void accept(String result) {
+                if (result.equalsIgnoreCase("false")) {
+                    view.showMessage("Reallocation failed!!!");
+                    LogUtils.info("Reallocation falied");
+                }else{
+                    LogUtils.info("Reallocation successful");
+                }
+            }
+        });
     }
 }

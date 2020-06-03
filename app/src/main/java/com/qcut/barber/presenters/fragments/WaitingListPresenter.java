@@ -3,30 +3,26 @@ package com.qcut.barber.presenters.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.functions.FirebaseFunctions;
-import com.google.firebase.functions.HttpsCallableResult;
 import com.qcut.barber.adaptors.BarberSelectionArrayAdapter;
 import com.qcut.barber.adaptors.WaitingListRecyclerViewAdapter;
 import com.qcut.barber.eventbus.EventBus;
 import com.qcut.barber.events.BarberQueuesChangeEvent;
 import com.qcut.barber.events.BarbersChangeEvent;
 import com.qcut.barber.events.QueueTabSelectedEvent;
+import com.qcut.barber.listeners.IResult;
 import com.qcut.barber.listeners.WaitingListClickListener;
 import com.qcut.barber.models.Barber;
 import com.qcut.barber.models.BarberQueue;
 import com.qcut.barber.models.Customer;
 import com.qcut.barber.models.CustomerComparator;
 import com.qcut.barber.models.ShopDetails;
-import com.qcut.barber.util.BarberSelectionUtils;
+import com.qcut.barber.util.CloudFunctionsUtils;
 import com.qcut.barber.util.Constants;
 import com.qcut.barber.util.DBUtils;
+import com.qcut.barber.util.LogUtils;
 import com.qcut.barber.views.WaitingListView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -101,7 +97,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
 
     public void onCustomerAddYesClick() {
         view.hideAddCustomerDialog();
-        final String selectedBarberKey = view.getSelectedBarberKey();
+        String selectedBarberKey = view.getSelectedBarberKey();
         final String customerName = view.getEnteredCustomerName();
         if (StringUtils.isNotBlank(customerName)) {
             final Customer.CustomerBuilder customerBuilder = Customer.builder();
@@ -110,43 +106,19 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
             if (!anyBarber) {
                 customerBuilder.preferredBarberKey(selectedBarberKey);
             }
-            /**
-             * var customerName = data.customerName;
-             *   console.log("customerName : "+customerName);
-             *   var customerKey = data.customerKey;
-             *   console.log("customerKey : "+customerKey);
-             *   var channel = data.channel;
-             *   console.log("channel : "+channel);
-             *   var shopKey = data.shopKey;
-             *   console.log("shopKey : "+shopKey);
-             *   var anyBarber = data.anyBarber;
-             *   console.log("Anybarber : "+anyBarber);
-             */
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("customerName", customerName);
-            data.put("customerKey", "");
-            data.put("channel", "DIRECT");
-            data.put("shopKey", userid);
-            data.put("anyBarber", anyBarber);
-
-            FirebaseFunctions.getInstance().getHttpsCallable("queueCustomer")
-                    .call(data)
-                    .continueWith(new Continuation<HttpsCallableResult, String>() {
-                        @Override
-                        public String then(@NonNull Task<HttpsCallableResult> task) throws Exception {
-                            // This continuation runs on either success or failure, but if the task
-                            // has failed then getResult() will throw an Exception which will be
-                            // propagated down.
-                            String result = (String) task.getResult().getData();
-                            if (result.equalsIgnoreCase("false")) {
-                                view.showMessage("Customer addition failed. Try again!");
-                            } else {
-                                view.showMessage("Success. Customer addition successful."+result);
-                            }
-                            return result;
-                        }
-                    });
+            selectedBarberKey = anyBarber ? "" : selectedBarberKey;
+            LogUtils.info("add customer/......");
+            CloudFunctionsUtils.queueCustomer(userid, customerName, "DIRECT", selectedBarberKey, new IResult<String>() {
+                @Override
+                public void accept(String result) {
+                    LogUtils.info("accept/......" + result);
+                    if (result.equalsIgnoreCase("false")) {
+                        view.showMessage("Customer addition failed. Try again!");
+                    } else {
+                        view.showMessage("Success. Customer addition successful." + result);
+                    }
+                }
+            });
             /*if (barbersMap.isEmpty()) {
                 DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
                     @Override

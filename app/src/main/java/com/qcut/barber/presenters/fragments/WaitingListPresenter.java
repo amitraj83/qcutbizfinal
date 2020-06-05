@@ -19,6 +19,7 @@ import com.qcut.barber.models.BarberQueue;
 import com.qcut.barber.models.Customer;
 import com.qcut.barber.models.CustomerComparator;
 import com.qcut.barber.models.ShopDetails;
+import com.qcut.barber.util.BarberSelectionUtils;
 import com.qcut.barber.util.CloudFunctionsUtils;
 import com.qcut.barber.util.Constants;
 import com.qcut.barber.util.DBUtils;
@@ -106,20 +107,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
             if (!anyBarber) {
                 customerBuilder.preferredBarberKey(selectedBarberKey);
             }
-            selectedBarberKey = anyBarber ? "" : selectedBarberKey;
-            LogUtils.info("add customer/......");
-            CloudFunctionsUtils.queueCustomer(userid, customerName, "DIRECT", selectedBarberKey, new IResult<String>() {
-                @Override
-                public void accept(String result) {
-                    LogUtils.info("accept/......" + result);
-                    if (result.equalsIgnoreCase("false")) {
-                        view.showMessage("Customer addition failed. Try again!");
-                    } else {
-                        view.showMessage("Success. Customer addition successful." + result);
-                    }
-                }
-            });
-            /*if (barbersMap.isEmpty()) {
+            if (barbersMap.isEmpty()) {
                 DBUtils.getBarbers(database, userid, new OnSuccessListener<Map<String, Barber>>() {
                     @Override
                     public void onSuccess(Map<String, Barber> barbersMap) {
@@ -129,7 +117,7 @@ public class WaitingListPresenter implements BarbersChangeEvent.BarbersChangeEve
                 });
             } else {
                 BarberSelectionUtils.assignBarber(database, userid, customerBuilder, barbersMap);
-            }*/
+            }
 
         } else {
             view.showMessage("Cannot add customer. No name provided");

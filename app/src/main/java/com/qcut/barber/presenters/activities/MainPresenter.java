@@ -152,17 +152,6 @@ public class MainPresenter implements BarbersChangeEvent.BarbersChangeEventHandl
 
     @Override
     public void onRelocationRequested(RelocationRequestEvent event) {
-//        BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
-        CloudFunctionsUtils.reallocate(userid, new IResult<String>() {
-            @Override
-            public void accept(String result) {
-                if (result.equalsIgnoreCase("false")) {
-                    view.showMessage("Reallocation failed!!!");
-                    LogUtils.info("Reallocation falied");
-                }else{
-                    LogUtils.info("Reallocation successful");
-                }
-            }
-        });
+        BarberSelectionUtils.reAllocateCustomers(database, userid, barberMap);
     }
 }
